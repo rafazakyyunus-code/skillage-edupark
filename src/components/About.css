@@ -1,0 +1,57 @@
+.about {
+  display: flex;
+  gap: 60px;
+  padding: 100px 80px;
+  background: #f8f9fb;
+}
+
+.about-image {
+  position: relative;
+}
+
+.about-image img {
+  width: 450px;
+  border-radius: 16px;
+}
+
+.experience {
+  position: absolute;
+  bottom: -20px;
+  right: -20px;
+  background: #16c35b;
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.about-content {
+  max-width: 550px;
+}
+
+.tag {
+  background: #e7f8ee;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #16c35b;
+  font-weight: 600;
+}
+
+.about-content h2 {
+  margin-top: 20px;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.about-content p {
+  margin-top: 15px;
+  line-height: 1.6;
+  color: #555;
+}
+
+.features {
+  display: flex;
+  gap: 40px;
+  margin-top: 20px;
+}
