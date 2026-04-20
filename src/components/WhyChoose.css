@@ -1,0 +1,39 @@
+.why {
+  padding: 100px 80px;
+  text-align: center;
+  background: white;
+}
+
+.why-header h2 {
+  font-size: 36px;
+  font-weight: 800;
+}
+
+.why-header p {
+  margin-top: 10px;
+  color: #666;
+}
+
+.why-cards {
+  margin-top: 60px;
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.why-card {
+  width: 260px;
+  background: #f8f9fb;
+  padding: 30px;
+  border-radius: 16px;
+  transition: 0.3s;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  cursor: pointer;
+}
+
+.why-card:hover {
+  background: #16c35b;
+  color: white;
+  box-shadow: 0 15px 35px rgba(22,195,91,0.3);
+}

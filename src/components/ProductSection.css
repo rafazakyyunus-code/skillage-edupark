@@ -1,0 +1,175 @@
+/* SECTION */
+.product-section {
+  padding: 80px 0;
+  background: #f5f7f6;
+}
+
+/* CONTAINER (CENTER FIX) */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+  width: 100%;
+}
+
+/* HEADER */
+.section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-header h2 {
+  font-size: 32px;
+  color: #0d2c54;
+}
+
+.section-header p {
+  max-width: 600px;
+  margin: 10px auto 0;
+  color: #555;
+  line-height: 1.6;
+}
+
+.underline {
+  width: 60px;
+  height: 4px;
+  background: #1cc88a;
+  margin: 10px auto;
+  border-radius: 10px;
+}
+
+/* GRID */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  justify-content: center;
+}
+
+/* CARD */
+.card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: 0.3s ease;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+}
+
+/* IMAGE */
+.card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+  background: #eee;
+  transition: 0.4s;
+}
+
+.card:hover img {
+  transform: scale(1.05);
+}
+
+/* BODY */
+.card-body {
+  padding: 18px;
+}
+
+.card-body h3 {
+  margin-bottom: 8px;
+  color: #0d2c54;
+}
+
+.card-body p {
+  font-size: 14px;
+  color: #666;
+}
+
+/* BUTTON */
+.card-btn {
+  margin-top: 12px;
+  padding: 8px 16px;
+  border: none;
+  background: #1cc88a;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.card-btn:hover {
+  background: #17a673;
+}
+
+/* BOTTOM BUTTON */
+.center-btn {
+  text-align: center;
+}
+
+.primary-btn {
+  margin-top: 40px;
+  padding: 12px 28px;
+  border: none;
+  background: #1cc88a;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.primary-btn:hover {
+  background: #17a673;
+  transform: scale(1.05);
+}
+
+/* ================= RESPONSIVE ================= */
+
+/* Laptop kecil */
+@media (max-width: 1024px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .product-section {
+    padding: 60px 0;
+  }
+
+  .section-header h2 {
+    font-size: 26px;
+  }
+
+  .card img {
+    height: 180px;
+  }
+}
+
+/* HP */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 14px;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    margin: 0 auto;
+  }
+
+  .section-header p {
+    font-size: 14px;
+  }
+
+  .primary-btn {
+    width: 100%;
+  }
+}

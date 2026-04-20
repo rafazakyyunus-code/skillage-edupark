@@ -1,0 +1,108 @@
+.footer {
+  background: linear-gradient(135deg, #0f3d1f, #0a1f12);
+  color: #ddd;
+  padding: 50px 20px 20px;
+  font-family: Arial, sans-serif;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+/* LEFT */
+.footer-left {
+  flex: 1;
+  min-width: 250px;
+}
+
+.logo {
+  color: #2ecc71;
+  margin-bottom: 10px;
+}
+
+.footer-left p {
+  font-size: 14px;
+  color: #bbb;
+}
+
+.social-icons {
+  margin-top: 15px;
+  display: flex;
+  gap: 15px;
+}
+
+.social-icons a {
+  font-size: 20px;
+  color: white;
+  transition: 0.3s;
+}
+
+/* HOVER WARNA SESUAI BRAND */
+.social-icons a:nth-child(1):hover {
+  color: #25D366; /* WhatsApp */
+}
+
+.social-icons a:nth-child(2):hover {
+  color: #E4405F; /* Instagram */
+}
+
+.social-icons a:nth-child(3):hover {
+  color: #1877F2; /* Facebook */
+}
+
+.social-icons a:nth-child(4):hover {
+  color: #000000; /* TikTok */
+}
+
+/* animasi dikit */
+.social-icons a:hover {
+  transform: translateY(-3px) scale(1.1);
+}
+
+/* MIDDLE */
+.footer-middle {
+  flex: 1;
+  min-width: 250px;
+}
+
+.footer-middle h3 {
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.footer-middle p {
+  font-size: 14px;
+  color: #bbb;
+}
+
+/* RIGHT */
+.footer-right {
+  flex: 1;
+  min-width: 250px;
+}
+
+.footer-right iframe {
+  width: 100%;
+  height: 150px;
+  border-radius: 10px;
+}
+
+/* BOTTOM */
+.footer-bottom {
+  text-align: center;
+  margin-top: 30px;
+  border-top: 1px solid #333;
+  padding-top: 15px;
+  font-size: 13px;
+  color: #888;
+}
+
+.map {
+  width: 100%;
+  height: 200px;
+  border-radius: 10px;
+  overflow: hidden;
+}

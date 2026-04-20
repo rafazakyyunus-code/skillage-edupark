@@ -1,59 +1,131 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Navbar.css";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null);
+
+  const toggleDropdown = (name) => {
+    setOpenDropdown((prev) => (prev === name ? null : name));
+  };
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+    setOpenDropdown(null);
+  };
+
+  // close saat resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 992) closeMenu();
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // close dropdown saat klik luar
+  useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (!e.target.closest(".dropdown")) {
+      setOpenDropdown(null);
+    }
+  };
+
+  document.addEventListener("click", handleClickOutside);
+  return () => document.removeEventListener("click", handleClickOutside);
+}, []);
 
   return (
-    <nav className="navbar">
-      <div className="logo">
-        🌿 <span>Edupark</span>
-      </div>
+    <>
+      <nav className="navbar">
+        <div className="nav-container">
 
-      <ul className={menuOpen ? "nav-links active" : "nav-links"}>
-  <li>Beranda</li>
-  <li>Tentang Kami</li>
+          {/* LOGO */}
+          <div className="logo">
+            🌿 <span>Edupark</span>
+          </div>
 
-  {/* DROPDOWN PROGRAM */}
-  <li className="dropdown">
-    Program Kami 
-    <ul className="dropdown-menu">
-      <li>Hydroponic</li>
-      <li>Venue Workshop</li>
-      <li>Peternakan</li>
-      <li>Venue Alam</li>
-    </ul>
-  </li>
+          {/* MENU */}
+          <ul className={menuOpen ? "nav-links active" : "nav-links"}>
 
-  <li>Galeri</li>
+            <li onClick={closeMenu}>Beranda</li>
+            <li onClick={closeMenu}>Tentang Kami</li>
 
-  {/* DROPDOWN PRODUK */}
-  <li className="dropdown">
-    Produk
-    <ul className="dropdown-menu">
-      <li>Semua Produk</li>
-      <li>Peternakan</li>
-      <li>Sayuran</li>
-      <li>Saprodi</li>
-    </ul>
-  </li>
+            {/* PROGRAM */}
+            <li className={`dropdown ${openDropdown === "program" ? "open" : ""}`}>
+              <span
+                className="dropdown-title"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleDropdown("program");
+                }}
+              >
+                Program Kami
+                <svg className="chevron" viewBox="0 0 24 24">
+                  <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+              </span>
 
-  <li>Artikel</li>
-  <li>E-tiket</li>
+              <ul className={openDropdown === "program" ? "dropdown-menu show" : "dropdown-menu"}>
+                <li onClick={closeMenu}>Hydroponic</li>
+                <li onClick={closeMenu}>Venue Workshop</li>
+                <li onClick={closeMenu}>Peternakan</li>
+                <li onClick={closeMenu}>Venue Alam</li>
+              </ul>
+            </li>
 
-  <button className="btn-contact mobile-btn">Hubungi Kami</button>
-</ul>
+            <li onClick={closeMenu}>Galeri</li>
 
-      <button className="btn-contact desktop-btn">Hubungi Kami</button>
+            {/* PRODUK */}
+            <li className={`dropdown ${openDropdown === "produk" ? "open" : ""}`}>
+              <span
+                className="dropdown-title"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleDropdown("produk");
+                }}
+              >
+                Produk
+                <svg className="chevron" viewBox="0 0 24 24">
+                  <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+              </span>
 
-      <div
-        className={menuOpen ? "hamburger open" : "hamburger"}
-        onClick={() => setMenuOpen(!menuOpen)}
-      >
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    </nav>
+              <ul className={openDropdown === "produk" ? "dropdown-menu show" : "dropdown-menu"}>
+                <li onClick={closeMenu}>Semua Produk</li>
+                <li onClick={closeMenu}>Peternakan</li>
+                <li onClick={closeMenu}>Sayuran</li>
+                <li onClick={closeMenu}>Saprodi</li>
+              </ul>
+            </li>
+
+            <li onClick={closeMenu}>Artikel</li>
+            <li onClick={closeMenu}>E-Tiket</li>
+          </ul>
+
+          {/* BUTTON */}
+          <button className="btn-contact desktop-btn">
+            Hubungi Kami
+          </button>
+
+          {/* HAMBURGER */}
+          <div
+            className={menuOpen ? "hamburger open" : "hamburger"}
+            onClick={(e) => {
+              e.stopPropagation();
+              setMenuOpen(!menuOpen);
+            }}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </nav>
+
+      {/* OVERLAY */}
+      {menuOpen && <div className="overlay" onClick={closeMenu} />}
+    </>
   );
 }
