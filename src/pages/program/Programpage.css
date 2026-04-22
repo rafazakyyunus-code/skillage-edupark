@@ -1,0 +1,351 @@
+/* ===== ProgramPage.css ===== */
+/* Digunakan oleh semua halaman program: Hydroponic, VenueWorkshop, Peternakan, VenueAlam */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+
+/* ===== HERO ===== */
+.program-hero {
+  position: relative;
+  min-height: 100vh;
+  padding-top: 80px; /* offset navbar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Background per halaman */
+.hydroponic-hero {
+  background: linear-gradient(135deg, #0a3d1f 0%, #16c35b 50%, #0d5c2e 100%);
+}
+
+.workshop-hero {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+.peternakan-hero {
+  background: linear-gradient(135deg, #5d4037 0%, #8d6e63 50%, #4e342e 100%);
+}
+
+.venuealam-hero {
+  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #388e3c 100%);
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 700px;
+  padding: 0 20px;
+  animation: fadeUp 0.8s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  padding: 6px 18px;
+  border-radius: 50px;
+  font-size: 14px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.hero-content h1 {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 800;
+  margin: 0 0 16px;
+  line-height: 1.1;
+}
+
+.hero-content p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.hero-btns {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ===== BUTTONS ===== */
+.btn-primary {
+  background: #16c35b;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  transition: all 0.3s;
+  display: inline-block;
+}
+
+.btn-primary:hover {
+  background: #0fa64b;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(22,195,91,0.4);
+}
+
+.btn-outline {
+  background: transparent;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  border: 2px solid rgba(255,255,255,0.6);
+  transition: all 0.3s;
+  display: inline-block;
+}
+
+.btn-outline:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: white;
+}
+
+/* ===== CONTAINER ===== */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ===== ABOUT SECTION ===== */
+.program-about {
+  padding: 90px 0;
+  background: #fff;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.tag {
+  display: inline-block;
+  color: #16c35b;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.about-text h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  line-height: 1.25;
+  margin: 0 0 20px;
+}
+
+.about-text h2 .green {
+  color: #16c35b;
+}
+
+.about-text p {
+  color: #555;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.stats-row {
+  display: flex;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat strong {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #16c35b;
+}
+
+.stat span {
+  font-size: 13px;
+  color: #888;
+}
+
+.about-visual {
+  display: flex;
+  justify-content: center;
+}
+
+.visual-card {
+  background: linear-gradient(135deg, #e8f9ef, #c8f2d8);
+  border-radius: 24px;
+  padding: 60px 40px;
+  text-align: center;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 20px 50px rgba(22,195,91,0.12);
+}
+
+.visual-icon {
+  font-size: 5rem;
+  margin-bottom: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.visual-card p {
+  color: #2d6a4f;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* ===== FEATURES ===== */
+.program-features {
+  padding: 90px 0;
+  background: #f9fafb;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 50px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 24px;
+}
+
+.feature-card {
+  background: white;
+  border-radius: 20px;
+  padding: 36px 28px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  transition: all 0.3s;
+  border: 1px solid #f0f0f0;
+}
+
+.feature-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 35px rgba(22,195,91,0.12);
+  border-color: #16c35b;
+}
+
+.feature-icon {
+  font-size: 2.8rem;
+  margin-bottom: 16px;
+}
+
+.feature-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 10px;
+}
+
+.feature-card p {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ===== PLANTS ===== */
+.program-plants {
+  padding: 90px 0;
+  background: white;
+}
+
+.plants-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+}
+
+.plant-chip {
+  background: #e8f9ef;
+  color: #16c35b;
+  padding: 10px 22px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 15px;
+  border: 2px solid #c8f2d8;
+  transition: all 0.3s;
+  cursor: default;
+}
+
+.plant-chip:hover {
+  background: #16c35b;
+  color: white;
+  border-color: #16c35b;
+  transform: scale(1.05);
+}
+
+/* ===== CTA ===== */
+.program-cta {
+  background: linear-gradient(135deg, #0a3d1f, #16c35b);
+  padding: 100px 0;
+  text-align: center;
+  color: white;
+}
+
+.program-cta h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.program-cta p {
+  font-size: 1.1rem;
+  opacity: 0.85;
+  margin-bottom: 36px;
+}
+
+.cta-btns {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .stats-row {
+    gap: 20px;
+  }
+
+  .program-cta h2 {
+    font-size: 1.8rem;
+  }
+}
