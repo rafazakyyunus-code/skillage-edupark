@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+
+import { Link } from "react-router-dom";
+
 import "./Navbar.css";
 
 export default function Navbar() {
@@ -49,60 +52,64 @@ export default function Navbar() {
           {/* MENU */}
           <ul className={menuOpen ? "nav-links active" : "nav-links"}>
 
-            <li onClick={closeMenu}>Beranda</li>
-            <li onClick={closeMenu}>Tentang Kami</li>
+<li>
+  <Link to="/" onClick={closeMenu}>Beranda</Link>
+</li>
 
-            {/* PROGRAM */}
-            <li className={`dropdown ${openDropdown === "program" ? "open" : ""}`}>
-              <span
-                className="dropdown-title"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleDropdown("program");
-                }}
-              >
-                Program Kami
-                <svg className="chevron" viewBox="0 0 24 24">
-                  <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2"/>
-                </svg>
-              </span>
+  <li onClick={closeMenu}>Tentang Kami</li>
 
-              <ul className={openDropdown === "program" ? "dropdown-menu show" : "dropdown-menu"}>
-                <li onClick={closeMenu}>Hydroponic</li>
-                <li onClick={closeMenu}>Venue Workshop</li>
-                <li onClick={closeMenu}>Peternakan</li>
-                <li onClick={closeMenu}>Venue Alam</li>
-              </ul>
-            </li>
+  {/* PROGRAM */}
+  <li className={`dropdown ${openDropdown === "program" ? "open" : ""}`}>
+    <span
+      className="dropdown-title"
+      onClick={(e) => {
+        e.stopPropagation();
+        toggleDropdown("program");
+      }}
+    >
+      Program Kami
+      <svg className="chevron" viewBox="0 0 24 24">
+        <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2"/>
+      </svg>
+    </span>
 
-            <li onClick={closeMenu}>Galeri</li>
+    <ul className={openDropdown === "program" ? "dropdown-menu show" : "dropdown-menu"}>
+      <li><Link to="/program/hydroponic" onClick={closeMenu}>Hydroponic</Link></li>
+      <li><Link to="/program/venue-workshop" onClick={closeMenu}>Venue Workshop</Link></li>
+      <li><Link to="/program/peternakan" onClick={closeMenu}>Peternakan</Link></li>
+      <li><Link to="/program/venue-alam" onClick={closeMenu}>Venue Alam</Link></li>
+    </ul>
+  </li>
 
-            {/* PRODUK */}
-            <li className={`dropdown ${openDropdown === "produk" ? "open" : ""}`}>
-              <span
-                className="dropdown-title"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleDropdown("produk");
-                }}
-              >
-                Produk
-                <svg className="chevron" viewBox="0 0 24 24">
-                  <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2"/>
-                </svg>
-              </span>
+  <li onClick={closeMenu}>Galeri</li>
 
-              <ul className={openDropdown === "produk" ? "dropdown-menu show" : "dropdown-menu"}>
-                <li onClick={closeMenu}>Semua Produk</li>
-                <li onClick={closeMenu}>Peternakan</li>
-                <li onClick={closeMenu}>Sayuran</li>
-                <li onClick={closeMenu}>Saprodi</li>
-              </ul>
-            </li>
+  {/* PRODUK */}
+  <li className={`dropdown ${openDropdown === "produk" ? "open" : ""}`}>
+    <span
+      className="dropdown-title"
+      onClick={(e) => {
+        e.stopPropagation();
+        toggleDropdown("produk");
+      }}
+    >
+      Produk
+      <svg className="chevron" viewBox="0 0 24 24">
+        <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2"/>
+      </svg>
+    </span>
 
-            <li onClick={closeMenu}>Artikel</li>
-            <li onClick={closeMenu}>E-Tiket</li>
-          </ul>
+    <ul className={openDropdown === "produk" ? "dropdown-menu show" : "dropdown-menu"}>
+      <li onClick={closeMenu}>Semua Produk</li>
+      <li onClick={closeMenu}>Peternakan</li>
+      <li onClick={closeMenu}>Sayuran</li>
+      <li onClick={closeMenu}>Saprodi</li>
+    </ul>
+  </li>
+
+  <li onClick={closeMenu}>Artikel</li>
+  <li onClick={closeMenu}>E-Tiket</li>
+
+</ul>
 
           {/* BUTTON */}
           <button className="btn-contact desktop-btn">
