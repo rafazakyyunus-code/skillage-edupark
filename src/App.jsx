@@ -9,8 +9,10 @@ import About from "./components/About";
 import WhyChoose from "./components/WhyChoose";
 import ProductSection from "./components/ProductSection";
 import ProgramSection from "./components/ProgramSection";
-import GallerySection from "./components/GallerySection";
 import CTA from "./components/CTA";
+
+import Gallery from "./pages/gallery/Gallery";
+import GalleryDetail from "./pages/gallery/GalleryDetail";
 
 import Hydroponic from "./pages/program/Hydroponic";
 import VenueWorkshop from "./pages/program/Venueworkshop";
@@ -33,17 +35,19 @@ function App() {
               <WhyChoose />
               <ProductSection />
               <ProgramSection />
-              <GallerySection />
               <CTA />
             </>
           }
         />
 
-        {/* HALAMAN PROGRAM */}
+                       {/* HALAMAN PROGRAM */}
         <Route path="/program/hydroponic" element={<Hydroponic />} />
         <Route path="/program/venue-workshop" element={<VenueWorkshop />} />
         <Route path="/program/peternakan" element={<Peternakan />} />
         <Route path="/program/venue-alam" element={<VenueAlam />} />
+                        {/* bagian gallery */}
+       <Route path="/gallery" element={<Gallery />} />
+       <Route path="/gallery/:id" element={<GalleryDetail />} />
       </Routes>
 
       <Footer />

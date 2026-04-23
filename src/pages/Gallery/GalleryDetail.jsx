@@ -5,6 +5,10 @@ import "./GalleryDetail.css"
 export default function GalleryDetail() {
   const { id } = useParams()
   const item = galleryData.find(d => d.id === parseInt(id))
+  
+  if (!item) {
+  return <h2 style={{ padding: "120px" }}>Data tidak ditemukan</h2>;
+}
 
   return (
     <div className="detail-container">

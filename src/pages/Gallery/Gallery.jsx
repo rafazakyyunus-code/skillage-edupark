@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import "./Gallery.css"
+import "./Gallery.css";
 import galleryData from "./GalleryData"
 
 const itemsPerPage = 4

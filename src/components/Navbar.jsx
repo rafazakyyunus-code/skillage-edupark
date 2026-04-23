@@ -83,7 +83,9 @@ export default function Navbar() {
     </ul>
   </li>
 
-  <li onClick={closeMenu}>Galeri</li>
+ <li>
+  <Link to="/gallery" onClick={closeMenu}>Galeri</Link>
+</li>
 
   {/* PRODUK */}
   <li className={`dropdown ${openDropdown === "produk" ? "open" : ""}`}>
