@@ -112,29 +112,25 @@ export default function Navbar() {
 
               <ul className={openDropdown === "produk" ? "dropdown-menu show" : "dropdown-menu"}>
                 <li>
-                  <NavLink to="/produk" onClick={closeMenu}
-                    className={({ isActive }) => isActive ? "active" : ""}>
+                  <NavLink to="/produk" onClick={closeMenu}>
                     Semua Produk
                   </NavLink>
                 </li>
 
                 <li>
-                  <NavLink to="/produk/peternakan" onClick={closeMenu}
-                    className={({ isActive }) => isActive ? "active" : ""}>
+                  <NavLink to="/produk/kategori/hewan-peternakan" onClick={closeMenu}>
                     Peternakan
                   </NavLink>
                 </li>
 
                 <li>
-                  <NavLink to="/produk/sayuran" onClick={closeMenu}
-                    className={({ isActive }) => isActive ? "active" : ""}>
+                  <NavLink to="/produk/kategori/sayuran" onClick={closeMenu}>
                     Sayuran
                   </NavLink>
                 </li>
 
                 <li>
-                  <NavLink to="/produk/saprodi" onClick={closeMenu}
-                    className={({ isActive }) => isActive ? "active" : ""}>
+                  <NavLink to="/produk/kategori/saprodi" onClick={closeMenu}>
                     Saprodi
                   </NavLink>
                 </li>
@@ -181,3 +177,4 @@ export default function Navbar() {
     </>
   );
 }
+
