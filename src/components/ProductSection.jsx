@@ -1,25 +1,26 @@
 import { motion } from "framer-motion";
 import "./ProductSection.css";
 
+
 const products = [
   {
     title: "Pupuk Bokashi",
-    img: "/images/bokashi.jpg",
+    img: "https://picsum.photos/300?random=1",
     desc: "Exploring plant biology and cultural practices in our living laboratory.",
   },
   {
     title: "Terong Ungu",
-    img: "/images/terong.jpg",
+    img: "https://picsum.photos/300?random=2",
     desc: "Studying local crop species and insect ecosystems in protected habitats.",
   },
   {
     title: "Toge",
-    img: "/images/toge.jpg",
+    img: "https://picsum.photos/300?random=3",
     desc: "Hands-on organic farming skills from seed germination to harvesting.",
   },
   {
     title: "Cabe-Cabean",
-    img: "/images/cabe.jpg",
+    img: "https://picsum.photos/300?random=4",
     desc: "Creative expression using natural pigments and organic materials.",
   },
 ];
@@ -59,9 +60,10 @@ export default function ProductSection() {
               <img
                 src={item.img}
                 alt={item.title}
-                onError={(e) =>
-                  (e.target.src = "https://via.placeholder.com/300")
-                }
+                onError={(e) => {
+                  console.log("Image error:", item.img);
+                  e.target.src = "https://via.placeholder.com/300";
+                }}
               />
 
               <div className="card-body">

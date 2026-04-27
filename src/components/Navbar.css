@@ -9,8 +9,7 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
-
-/* NAVBAR */
+/* ================= NAVBAR ================= */
 .navbar {
   position: fixed;
   top: 0;
@@ -22,17 +21,6 @@ body {
 
   transform: translateY(-100%);
   animation: navbarSlide 0.6s ease forwards;
-}
-
-.nav-container {
-  max-width: 1200px;
-  margin: auto;
-  height: 70px;
-  padding: 0 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap; /* 🔥 penting */
 }
 
 @keyframes navbarSlide {
@@ -49,9 +37,10 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
 }
 
-/* LOGO */
+/* ================= LOGO ================= */
 .logo {
   font-size: 20px;
   font-weight: 700;
@@ -61,13 +50,27 @@ body {
   gap: 8px;
 }
 
-/* NAV */
+/* ================= NAV LINKS ================= */
 .nav-links {
   list-style: none;
   display: flex;
-  gap: 28px;
   align-items: center;
-  gap: 20px; /* sebelumnya 28px terlalu lebar */
+  gap: 20px;
+}
+
+.nav-links li {
+  cursor: pointer;
+  font-weight: 500;
+  position: relative;
+  transition: 0.3s;
+  white-space: nowrap;
+  width: 100%;
+  padding: 10px 0;
+}
+
+/* garis pembatas */
+.nav-links li:not(:last-child) {
+  border-bottom: 1px solid rgba(22, 195, 91, 0.15);
 }
 
 .nav-links a {
@@ -79,17 +82,7 @@ body {
   color: black;
 }
 
-.nav-links a:hover {
-  color: #16c35b;
-}
-.nav-links li {
-  cursor: pointer;
-  font-weight: 500;
-  position: relative;
-  transition: 0.3s;
-  white-space: nowrap;
-}
-
+.nav-links a:hover,
 .nav-links li:hover {
   color: #16c35b;
 }
@@ -111,7 +104,16 @@ body {
   width: 100%;
 }
 
-/* BUTTON */
+.nav-links a.active {
+  color: #16c35b;
+  font-weight: 600;
+}
+
+.nav-links a.active::after {
+  width: 100%;
+}
+
+/* ================= BUTTON ================= */
 .btn-contact {
   background: #16c35b;
   border: none;
@@ -121,7 +123,7 @@ body {
   cursor: pointer;
 }
 
-/* DROPDOWN */
+/* ================= DROPDOWN ================= */
 .dropdown {
   position: relative;
 }
@@ -131,6 +133,13 @@ body {
   align-items: center;
   gap: 6px;
   cursor: pointer;
+  font-weight: 500;
+  font-size: 16px;
+  color: black;
+}
+
+.dropdown.active .dropdown-title {
+  color: #16c35b;
 }
 
 .chevron {
@@ -142,18 +151,18 @@ body {
   transform: rotate(180deg);
 }
 
+/* menu */
 .dropdown-menu {
   list-style: none;
   padding: 8px;
   position: absolute;
   top: 50px;
   left: 0;
-  background: white;
   min-width: 220px;
   border-radius: 14px;
 
-  box-shadow: 0 15px 35px rgba(0,0,0,0.08);
   background: #f8f8f8;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.08);
 
   opacity: 0;
   visibility: hidden;
@@ -161,64 +170,55 @@ body {
   transition: all 0.25s ease;
 }
 
-/* SHOW */
 .dropdown-menu.show {
   opacity: 1;
   visibility: visible;
   transform: translateY(0) scale(1);
 }
 
-/* ITEM */
+/* item */
 .dropdown-menu li {
-  padding: 12px 16px;
-  border-radius: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(22, 195, 91, 0.2);
+  background: #fff;
   transition: all 0.25s ease;
 }
 
-/* LINK FULL WIDTH */
 .dropdown-menu a {
   display: block;
   width: 100%;
-  color: #222;
-  text-decoration: none;
-  font-size: 14px;
-}
-
-/* 🔥 HOVER KEREN */
-.dropdown-menu li:hover {
-  background: rgba(22, 195, 91, 0.1);
+  font-size: 15px;
+  font-weight: 400;
   color: #16c35b;
-  transform: translateX(5px);
+  text-decoration: none;
 }
 
-/* TEXT IKUT HIJAU */
+/* hover */
+.dropdown-menu li:hover {
+  background: rgba(22, 195, 91, 0.08);
+  transform: translateX(3px);
+}
+
 .dropdown-menu li:hover a {
   color: #16c35b;
 }
 
-
-
-.dropdown-menu a {
-  display: block;
-  width: 100%;
-  color: black;
+/* active item dropdown */
+.dropdown-menu a.active {
+  color: #16c35b;
+  font-weight: 600;
+  background: rgba(22, 195, 91, 0.1);
+  border-radius: 8px;
+  padding-left: 10px;
 }
 
-.dropdown-menu.show {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
+.dropdown-menu a.active::after {
+  display: none;
 }
 
-.dropdown-menu li {
-  padding: 10px 20px;
-}
-
-.dropdown-menu li:hover {
-  background: #f5f5f5;
-}
-
-/* HAMBURGER */
+/* ================= HAMBURGER ================= */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -231,9 +231,8 @@ body {
   background: black;
 }
 
-/* MOBILE */
+/* ================= MOBILE ================= */
 @media (max-width: 1200px) {
-
   .nav-links {
     position: fixed;
     top: 70px;
@@ -243,18 +242,15 @@ body {
     background: white;
     flex-direction: column;
     padding: 20px;
+    padding-bottom: 40px;
     gap: 16px;
     font-size: 14px;
     transition: 0.4s;
     z-index: 1000;
-    padding-bottom: 40px;
-    display: flex;
-    
 
-    overflow-y: auto;      /* ✅ biar bisa scroll */
-    -webkit-overflow-scrolling: touch; /* biar smooth di HP */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
-  
 
   .nav-links.active {
     right: 0;
@@ -264,9 +260,9 @@ body {
     width: 100%;
   }
 
-  /* 🔥 FIX DROPDOWN MOBILE */
+  /* dropdown mobile */
   .dropdown-menu {
-    position: relative;   /* ⬅️ ini kunci */
+    position: relative;
     top: 0;
     left: 0;
     width: 100%;
@@ -277,11 +273,11 @@ body {
     visibility: visible;
     transform: none;
 
-    display: none; /* default hidden */
+    display: none;
   }
 
   .dropdown-menu.show {
-    display: block; /* muncul ke bawah */
+    display: block;
   }
 
   .dropdown-menu li {
@@ -298,50 +294,9 @@ body {
   }
 }
 
-/* OVERLAY */
+/* ================= OVERLAY ================= */
 .overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.4);
-}
-
-/* PEMBATAS ANTAR MENU */
-.nav-links li {
-  width: 100%;
-  padding: 10px 0;
-}
-
-/* garis pembatas */
-.nav-links li:not(:last-child) {
-  border-bottom: 1px solid rgba(0,0,0,0.08);
-}
-
-.nav-links li:not(:last-child) {
-  border-bottom: 1px solid rgba(22, 195, 91, 0.15);
-}
-
-.dropdown-title {
-  font-weight: 500;
-  font-size: 16px;
-  color: #16c35b;
-}
-
-.dropdown-menu li {
-  padding: 14px 16px;
-  border-radius: 12px;
-  margin-bottom: 8px;
-  border: 1px solid rgba(22, 195, 91, 0.2);
-  background: #fff;
-}
-
-.dropdown-menu a {
-  font-size: 15px;
-  font-weight: 400;
-  color: #16c35b;
-}
-
-/* hover biar halus */
-.dropdown-menu li:hover {
-  background: rgba(22, 195, 91, 0.08);
-  transform: translateX(3px);
 }

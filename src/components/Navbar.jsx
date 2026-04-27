@@ -1,14 +1,12 @@
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet"></link>
-
 import { useState, useEffect } from "react";
-
-import { Link } from "react-router-dom";
-
+import { NavLink, useLocation } from "react-router-dom";
 import "./Navbar.css";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
+
+  const location = useLocation();
 
   const toggleDropdown = (name) => {
     setOpenDropdown((prev) => (prev === name ? null : name));
@@ -19,27 +17,26 @@ export default function Navbar() {
     setOpenDropdown(null);
   };
 
-  // close saat resize
+  const isProgramActive = location.pathname.startsWith("/program");
+  const isProdukActive = location.pathname.startsWith("/produk");
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 992) closeMenu();
     };
-
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // close dropdown saat klik luar
   useEffect(() => {
-  const handleClickOutside = (e) => {
-    if (!e.target.closest(".dropdown")) {
-      setOpenDropdown(null);
-    }
-  };
-
-  document.addEventListener("click", handleClickOutside);
-  return () => document.removeEventListener("click", handleClickOutside);
-}, []);
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".dropdown")) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
 
   return (
     <>
@@ -54,66 +51,111 @@ export default function Navbar() {
           {/* MENU */}
           <ul className={menuOpen ? "nav-links active" : "nav-links"}>
 
-<li>
-  <Link to="/" onClick={closeMenu}>Beranda</Link>
-</li>
+            <li>
+              <NavLink to="/" onClick={closeMenu}
+                className={({ isActive }) => isActive ? "active" : ""}>
+                Beranda
+              </NavLink>
+            </li>
 
-  <li onClick={closeMenu}>Tentang Kami</li>
+            <li>
+              <NavLink to="/tentang" onClick={closeMenu}
+                className={({ isActive }) => isActive ? "active" : ""}>
+                Tentang Kami
+              </NavLink>
+            </li>
 
-  {/* PROGRAM */}
-  <li className={`dropdown ${openDropdown === "program" ? "open" : ""}`}>
-    <span
-      className="dropdown-title"
-      onClick={(e) => {
-        e.stopPropagation();
-        toggleDropdown("program");
-      }}
-    >
-      Program Kami
-      <svg className="chevron" viewBox="0 0 24 24">
-        <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2"/>
-      </svg>
-    </span>
+            {/* PROGRAM */}
+            <li className={`dropdown ${openDropdown === "program" ? "open" : ""} ${isProgramActive ? "active" : ""}`}>
+              <span
+                className="dropdown-title"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleDropdown("program");
+                }}
+              >
+                Program Kami
+                <svg className="chevron" viewBox="0 0 24 24">
+                  <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+              </span>
 
-    <ul className={openDropdown === "program" ? "dropdown-menu show" : "dropdown-menu"}>
-      <li><Link to="/program/hydroponic" onClick={closeMenu}>Hydroponic</Link></li>
-      <li><Link to="/program/venue-workshop" onClick={closeMenu}>Venue Workshop</Link></li>
-      <li><Link to="/program/peternakan" onClick={closeMenu}>Peternakan</Link></li>
-      <li><Link to="/program/venue-alam" onClick={closeMenu}>Venue Alam</Link></li>
-    </ul>
-  </li>
+              <ul className={openDropdown === "program" ? "dropdown-menu show" : "dropdown-menu"}>
+                <li><NavLink to="/program/hydroponic" onClick={closeMenu}>Hydroponic</NavLink></li>
+                <li><NavLink to="/program/venue-workshop" onClick={closeMenu}>Venue Workshop</NavLink></li>
+                <li><NavLink to="/program/peternakan" onClick={closeMenu}>Peternakan</NavLink></li>
+                <li><NavLink to="/program/venue-alam" onClick={closeMenu}>Venue Alam</NavLink></li>
+              </ul>
+            </li>
 
- <li>
-  <Link to="/gallery" onClick={closeMenu}>Galeri</Link>
-</li>
+            <li>
+              <NavLink to="/gallery" onClick={closeMenu}
+                className={({ isActive }) => isActive ? "active" : ""}>
+                Galeri
+              </NavLink>
+            </li>
 
-  {/* PRODUK */}
-  <li className={`dropdown ${openDropdown === "produk" ? "open" : ""}`}>
-    <span
-      className="dropdown-title"
-      onClick={(e) => {
-        e.stopPropagation();
-        toggleDropdown("produk");
-      }}
-    >
-      Produk
-      <svg className="chevron" viewBox="0 0 24 24">
-        <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2"/>
-      </svg>
-    </span>
+            {/* PRODUK */}
+            <li className={`dropdown ${openDropdown === "produk" ? "open" : ""} ${isProdukActive ? "active" : ""}`}>
+              <span
+                className="dropdown-title"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleDropdown("produk");
+                }}
+              >
+                Produk
+                <svg className="chevron" viewBox="0 0 24 24">
+                  <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+              </span>
 
-    <ul className={openDropdown === "produk" ? "dropdown-menu show" : "dropdown-menu"}>
-      <li onClick={closeMenu}>Semua Produk</li>
-      <li onClick={closeMenu}>Peternakan</li>
-      <li onClick={closeMenu}>Sayuran</li>
-      <li onClick={closeMenu}>Saprodi</li>
-    </ul>
-  </li>
+              <ul className={openDropdown === "produk" ? "dropdown-menu show" : "dropdown-menu"}>
+                <li>
+                  <NavLink to="/produk" onClick={closeMenu}
+                    className={({ isActive }) => isActive ? "active" : ""}>
+                    Semua Produk
+                  </NavLink>
+                </li>
 
-  <li onClick={closeMenu}>Artikel</li>
-  <li onClick={closeMenu}>E-Tiket</li>
+                <li>
+                  <NavLink to="/produk/peternakan" onClick={closeMenu}
+                    className={({ isActive }) => isActive ? "active" : ""}>
+                    Peternakan
+                  </NavLink>
+                </li>
 
-</ul>
+                <li>
+                  <NavLink to="/produk/sayuran" onClick={closeMenu}
+                    className={({ isActive }) => isActive ? "active" : ""}>
+                    Sayuran
+                  </NavLink>
+                </li>
+
+                <li>
+                  <NavLink to="/produk/saprodi" onClick={closeMenu}
+                    className={({ isActive }) => isActive ? "active" : ""}>
+                    Saprodi
+                  </NavLink>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <NavLink to="/artikel" onClick={closeMenu}
+                className={({ isActive }) => isActive ? "active" : ""}>
+                Artikel
+              </NavLink>
+            </li>
+
+            <li>
+              <NavLink to="/tiket" onClick={closeMenu}
+                className={({ isActive }) => isActive ? "active" : ""}>
+                E-Tiket
+              </NavLink>
+            </li>
+
+          </ul>
 
           {/* BUTTON */}
           <button className="btn-contact desktop-btn">
@@ -135,7 +177,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* OVERLAY */}
       {menuOpen && <div className="overlay" onClick={closeMenu} />}
     </>
   );
