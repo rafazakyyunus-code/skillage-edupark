@@ -58,11 +58,15 @@ export default function Navbar() {
                 </NavLink>
               </li>
 
-              <li>
-                <NavLink to="/tentang" onClick={closeMenu}>
-                  Tentang Kami
-                </NavLink>
-              </li>
+            <li>
+              <NavLink 
+                to="/tentang-kami" 
+                onClick={closeMenu}
+                className={({ isActive }) => isActive ? "active" : ""}
+              >
+                Tentang Kami
+              </NavLink>
+            </li>
 
               {/* PROGRAM */}
               <li className={`dropdown ${openDropdown === "program" ? "open" : ""} ${isProgramActive ? "active" : ""}`}>

@@ -1,0 +1,336 @@
+.tk-hero {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+
+  /* ANTI NAVBAR NUTUP */
+  padding-top: 80px;
+}
+
+.tk-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 40, 25, 0.6);
+}
+
+.tk-hero-content {
+  position: relative;
+  text-align: center;
+  color: white;
+  max-width: 800px;
+  padding: 0 24px;
+  transform: scale(1);
+}
+
+.tk-hero-tag {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #7dffb3;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: inline-block;
+}
+
+.tk-hero-content h1 {
+  /*font-family: "Playfair Display", serifc:\codingan\skillage-edupark\skillage-edupark;*/
+  font-size: clamp(28px, 5vw, 56px);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.tk-hero-content p {
+  font-family: "Inter", sans-serif;
+  font-size: clamp(14px, 2vw, 18px);
+  line-height: 1.7;
+  color: #eaeaea;
+}
+
+/* SECTION TAG */
+.section-tag {
+  color: #22c55e;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 8px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.section-tag.center {
+  text-align: center;
+}
+
+/* JOURNEY */
+.tk-journey {
+  padding: 80px 24px;
+  background: #fff;
+}
+
+.tk-journey-container {
+  max-width: 1100px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+
+.tk-journey img {
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.tk-journey img:hover {
+  transform: scale(1.02) translateY(-4px);
+  box-shadow: 0 25px 50px rgba(34, 197, 94, 0.18);
+}
+
+.tk-journey-text {
+  animation: fadeUp 1s ease forwards;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tk-journey-text h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #0f172a;
+}
+
+.tk-journey-text h4 {
+  font-family: 'Poppins regular', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  margin-top: 18px;
+  color: #4b5563;
+  position: relative;
+  padding-left: 14px;
+}
+
+.tk-journey-text h4::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 4px;
+  height: 16px;
+  background: #22c55e;
+  border-radius: 2px;
+}
+
+.tk-journey-text p {
+  font-family: 'Poppins regular', sans-serif;
+  margin-bottom: 20px;
+  text-align: justify;
+  line-height: 1.8;
+  font-size: clamp(18px, 1.5vw, 18px);
+  color: #4b5563;
+}
+
+.tk-journey-text h4 {
+  position: relative;
+  padding-left: 14px;
+}
+
+/* REASON */
+.tk-reason {
+  padding: 80px 24px;
+  text-align: center;
+  background: #f8faf9;
+}
+
+.tk-reason h2 {
+/*  font-family: "Playfair Display", serif; */
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin-bottom: 48px;
+}
+
+.tk-reason-grid {
+  max-width: 1100px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+.reason-card {
+  background: #fff;
+  padding: 32px 20px;
+  border-radius: 16px;
+  font-size: 15px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.reason-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(34, 197, 94, 0.12);
+  transition: all 0.3s ease;
+}
+
+.icon {
+  margin-bottom: 15px;
+}
+
+.reason-card h4 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 16px 0 10px;
+  color: #0f172a;
+}
+
+.reason-card p {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(18px, 1.5vw, 18px);
+  line-height: 1.7;
+  color: #64748b;
+  margin: 0;
+}
+
+/* TESTIMONIAL */
+.tk-testimonial {
+  background: linear-gradient(135deg, #0f3d24, #14532d, #166534);
+  padding: 80px 20px;
+  text-align: center;
+  color: white;
+}
+
+.tk-testimonial-header {
+  margin-bottom: 40px;
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.tk-section-tag {
+  color: #3ddc84;
+  font-size: 15px;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.tk-testimonial-header h2 {
+  margin-top: 10px;
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.tk-testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.tk-testimonial-card {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  padding: 28px;
+  border-radius: 18px;
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+.tk-testimonial-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(34, 197, 94, 0.12);
+}
+
+.tk-testimonial-card h4 {
+  margin-bottom: 17px;
+  font-size: 20px;
+}
+
+.tk-testimonial-card p {
+  font-size: clamp(18px, 1.5vw, 18px);
+  line-height: 1.6;
+  color: #dcdcdc;
+}
+
+.stars {
+  color: #3ddc84;
+  margin-top: 10px;
+  display: block;
+}
+
+/* RESPONSIVE */
+@media (max-width:900px){
+  .tk-testimonial-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+/* CTA */
+.tk-cta {
+  background: #f8faf9;
+  color: black;
+  text-align: center;
+  padding: 80px 24px;
+}
+
+.tk-cta h2 {
+/*  font-family: "Playfair Display", serif; */
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin-bottom: 16px;
+}
+
+.tk-cta p {
+  font-size: clamp(18px, 1.5vw, 18px);
+}
+
+.tk-cta button {
+  margin-top: 24px;
+  padding: 17px 30px;
+  border: none;
+  border-radius: 999px;
+  background: #22c55e;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.3s ease;
+}
+
+.tk-cta button:hover {
+  box-shadow: 0 15px 30px rgba(34, 197, 94, 0.12);
+  transform: translateY(-5px);
+  transition: 0.3s ease;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .tk-journey-container {
+    grid-template-columns: 1fr;
+  }
+
+  .tk-reason-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .tk-reason-grid {
+    grid-template-columns: 1fr;
+  }
+}

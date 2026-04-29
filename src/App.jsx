@@ -12,6 +12,7 @@ import ProductSection from "./components/ProductSection";
 import ProgramSection from "./components/ProgramSection";
 import CTA from "./components/CTA";
 import GallerySection from "./components/GallerySection";
+import Tentangkami from "./components/Tentangkami";
 
 import Gallery from "./pages/Gallery/Gallery";
 import GalleryDetail from "./pages/Gallery/GalleryDetail";
@@ -26,6 +27,7 @@ import VenueWorkshop from "./pages/program/VenueWorkshop";
 import Peternakan from "./pages/program/Peternakan";
 import VenueAlam from "./components/VenueAlam";
 
+
 /* HOME */
 function Home() {
   return (
@@ -34,6 +36,7 @@ function Home() {
       <About />
       <WhyChoose />
       <ProductSection />
+      <Tentangkami/>
       <ProgramSection />
       <GallerySection />
       <CTA />
@@ -66,6 +69,7 @@ function App() {
         <Routes location={location} key={location.pathname}>
           {/* HOME */}
           <Route path="/" element={<AnimatedPage><Home /></AnimatedPage>} />
+          <Route path="/tentang-kami" element={<AnimatedPage><Tentangkami /></AnimatedPage>} />
 
           {/* PROGRAM */}
           <Route path="/program/hydroponic" element={<AnimatedPage><Hydroponic /></AnimatedPage>} />
