@@ -117,7 +117,7 @@ export default function Navbar() {
               </li>
 
               <li>
-                <NavLink to="/artikel" onClick={closeMenu}>
+                <NavLink to="/article" onClick={closeMenu}>
                   Artikel
                 </NavLink>
               </li>
