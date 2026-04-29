@@ -30,15 +30,24 @@ body {
 }
 
 .nav-container {
-  max-width: 1200px;
+  max-width: 100%; /* dari 1200px jadi full */
+  padding: 0 50px; /* kasih ruang kiri kanan */
   margin: auto;
   height: 70px;
   padding: 0 24px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
 }
+
+/* BIKIN MENU DI TENGAH */
+.nav-center {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start; /* gak center lagi */
+  margin-left: 60px; /* jarak dari logo (atur feel di sini) */
+}
+
+
 
 /* ================= LOGO ================= */
 .logo {
@@ -48,6 +57,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-right: 20px;
 }
 
 /* ================= NAV LINKS ================= */
@@ -55,7 +65,7 @@ body {
   list-style: none;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 32px; /* lebih lega dari sebelumnya */
 }
 
 .nav-links li {
@@ -121,6 +131,8 @@ body {
   border-radius: 30px;
   color: white;
   cursor: pointer;
+  margin-left: auto;
+  margin-right: 20px; /* biar gak nempel kanan banget */
 }
 
 /* ================= DROPDOWN ================= */
