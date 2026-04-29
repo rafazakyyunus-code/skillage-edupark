@@ -15,7 +15,6 @@ import GallerySection from "./components/GallerySection";
 
 import Tentangkami from "./components/Tentangkami";
 
-import VenueAlam from "./components/VenueAlam";
 
 
 // Gallery Pages
@@ -30,6 +29,9 @@ import ProdukDetail from "./pages/SemuaProduk/ProdukDetail";
 import Hydroponic from "./pages/program/Hydroponic";
 import VenueWorkshop from "./pages/program/VenueWorkshop";
 import Peternakan from "./pages/program/Peternakan";
+
+import VenueAlam from "./pages/venue/VenueAlam";
+import VenueDetail from "./pages/venue/VenueDetail";
 
 // ARTICLE PAGES
 import Article from "./pages/Article/Article";
@@ -238,6 +240,10 @@ be642202c9f9eb8f129850a644207b38fc9d599d
               </AnimatedPage>
             }
           />
+
+
+          <Route path="/venue/:id" element={<VenueDetail />} />
+
         </Routes>
       </AnimatePresence>
 

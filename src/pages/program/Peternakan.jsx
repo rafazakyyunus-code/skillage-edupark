@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import "./ProgramPage.css";
-
+import heroImage from "/src/assets/images/pertenakan domba.jpeg";
 export default function Peternakan() {
   const hewan = [
     { icon: "🪱", name: "Budidaya Maggot", desc: "Pelajari proses pemerahan susu segar" },
@@ -11,7 +11,14 @@ export default function Peternakan() {
 
   return (
     <div className="program-page">
-      <section className="program-hero peternakan-hero">
+       <section
+        className="program-hero peternakan-hero"
+        style={{
+          backgroundImage: `url(${heroImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center"
+        }}
+      >
         <div className="hero-overlay" />
         <div className="hero-content">
           <span className="badge">🌿 Program Kami</span>

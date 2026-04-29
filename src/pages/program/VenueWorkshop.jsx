@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import "./ProgramPage.css";
-
+import heroImage from "/src/assets/images/workshop.jpeg";
 export default function VenueWorkshop() {
   const fasilitas = [
     { icon: "🏛️", title: "Ruang Serbaguna", desc: "Kapasitas hingga 200 peserta dengan AC & sound system" },
@@ -11,7 +11,14 @@ export default function VenueWorkshop() {
 
   return (
     <div className="program-page">
-      <section className="program-hero workshop-hero">
+       <section
+        className="program-hero workshop-hero"
+        style={{
+          backgroundImage: `url(${heroImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center"
+        }}
+      >
         <div className="hero-overlay" />
         <div className="hero-content">
           <span className="badge">🌿 Program Kami</span>

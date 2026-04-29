@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import "./ProgramPage.css";
+import heroImage from "/src/assets/images/hydroponicc.jpeg";
 
 export default function Hydroponic() {
   const features = [
@@ -23,7 +24,14 @@ export default function Hydroponic() {
   return (
     <div className="program-page">
       {/* HERO */}
-      <section className="program-hero hydroponic-hero">
+   <section
+  className="program-hero hydroponic-hero"
+  style={{
+    backgroundImage: `url(${heroImage})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center"
+  }}
+>
         <div className="hero-overlay" />
         <div className="hero-content">
           <span className="badge">🌿 Program Kami</span>
@@ -88,18 +96,19 @@ export default function Hydroponic() {
       </section>
 
       {/* TANAMAN */}
-      <section className="program-plants">
-        <div className="container">
-          <h2 className="section-title">Tanaman yang Ditanam</h2>
-          <div className="plants-grid">
-            {plants.map((plant, i) => (
-           <div className="plant-chip" key={i}>
-           {plant.icon} {plant.name}
-          </div>
-))}
-          </div>
+   <section className="program-plants">
+  <h2 className="section-title">Tanaman yang Ditanam</h2>
+
+  <div className="plants-wrapper">
+    <div className="plants-track">
+      {[...plants, ...plants].map((plant, i) => (
+        <div className="plant-chip" key={i}>
+          {plant.icon} {plant.name}
         </div>
-      </section>
+      ))}
+    </div>
+  </div>
+</section>
 
       {/* DAFTAR */}
       <section className="program-cta" id="daftar">

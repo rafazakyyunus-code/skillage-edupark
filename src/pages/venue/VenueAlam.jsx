@@ -54,9 +54,9 @@ export default function VenueAlam() {
                 <div className="venue-content">
                   <h3>{item.title}</h3>
                   <p>{item.desc}</p>
-                  <Link to="#" className="venue-link">
+                  <Link to={`/venue/${i}`} className="venue-link">
                     Pelajari Selengkapnya →
-                  </Link>
+                    </Link>
                 </div>
               </div>
             ))}
