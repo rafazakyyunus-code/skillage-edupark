@@ -106,3 +106,14 @@
   border-radius: 10px;
   overflow: hidden;
 }
+
+@media (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .map {
+    height: 180px;
+  }
+}
