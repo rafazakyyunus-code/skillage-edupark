@@ -83,3 +83,17 @@
 .program-card:hover span {
   letter-spacing: 1px;
 }
+
+@media (max-width: 768px) {
+  .program {
+    padding: 60px 20px;
+  }
+
+  .program-header h2 {
+    font-size: 26px;
+  }
+
+  .program-content {
+    text-align: center;
+  }
+}

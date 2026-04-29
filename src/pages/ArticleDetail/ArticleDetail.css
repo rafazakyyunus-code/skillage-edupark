@@ -1,0 +1,167 @@
+.article-detail-page {
+  background: #f7f7f7;
+  padding: 50px 5%;
+}
+
+.article-detail-container {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.article-main-content {
+  flex: 2;
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+}
+
+.article-category {
+  color: #27ae60;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.article-main-content h1 {
+  font-size: 42px;
+  margin: 15px 0;
+  color: #0f2d5c;
+}
+
+.article-meta-detail {
+  display: flex;
+  gap: 20px;
+  color: gray;
+  margin-bottom: 20px;
+}
+
+.main-image,
+.secondary-image {
+  width: 100%;
+  border-radius: 15px;
+  margin: 20px 0;
+}
+
+.article-main-content p {
+  line-height: 1.8;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.article-main-content h2 {
+  color: #0f2d5c;
+  margin: 30px 0 15px;
+}
+
+.share-section {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.share-icons {
+  display: flex;
+  gap: 15px;
+  cursor: pointer;
+}
+
+/* SIDEBAR */
+
+.article-sidebar {
+  flex: 1;
+}
+
+.sidebar-card {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  margin-bottom: 25px;
+}
+
+.sidebar-card h3 {
+  margin-bottom: 20px;
+  color: #0f2d5c;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f5f5f5;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+}
+
+.recent-post {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.recent-post img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.recent-post p {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.recent-post span {
+  font-size: 12px;
+  color: gray;
+}
+
+.sidebar-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar-card li {
+  margin-bottom: 12px;
+  color: #555;
+}
+
+.cta-sidebar {
+  background: #0f2d5c;
+  color: white;
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.cta-sidebar button {
+  margin-top: 20px;
+  background: #2ecc71;
+  border: none;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.not-found {
+  text-align: center;
+  padding: 100px;
+  font-size: 30px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+  .article-detail-container {
+    flex-direction: column;
+  }
+}

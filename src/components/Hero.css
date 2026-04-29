@@ -138,6 +138,29 @@ html, body {
   }
 }
 
+@media (max-width: 992px) {
+  .hero {
+    padding: 0 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 0 20px;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .hero h1 {
+    font-size: 36px;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
 .btn-primary {
   background: linear-gradient(135deg, #16c35b, #0fa64b);
   border: none;
