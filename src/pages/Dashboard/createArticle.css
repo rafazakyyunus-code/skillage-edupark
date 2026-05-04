@@ -379,3 +379,35 @@
 .tag-remove:hover {
   color: #ef4444;
 }
+.editor-content {
+  min-height: 320px;
+  padding: 16px;
+}
+
+.editor-content .ProseMirror {
+  min-height: 280px;
+  outline: none;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.editor-content ul,
+.editor-content ol {
+  padding-left: 20px;
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #e5e7eb;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+.tag button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+}

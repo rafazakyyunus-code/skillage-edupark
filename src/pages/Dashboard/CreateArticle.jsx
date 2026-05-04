@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
 import "./createArticle.css";
+
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import LinkExtension from "@tiptap/extension-link";
+
 import {
   LayoutDashboard,
   PenSquare,
@@ -25,13 +30,21 @@ export default function CreateArticle() {
   /* ================= LOAD ================= */
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("draft")) || {};
-
     if (saved.image) setImage(saved.image);
     if (saved.tags) setTags(saved.tags);
     if (saved.title) setTitle(saved.title);
     if (saved.content) setContent(saved.content);
     if (saved.visibility) setVisibility(saved.visibility);
   }, []);
+
+  /* ================= TIPTAP ================= */
+  const editor = useEditor({
+    extensions: [StarterKit, LinkExtension],
+    content: content || "<p>Start writing your masterpiece...</p>",
+    onUpdate: ({ editor }) => {
+      setContent(editor.getHTML());
+    },
+  });
 
   /* ================= IMAGE ================= */
   const handleImage = (e) => {
@@ -54,8 +67,8 @@ export default function CreateArticle() {
     setInputTag("");
   };
 
-  const removeTag = (index) => {
-    setTags(tags.filter((_, i) => i !== index));
+  const removeTag = (i) => {
+    setTags(tags.filter((_, index) => index !== i));
   };
 
   const handleTagEnter = (e) => {
@@ -145,11 +158,11 @@ export default function CreateArticle() {
           </div>
 
           <div className="ca-actions">
-            <button type="button" className="btn-draft" onClick={handleSaveDraft}>
+            <button className="btn-draft" onClick={handleSaveDraft}>
               Save Draft
             </button>
-            <button type="button" className="btn-submit">
-              Submit for Review 
+            <button className="btn-submit">
+              Submit for Review
             </button>
           </div>
         </div>
@@ -166,23 +179,28 @@ export default function CreateArticle() {
             />
 
             <div className="ca-editor">
+
+              {/* TOOLBAR */}
               <div className="toolbar">
-                <button type="button"><b>B</b></button>
-                <button type="button"><i>I</i></button>
-                <button type="button"><u>U</u></button>
-                <button type="button"><List size={16} /></button>
-                <button type="button"><ListOrdered size={16} /></button>
-                <button type="button"><Quote size={16} /></button>
-                <button type="button"><Link size={16} /></button>
-                <button type="button"><Code size={16} /></button>
-                <button type="button"><ImagePlus size={16} /></button>
+                <button onClick={() => editor.chain().focus().toggleBold().run()}><b>B</b></button>
+                <button onClick={() => editor.chain().focus().toggleItalic().run()}><i>I</i></button>
+                <button onClick={() => editor.chain().focus().toggleBulletList().run()}><List size={16} /></button>
+                <button onClick={() => editor.chain().focus().toggleOrderedList().run()}><ListOrdered size={16} /></button>
+                <button onClick={() => editor.chain().focus().toggleBlockquote().run()}><Quote size={16} /></button>
+                <button onClick={() => editor.chain().focus().toggleCodeBlock().run()}><Code size={16} /></button>
+
+                <button
+                  onClick={() => {
+                    const url = prompt("Enter URL");
+                    if (url) editor.chain().focus().setLink({ href: url }).run();
+                  }}
+                >
+                  <Link size={16} />
+                </button>
               </div>
 
-              <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Start writing your masterpiece..."
-              />
+              {/* EDITOR */}
+              <EditorContent editor={editor} className="editor-content" />
             </div>
           </div>
 
@@ -217,7 +235,7 @@ export default function CreateArticle() {
               </select>
             </div>
 
-            {/* TAG */}
+            {/* TAGS */}
             <div className="box">
               <h4>Tags</h4>
 
@@ -225,13 +243,7 @@ export default function CreateArticle() {
                 {tags.map((t, i) => (
                   <div key={i} className="tag">
                     <span>{t}</span>
-                    <button
-                      type="button"
-                      className="tag-remove"
-                      onClick={() => removeTag(i)}
-                    >
-                      ✕
-                    </button>
+                    <button onClick={() => removeTag(i)}>✕</button>
                   </div>
                 ))}
               </div>
@@ -248,25 +260,23 @@ export default function CreateArticle() {
             <div className="box visibility">
               <h4>Visibility</h4>
 
-              <div className="radio-group">
-                <label className="radio-item">
-                  <input
-                    type="radio"
-                    checked={visibility === "public"}
-                    onChange={() => setVisibility("public")}
-                  />
-                  <span>Public</span>
-                </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={visibility === "public"}
+                  onChange={() => setVisibility("public")}
+                />
+                Public
+              </label>
 
-                <label className="radio-item">
-                  <input
-                    type="radio"
-                    checked={visibility === "private"}
-                    onChange={() => setVisibility("private")}
-                  />
-                  <span>Members Only</span>
-                </label>
-              </div>
+              <label>
+                <input
+                  type="radio"
+                  checked={visibility === "private"}
+                  onChange={() => setVisibility("private")}
+                />
+                Members Only
+              </label>
             </div>
 
           </div>
