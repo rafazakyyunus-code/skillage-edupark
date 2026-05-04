@@ -256,28 +256,29 @@ export default function CreateArticle() {
               />
             </div>
 
-            {/* VISIBILITY */}
             <div className="box visibility">
-              <h4>Visibility</h4>
+                <h4>Visibility</h4>
 
-              <label>
-                <input
-                  type="radio"
-                  checked={visibility === "public"}
-                  onChange={() => setVisibility("public")}
-                />
-                Public
-              </label>
+                <div className="radio-group">
+                    <label className="radio-item">
+                    <input
+                        type="radio"
+                        checked={visibility === "public"}
+                        onChange={() => setVisibility("public")}
+                    />
+                    <span>Public</span>
+                    </label>
 
-              <label>
-                <input
-                  type="radio"
-                  checked={visibility === "private"}
-                  onChange={() => setVisibility("private")}
-                />
-                Members Only
-              </label>
-            </div>
+                    <label className="radio-item">
+                    <input
+                        type="radio"
+                        checked={visibility === "private"}
+                        onChange={() => setVisibility("private")}
+                    />
+                    <span>Members Only</span>
+                    </label>
+                </div>
+                </div>
 
           </div>
         </div>
