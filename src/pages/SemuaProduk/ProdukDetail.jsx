@@ -12,43 +12,64 @@ export default function ProdukDetail() {
 
   return (
     <div className="pd-root">
-
       <div className="pd-container">
-
         {/* LEFT IMAGE */}
         <div className="pd-image-section">
-          <img src={product.image} alt={product.name} />
+          <img src={product.image} alt={product.name} className="pd-main-image" />
 
           <div className="pd-thumbnails">
-            <img src={product.image} alt={product.name} />
-            <img src={product.image} alt={product.name} />
-            <img src={product.image} alt={product.name} />
+            {/* Thumbnail dibuat dalam wrapper agar bisa diatur kelonjongannya */}
+            <div className="pd-thumb-wrapper active">
+              <img src={product.image} alt={product.name} />
+            </div>
+            <div className="pd-thumb-wrapper">
+              <img src={product.image} alt={product.name} />
+            </div>
+            <div className="pd-thumb-wrapper">
+              <img src={product.image} alt={product.name} />
+            </div>
+            <div className="pd-thumb-wrapper pd-thumb-more">
+              <span>4</span>
+            </div>
           </div>
         </div>
 
         {/* RIGHT CONTENT */}
         <div className="pd-info">
-
           <h1 className="pd-title">{product.name}</h1>
 
-          <div className="pd-rating">⭐⭐⭐⭐⭐ (4.9 / 5)</div>
+          <div className="pd-rating">
+            <span className="stars">⭐⭐⭐⭐⭐</span> 
+            <span className="rating-text">(4.9 / 5, 2.4k Students)</span>
+          </div>
 
           <h2 className="pd-price">
             Rp {product.price.toLocaleString("id-ID")}
           </h2>
+          <p className="pd-price-note">One-time payment. Lifetime access included.</p>
 
-          <p className="pd-desc">
-            Produk berkualitas dari Edupark yang cocok untuk edukasi dan kebutuhan sehari-hari.
-          </p>
+          <p className="pd-desc">{product.desc}</p>
 
+          {/* List dengan icon centang custom */}
           <ul className="pd-features">
-            <li>✔ Produk berkualitas tinggi</li>
-            <li>✔ Cocok untuk edukasi</li>
-            <li>✔ Harga terjangkau</li>
+            <li>
+              <span className="pd-check">✓</span> 
+              Produk berkualitas tinggi dari peternakan organik.
+            </li>
+            <li>
+              <span className="pd-check">✓</span> 
+              Hands-on experience dengan standar industri Fortune 500.
+            </li>
+            <li>
+              <span className="pd-check">✓</span> 
+              Mendapatkan dukungan penuh dari tim ahli kami.
+            </li>
           </ul>
 
           <div className="pd-actions">
-            <button className="pd-buy">Beli Sekarang</button>
+            <button className="pd-buy">
+              <span className="cart-icon">🛒</span> Beli Sekarang
+            </button>
 
             <button
               className="pd-back"
@@ -58,6 +79,18 @@ export default function ProdukDetail() {
             </button>
           </div>
 
+          {/* Footer Info Tambahan */}
+          <div className="pd-footer-info">
+            <div className="pd-footer-item">
+              <span className="pd-footer-icon">🛡️</span> Verified Institution
+            </div>
+            <div className="pd-footer-item">
+              <span className="pd-footer-icon">🌐</span> Global Certificate
+            </div>
+            <div className="pd-footer-item">
+              <span className="pd-footer-icon">🔒</span> Secure Checkout
+            </div>
+          </div>
         </div>
       </div>
     </div>

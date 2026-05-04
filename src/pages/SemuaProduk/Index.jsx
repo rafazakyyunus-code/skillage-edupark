@@ -66,18 +66,16 @@ export default function SemuaProduk() {
     currentPage * ITEMS_PER_PAGE
   );
 
-  /* 🔥 HANDLE CATEGORY + UPDATE URL */
-  const handleCategory = (cat) => {
-    setCurrentPage(1);
-
-    if (cat === "Semua Produk") {
-      navigate("/produk");
-    } else {
-      // FIX: Harus menggunakan prefix 'kategori/' agar tidak tabrakan dengan route detail /produk/:id
-      const slug = cat.toLowerCase().replace(/\s+/g, "-");
-      navigate(`/produk/kategori/${slug}`);
-    }
-  };
+  // Tambahkan baris ini di bagian handleCategory agar tidak terasa "lompat" ke atas
+const handleCategory = (cat) => {
+  setCurrentPage(1);
+  if (cat === "Semua Produk") {
+    navigate("/produk");
+  } else {
+    const slug = cat.toLowerCase().replace(/\s+/g, "-");
+    navigate(`/produk/kategori/${slug}`);
+  }
+};
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
@@ -127,6 +125,7 @@ export default function SemuaProduk() {
       {/* MAIN CONTENT */}
       <div className="sp-container">
         <aside className="sp-sidebar">
+          {/* Kategori List */}
           <ul className="sp-cat-list">
             {CATEGORIES.map((cat) => (
               <li
@@ -138,6 +137,17 @@ export default function SemuaProduk() {
               </li>
             ))}
           </ul>
+
+          {/* 🔥 TAMBAHKAN PROMO BOX DI SINI */}
+          <div className="sp-promo-box">
+            <span className="sp-promo-label">PROMO MINGGU INI</span>
+            <p className="sp-promo-text">
+              Dapatkan diskon 20% untuk semua merchandise!
+            </p>
+            <a href="/promo" className="sp-promo-link">
+              Lihat Promo
+            </a>
+          </div>
         </aside>
 
         <main className="sp-main">
