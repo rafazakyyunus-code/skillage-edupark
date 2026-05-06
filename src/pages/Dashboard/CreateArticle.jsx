@@ -99,6 +99,8 @@ const NAV_ITEMS = [
   { id: "analytics",       label: "Analytics",      Icon: BarChart3 },
 ];
 
+const API_BASE = "http://localhost/skillage-api";
+
 /* ──────────────────────────────────────────
    SIDEBAR
    ────────────────────────────────────────── */
@@ -312,7 +314,7 @@ function DashboardView({ myArticles, setActiveNav }) {
 /* ──────────────────────────────────────────
    CREATE ARTICLE VIEW
    ────────────────────────────────────────── */
-function CreateArticleView({ onSubmitSuccess, onSaveDraft }) {
+function CreateArticleView({ onSubmitSuccess, onSaveDraft, onRefresh }) {
   const [image, setImage]         = useState(null);
   const [tags, setTags]           = useState(["FutureOfEd", "AI"]);
   const [inputTag, setInputTag]   = useState("");
@@ -320,6 +322,8 @@ function CreateArticleView({ onSubmitSuccess, onSaveDraft }) {
   const [title, setTitle]         = useState("");
   const [category, setCategory]   = useState(CATEGORIES[0]);
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   /* Load draft from localStorage */
   useEffect(() => {
@@ -328,6 +332,7 @@ function CreateArticleView({ onSubmitSuccess, onSaveDraft }) {
     if (saved.tags)  setTags(saved.tags);
     if (saved.visibility) setVisibility(saved.visibility);
     if (saved.category)   setCategory(saved.category);
+    if (saved.image) setImage(saved.image);
   }, []);
 
   /* TipTap editor */
@@ -365,57 +370,86 @@ function CreateArticleView({ onSubmitSuccess, onSaveDraft }) {
       tags,
       visibility,
       category,
+      image,
     }));
     onSaveDraft();
   };
 
-  /* Submit */
+  /* Submit Article */
+  const handleSubmit = async () => {
+    if (!title.trim()) {
+      setError("Judul artikel tidak boleh kosong");
+      return;
+    }
 
-const handleSubmit = async () => {
-  const contentHTML = editor?.getHTML() || "";
+    if (!editor?.getHTML() || editor.getHTML() === "<p>Start writing your masterpiece...</p>") {
+      setError("Konten artikel tidak boleh kosong");
+      return;
+    }
 
-  const article = {
-    title,
-    content: contentHTML,
-    author: "Admin Edupark",
-    image,
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const contentHTML = editor.getHTML();
+
+      // Hitung word count
+      const wordCount = contentHTML
+        .replace(/<[^>]+>/g, " ")
+        .split(/\s+/)
+        .filter(Boolean).length;
+
+      // Data artikel
+      const articleData = {
+        title: title.trim(),
+        content: contentHTML,
+        category,
+        tags: tags.join(","),
+        image: image || null,
+        visibility,
+        author: "Alex Thompson",
+        wordCount,
+        status: "pending",
+      };
+
+      // Kirim ke backend
+      const response = await fetch(`${API_BASE}/articles/create.php`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(articleData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Gagal menyimpan artikel");
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Clear draft
+        localStorage.removeItem("edupark_draft");
+        
+        // Update UI
+        onSubmitSuccess({
+          ...articleData,
+          id: result.id,
+          date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+          views: 0,
+        });
+
+        setSubmitted(true);
+      } else {
+        setError(result.message || "Gagal menyimpan artikel");
+      }
+    } catch (err) {
+      console.error("Submit error:", err);
+      setError(err.message || "Terjadi kesalahan saat mengirim artikel");
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  try {
-    // 🔗 kirim ke backend PHP
-    await fetch("http://localhost/api/create_article.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(article),
-    });
-
-    // hitung word count (TETAP DIPAKE UI KAMU)
-    const wc = contentHTML
-      .replace(/<[^>]+>/g, " ")
-      .split(/\s+/)
-      .filter(Boolean).length;
-
-    // 🔁 update state local (biar langsung muncul di My Articles)
-    onSubmitSuccess({
-      title,
-      category,
-      tags,
-      visibility,
-      image,
-      wordCount: Math.max(wc, 1),
-      content: contentHTML,
-    });
-
-    // UI success
-    setSubmitted(true);
-
-  } catch (err) {
-    console.error(err);
-    alert("Gagal kirim artikel");
-  }
-};
 
   if (submitted) {
     return (
@@ -428,23 +462,25 @@ const handleSubmit = async () => {
           Artikel Anda sedang dalam proses review oleh editor.
           Anda akan mendapat notifikasi setelah selesai diproses.
         </p>
-        <button className="ca-success__btn" onClick={() => setSubmitted(false)}>
+        <button 
+          className="ca-success__btn" 
+          onClick={() => {
+            setSubmitted(false);
+            setTitle("");
+            setTags(["FutureOfEd", "AI"]);
+            setVisibility("public");
+            setCategory(CATEGORIES[0]);
+            setImage(null);
+            setError(null);
+            editor?.chain().focus().setContent("<p>Start writing your masterpiece...</p>").run();
+            onRefresh?.();
+          }}
+        >
           + Tulis Artikel Baru
         </button>
       </div>
     );
   }
-
-  const toolbarBtn = (label, onClick, isActive = false) => (
-    <button
-      key={label}
-      onMouseDown={(e) => { e.preventDefault(); onClick(); }}
-      className={`ca-toolbar-btn${isActive ? " ca-toolbar-btn--active" : ""}`}
-      title={label}
-    >
-      {label}
-    </button>
-  );
 
   return (
     <div className="ca-editor-layout">
@@ -460,6 +496,21 @@ const handleSubmit = async () => {
             placeholder="Enter your catchy title..."
           />
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div style={{ 
+            background: "#FBE9E7", 
+            border: "1px solid #FFCCBC",
+            borderRadius: 8,
+            padding: "12px 16px",
+            marginBottom: 16,
+            color: "#BF360C",
+            fontSize: 13
+          }}>
+            {error}
+          </div>
+        )}
 
         {/* Editor */}
         <div className="ca-editor-card">
@@ -642,6 +693,29 @@ const handleSubmit = async () => {
             ))}
           </div>
         </div>
+
+        {/* Submit Button */}
+        <button 
+          className="ca-btn-submit" 
+          onClick={handleSubmit}
+          disabled={isLoading}
+          style={{
+            width: "100%",
+            opacity: isLoading ? 0.6 : 1,
+            cursor: isLoading ? "not-allowed" : "pointer"
+          }}
+        >
+          {isLoading ? "Mengirim..." : "Submit for Review"}
+        </button>
+
+        {/* Save Draft Button */}
+        <button 
+          className="ca-btn-draft" 
+          onClick={saveDraft}
+          style={{ width: "100%", marginTop: 8 }}
+        >
+          Save as Draft
+        </button>
       </div>
     </div>
   );
@@ -652,6 +726,7 @@ const handleSubmit = async () => {
    ────────────────────────────────────────── */
 function MyArticlesView({ articles, setArticles, setActiveNav }) {
   const [filter, setFilter] = useState("all");
+  const [isLoading, setIsLoading] = useState(false);
 
   const filters = [
     { id: "all",       label: "Semua" },
@@ -664,9 +739,26 @@ function MyArticlesView({ articles, setArticles, setActiveNav }) {
   const filtered =
     filter === "all" ? articles : articles.filter(a => a.status === filter);
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (!window.confirm("Hapus artikel ini?")) return;
-    setArticles(prev => prev.filter(a => a.id !== id));
+    
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE}/articles/delete.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+
+      if (response.ok) {
+        setArticles(prev => prev.filter(a => a.id !== id));
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert("Gagal menghapus artikel");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -708,9 +800,13 @@ function MyArticlesView({ articles, setArticles, setActiveNav }) {
               <div key={a.id} className="ca-article-item">
                 {/* Thumb placeholder */}
                 <div className="ca-article-item__thumb">
-                  <div style={{ width: "100%", height: "100%", background: "#c8e6c9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
-                    📄
-                  </div>
+                  {a.image ? (
+                    <img src={a.image} alt={a.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ) : (
+                    <div style={{ width: "100%", height: "100%", background: "#c8e6c9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
+                      📄
+                    </div>
+                  )}
                 </div>
 
                 <div className="ca-article-item__body">
@@ -743,6 +839,7 @@ function MyArticlesView({ articles, setArticles, setActiveNav }) {
                     title="Hapus"
                     style={{ color: "#dc2626" }}
                     onClick={() => handleDelete(a.id)}
+                    disabled={isLoading}
                   >
                     <Trash2 size={14} />
                   </button>
@@ -951,27 +1048,35 @@ function SettingsView() {
 /* ──────────────────────────────────────────
    MAIN EXPORT
    ────────────────────────────────────────── */
-export default function CreateArticle() {
+export default function CreateArticle({ onExternalSubmit }) {
   const [activeNav, setActiveNav]   = useState("create");
   const [lastSaved, setLastSaved]   = useState(null);
   const [myArticles, setMyArticles] = useState(SEED_MY_ARTICLES);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleSaveDraft = () => setLastSaved(new Date());
 
   const handleSubmitSuccess = (articleData) => {
-    const now = new Date();
     const newArticle = {
       ...articleData,
       id: Date.now(),
-      status: "pending",
-      date: now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
       views: 0,
     };
     setMyArticles(p => [newArticle, ...p]);
+    
+    // Kirim ke App.jsx jika ada callback
+    if (onExternalSubmit) {
+      onExternalSubmit(newArticle);
+    }
+  };
+
+  const handleRefresh = () => {
+    setRefreshKey(k => k + 1);
   };
 
   return (
-    <div className="ca-root">
+    <div className="ca-root" key={refreshKey}>
       <Sidebar activeNav={activeNav} setActiveNav={setActiveNav} />
 
       <div className="ca-main">
@@ -979,12 +1084,7 @@ export default function CreateArticle() {
           activeNav={activeNav}
           lastSaved={lastSaved}
           onSaveDraft={handleSaveDraft}
-          onSubmit={() => {
-            /* trigger submit from topbar — we need a ref or lifting state.
-               For now the topbar Submit button is wired to inner component
-               via the shared handler below. This is a placeholder if you want
-               to wire it from the topbar.  The Create view handles its own submit. */
-          }}
+          onSubmit={() => {}}
         />
 
         <div className="ca-body">
@@ -999,6 +1099,7 @@ export default function CreateArticle() {
             <CreateArticleView
               onSubmitSuccess={handleSubmitSuccess}
               onSaveDraft={handleSaveDraft}
+              onRefresh={handleRefresh}
             />
           )}
 
