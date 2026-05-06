@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { formatRp } from "./SemuaProdukData"; // ✅ FIX CASE
 import { Link } from "react-router-dom";
+import { Leaf } from 'lucide-react';
 
 export default function ProductCard({ product }) {
   const [imgError, setImgError] = useState(false);
@@ -18,7 +19,9 @@ export default function ProductCard({ product }) {
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className="sp-card-img-fallback">🌿</div>
+          <div className="sp-card-img-fallback flex items-center justify-center bg-gray-100 w-full h-full">
+            <Leaf size={40} className="text-gray-300" />
+          </div>
         )}
 
         {product.badge && (

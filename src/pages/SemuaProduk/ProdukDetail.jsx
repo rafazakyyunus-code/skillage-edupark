@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { ShieldCheck, Globe, Lock } from 'lucide-react';
 import { PRODUCTS } from "./SemuaProdukData";
 import "./ProdukDetail.css";
 
@@ -80,15 +81,20 @@ export default function ProdukDetail() {
           </div>
 
           {/* Footer Info Tambahan */}
-          <div className="pd-footer-info">
-            <div className="pd-footer-item">
-              <span className="pd-footer-icon">🛡️</span> Verified Institution
+          <div className="pd-footer-info flex gap-6 mt-8">
+            <div className="pd-footer-item flex items-center gap-2 text-sm text-gray-600">
+              <ShieldCheck size={18} className="text-blue-500" /> 
+              <span>Verified Institution</span>
             </div>
-            <div className="pd-footer-item">
-              <span className="pd-footer-icon">🌐</span> Global Certificate
+            
+            <div className="pd-footer-item flex items-center gap-2 text-sm text-gray-600">
+              <Globe size={18} className="text-blue-500" /> 
+              <span>Global Certificate</span>
             </div>
-            <div className="pd-footer-item">
-              <span className="pd-footer-icon">🔒</span> Secure Checkout
+            
+            <div className="pd-footer-item flex items-center gap-2 text-sm text-gray-600">
+              <Lock size={18} className="text-blue-500" /> 
+              <span>Secure Checkout</span>
             </div>
           </div>
         </div>

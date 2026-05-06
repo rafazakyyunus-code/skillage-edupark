@@ -1,10 +1,11 @@
+import { useState, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
-/* HOME */
+/* ───────── HOME ───────── */
 import Hero from "./components/Hero";
 import About from "./components/About";
 import WhyChoose from "./components/WhyChoose";
@@ -14,28 +15,24 @@ import CTA from "./components/CTA";
 import GallerySection from "./components/GallerySection";
 import Tentangkami from "./components/Tentangkami";
 
-/* PAGES */
-import Gallery from "./pages/Gallery/Gallery";
-import GalleryDetail from "./pages/Gallery/GalleryDetail";
-
-import Produk from "./pages/SemuaProduk/Index";
-import ProdukDetail from "./pages/SemuaProduk/ProdukDetail";
-
+/* ───────── PUBLIC PAGES ───────── */
+import Gallery from "./pages/gallery/Gallery";
+import GalleryDetail from "./pages/gallery/GalleryDetail";
+import Produk from "./pages/semuaProduk/Index";
+import ProdukDetail from "./pages/semuaProduk/ProdukDetail";
 import Hydroponic from "./pages/program/Hydroponic";
 import VenueWorkshop from "./pages/program/VenueWorkshop";
 import Peternakan from "./pages/program/Peternakan";
-
 import VenueAlam from "./pages/venue/VenueAlam";
 import VenueDetail from "./pages/venue/VenueDetail";
+import Article from "./pages/article/Article";
+import ArticleDetail from "./pages/articleDetail/ArticleDetail";
 
-/* ARTICLE */
-import Article from "./pages/Article/Article";
-import ArticleDetail from "./pages/ArticleDetail/ArticleDetail";
+/* ───────── DASHBOARD ───────── */
+import CreateArticle from "./pages/dashboard/CreateArticle";
+import Editor from "./pages/dashboard/Editor";
 
-/* DASHBOARD */
-import CreateArticle from "./pages/Dashboard/CreateArticle";
-
-/* HOME COMPONENT */
+/* ───────── UI ───────── */
 function Home() {
   return (
     <>
@@ -51,28 +48,91 @@ function Home() {
   );
 }
 
-/* ANIMATION */
 function AnimatedPage({ children }) {
   return (
     <motion.div
-      initial={{ x: "100%", opacity: 0 }}
+      initial={{ x: 20, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ duration: 0.5 }}
+      exit={{ x: -20, opacity: 0 }}
+      transition={{ duration: 0.3 }}
     >
       {children}
     </motion.div>
   );
 }
 
+/* ───────── GLOBAL ARTICLE STATE ───────── */
+function useArticles() {
+  const [allArticles, setAllArticles] = useState([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("edupark_articles");
+
+    if (saved) {
+      setAllArticles(JSON.parse(saved));
+    } else {
+      const seed = [
+        {
+          id: Date.now(),
+          title: "Welcome to Edupark - Demo Article",
+          author: "Demo Writer",
+          category: "Education Technology",
+          tags: ["demo", "edtech"],
+          submitted: "2 hours ago",
+          wordCount: 350,
+          status: "pending",
+          content:
+            "<p>Demo article for testing writer & editor workflow...</p>",
+        },
+      ];
+
+      setAllArticles(seed);
+      localStorage.setItem("edupark_articles", JSON.stringify(seed));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("edupark_articles", JSON.stringify(allArticles));
+  }, [allArticles]);
+
+  /* 🔥 WRITER → ADD ARTICLE */
+  const addArticle = (articleData) => {
+    const newArticle = {
+      ...articleData,
+      id: Date.now(),
+      author: "Alex Thompson",
+      role: "Writer",
+      submitted: new Date().toLocaleString(),
+      status: "pending",
+    };
+
+    setAllArticles((prev) => [newArticle, ...prev]);
+    console.log("✅ Masuk ke Editor:", newArticle.title);
+  };
+
+  /* 🔥 EDITOR → UPDATE STATUS */
+  const updateStatus = (articleId, newStatus, feedback = "") => {
+    setAllArticles((prev) =>
+      prev.map((a) =>
+        a.id === articleId
+          ? { ...a, status: newStatus, feedback }
+          : a
+      )
+    );
+
+    console.log(`✅ Update: ${newStatus}`, articleId);
+  };
+
+  return { articles: allArticles, addArticle, updateStatus };
+}
+
+/* ───────── APP ───────── */
 function App() {
   const location = useLocation();
+  const { articles, addArticle, updateStatus } = useArticles();
 
-  /* ❗ HIDE NAVBAR DI DASHBOARD */
-  const hideLayoutRoutes = ["/dashboard"];
-  const hideLayout = hideLayoutRoutes.some((path) =>
-    location.pathname.startsWith(path)
-  );
+  /* Hide navbar/footer di dashboard */
+  const hideLayout = location.pathname.startsWith("/dashboard");
 
   return (
     <>
@@ -81,7 +141,7 @@ function App() {
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           
-          {/* HOME */}
+          {/* PUBLIC */}
           <Route path="/" element={<AnimatedPage><Home /></AnimatedPage>} />
           <Route path="/tentang-kami" element={<AnimatedPage><Tentangkami /></AnimatedPage>} />
 
@@ -100,15 +160,31 @@ function App() {
           <Route path="/produk/kategori/:kategori" element={<AnimatedPage><Produk /></AnimatedPage>} />
           <Route path="/produk/:id" element={<AnimatedPage><ProdukDetail /></AnimatedPage>} />
 
-          {/* ARTICLE */}
-          <Route path="/article" element={<AnimatedPage><Article /></AnimatedPage>} />
-          <Route path="/article/:id" element={<AnimatedPage><ArticleDetail /></AnimatedPage>} />
+          {/* ARTICLE (TERHUBUNG STATE) */}
+          <Route path="/article" element={<AnimatedPage><Article articles={articles} /></AnimatedPage>} />
+          <Route path="/article/:id" element={<AnimatedPage><ArticleDetail articles={articles} /></AnimatedPage>} />
 
           {/* VENUE */}
           <Route path="/venue/:id" element={<AnimatedPage><VenueDetail /></AnimatedPage>} />
 
-          {/* 🔥 DASHBOARD */}
-          <Route path="/dashboard/create-article" element={<CreateArticle />} />
+          {/* 🔥 DASHBOARD (FIXED - NO NESTED BUG) */}
+          <Route
+            path="/dashboard/create-article"
+            element={<CreateArticle onExternalSubmit={addArticle} />}
+          />
+
+          <Route
+            path="/dashboard/editor"
+            element={
+              <Editor
+                externalArticles={articles}
+                onUpdateStatus={updateStatus}
+              />
+            }
+          />
+
+          {/* ❗ FALLBACK */}
+          <Route path="*" element={<h1>404 Not Found</h1>} />
 
         </Routes>
       </AnimatePresence>
