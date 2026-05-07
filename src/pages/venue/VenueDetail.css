@@ -217,3 +217,76 @@
   line-height: 1.8;
   margin-bottom: 16px;
 }
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 992px) {
+
+  .detail-wrapper {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .detail-image {
+    order: -1;
+  }
+
+  .detail-image img {
+    max-height: 450px;
+  }
+
+  .detail-text {
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .venue-detail-page {
+    padding: 80px 20px;
+  }
+
+  .detail-text h1 {
+    font-size: 2.2rem;
+  }
+
+  .detail-desc {
+    font-size: 0.98rem;
+  }
+
+  .detail-image img {
+    border-radius: 18px;
+  }
+
+  .back-btn {
+    width: 100%;
+    max-width: 260px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .detail-text h1 {
+    font-size: 1.9rem;
+    line-height: 1.3;
+  }
+
+  .detail-tag {
+    font-size: 11px;
+    letter-spacing: 2px;
+  }
+
+  .detail-desc {
+    font-size: 0.93rem;
+    line-height: 1.7;
+  }
+
+  .detail-wrapper {
+    gap: 28px;
+  }
+
+  .detail-image img {
+    border-radius: 16px;
+  }
+}

@@ -499,3 +499,173 @@
   .program-page section {
     padding: 100px 0;
   } 
+
+
+  /* ================= RESPONSIVE MOBILE ================= */
+@media (max-width: 992px) {
+
+  .program-page .about-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .program-page .about-text {
+    padding: 24px;
+  }
+
+  .program-page .visual-image {
+    height: 280px;
+  }
+
+  .stats-row {
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .program-page .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .program-page .program-cta {
+    padding: 100px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .program-page .program-hero {
+    margin-top: 70px;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+  }
+
+  .hydroponic-hero,
+  .workshop-hero,
+  .peternakan-hero {
+    padding: 100px 20px;
+  }
+
+  .program-page .hero-content h1 {
+    font-size: 2.7rem;
+    line-height: 1.1;
+  }
+
+  .program-page .hero-content p {
+    font-size: 1rem;
+  }
+
+  .program-page .hero-btns {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btn-primary,
+  .btn-outline {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .program-page section {
+    padding: 80px 0;
+  }
+
+  .section-title {
+    font-size: 1.8rem;
+    margin-bottom: 36px;
+  }
+
+  .program-page .about-text h2 {
+    font-size: 2rem;
+    line-height: 1.3;
+  }
+
+  .program-page .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .program-page .feature-card {
+    padding: 30px 22px;
+  }
+
+  .program-page .visual-image {
+    height: 240px;
+  }
+
+  .stats-row {
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .program-page .plants-track {
+    gap: 14px;
+    animation-duration: 14s;
+  }
+
+  .program-page .plant-chip {
+    font-size: 13px;
+    padding: 9px 16px;
+  }
+
+  .program-cta h2 {
+    font-size: 2rem;
+  }
+
+  .program-page .program-cta p {
+    font-size: 1rem;
+  }
+
+  .program-page .cta-btns {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .program-page .cta-btns a {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .program-page .hero-content h1 {
+    font-size: 2.2rem;
+  }
+
+  .program-page .hero-content p {
+    font-size: 0.95rem;
+  }
+
+  .program-page .about-text {
+    padding: 20px;
+    border-radius: 18px;
+  }
+
+  .program-page .about-text h2 {
+    font-size: 1.7rem;
+  }
+
+  .program-page .visual-image {
+    height: 210px;
+  }
+
+  .program-page .feature-card {
+    border-radius: 18px;
+  }
+
+  .program-page .feature-icon {
+    font-size: 2rem;
+  }
+
+  .program-cta h2 {
+    font-size: 1.8rem;
+  }
+
+  .container {
+    padding: 0 18px;
+  }
+}

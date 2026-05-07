@@ -286,3 +286,97 @@
     padding: 120px 20px 80px;
   }
 }
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 992px) {
+
+  .venue-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+  }
+
+  .venue-hero {
+    padding: 140px 20px 100px;
+  }
+
+  .venue-hero h1 {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .venue-hero {
+    padding: 120px 20px 80px;
+  }
+
+  .venue-hero h1 {
+    font-size: 2.4rem;
+  }
+
+  .venue-hero p {
+    font-size: 0.98rem;
+  }
+
+  .venue-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .venue-card {
+    border-radius: 22px;
+  }
+
+  .venue-image,
+  .venue-image img {
+    height: 220px;
+  }
+
+  .venue-content {
+    padding: 20px;
+  }
+
+  .venue-content h3 {
+    font-size: 1.15rem;
+  }
+
+  .venue-cta {
+    padding: 90px 20px;
+  }
+
+  .venue-cta h2 {
+    font-size: 2rem;
+  }
+
+  .venue-btn {
+    display: inline-block;
+    width: 100%;
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .venue-hero h1 {
+    font-size: 2rem;
+  }
+
+  .hero-badge {
+    font-size: 12px;
+    padding: 6px 14px;
+  }
+
+  .venue-image,
+  .venue-image img {
+    height: 200px;
+  }
+
+  .venue-content p {
+    font-size: 13px;
+  }
+
+  .venue-cta h2 {
+    font-size: 1.7rem;
+  }
+}

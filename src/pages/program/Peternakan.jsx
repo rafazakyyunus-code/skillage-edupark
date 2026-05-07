@@ -11,7 +11,7 @@ export default function Peternakan() {
   ];
 
   return (
-    <div className="program-page">a
+    <div className="program-page">
        <section
         className="program-hero peternakan-hero"
         style={{
