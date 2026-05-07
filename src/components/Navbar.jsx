@@ -6,6 +6,10 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
 
+  // 🔥 scroll behavior
+  const [showNavbar, setShowNavbar] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
   const location = useLocation();
 
   const toggleDropdown = (name) => {
@@ -22,7 +26,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth > 992) closeMenu();
+      if (window.innerWidth > 1200) closeMenu();
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -38,35 +42,50 @@ export default function Navbar() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY < 80) {
+        setShowNavbar(true);
+        return;
+      }
+
+      if (window.scrollY > lastScrollY) {
+        setShowNavbar(false);
+      } else {
+        setShowNavbar(true);
+      }
+
+      setLastScrollY(window.scrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
   return (
     <>
-      <nav className="navbar">
+      <nav className={`navbar ${showNavbar ? "show" : "hide"}`}>
         <div className="nav-container">
 
           {/* LOGO */}
           <div className="logo">
-            🌿 <span>Edupark</span>
+            <span className="leaf"></span>
+            <span>Edupark</span>
           </div>
 
-          {/* CENTER MENU */}
+          {/* MENU */}
           <div className="nav-center">
             <ul className={menuOpen ? "nav-links active" : "nav-links"}>
 
               <li>
-                <NavLink to="/" onClick={closeMenu}>
-                  Beranda
-                </NavLink>
+                <NavLink to="/" onClick={closeMenu}>Beranda</NavLink>
               </li>
 
-            <li>
-              <NavLink 
-                to="/tentang-kami" 
-                onClick={closeMenu}
-                className={({ isActive }) => isActive ? "active" : ""}
-              >
-                Tentang Kami
-              </NavLink>
-            </li>
+              <li>
+                <NavLink to="/tentang-kami" onClick={closeMenu}>
+                  Tentang Kami
+                </NavLink>
+              </li>
 
               {/* PROGRAM */}
               <li className={`dropdown ${openDropdown === "program" ? "open" : ""} ${isProgramActive ? "active" : ""}`}>
@@ -79,7 +98,7 @@ export default function Navbar() {
                 >
                   Program Kami
                   <svg className="chevron" viewBox="0 0 24 24">
-                    <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2"/>
+                    <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" fill="none"/>
                   </svg>
                 </span>
 
@@ -92,9 +111,7 @@ export default function Navbar() {
               </li>
 
               <li>
-                <NavLink to="/gallery" onClick={closeMenu}>
-                  Galeri
-                </NavLink>
+                <NavLink to="/gallery" onClick={closeMenu}>Galeri</NavLink>
               </li>
 
               {/* PRODUK */}
@@ -108,7 +125,7 @@ export default function Navbar() {
                 >
                   Produk
                   <svg className="chevron" viewBox="0 0 24 24">
-                    <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2"/>
+                    <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" fill="none"/>
                   </svg>
                 </span>
 
@@ -121,36 +138,33 @@ export default function Navbar() {
               </li>
 
               <li>
-                <NavLink to="/article" onClick={closeMenu}>
-                  Artikel
-                </NavLink>
+                <NavLink to="/article" onClick={closeMenu}>Artikel</NavLink>
               </li>
 
               <li>
-                <NavLink to="/tiket" onClick={closeMenu}>
-                  E-Tiket
-                </NavLink>
+                <NavLink to="/tiket" onClick={closeMenu}>E-Tiket</NavLink>
               </li>
 
             </ul>
           </div>
 
-          {/* BUTTON */}
-          <button className="btn-contact desktop-btn">
-            Hubungi Kami
-          </button>
+          {/* RIGHT */}
+          <div className="nav-right">
+            <button className="btn-contact desktop-btn">
+              Hubungi Kami
+            </button>
 
-          {/* HAMBURGER */}
-          <div
-            className={menuOpen ? "hamburger open" : "hamburger"}
-            onClick={(e) => {
-              e.stopPropagation();
-              setMenuOpen(!menuOpen);
-            }}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
+            <div
+              className={menuOpen ? "hamburger open" : "hamburger"}
+              onClick={(e) => {
+                e.stopPropagation();
+                setMenuOpen(!menuOpen);
+              }}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
           </div>
 
         </div>

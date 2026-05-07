@@ -14,13 +14,28 @@ body {
   position: fixed;
   top: 0;
   width: 100%;
-  backdrop-filter: blur(10px);
-  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.75);
   box-shadow: 0 2px 15px rgba(0,0,0,0.05);
   z-index: 1000;
+  transition: transform 0.35s ease;
 
   transform: translateY(-100%);
   animation: navbarSlide 0.6s ease forwards;
+}
+
+.navbar.show {
+  transform: translateY(0);
+}
+
+.navbar.hide {
+  transform: translateY(-100%);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 @keyframes navbarSlide {
@@ -30,11 +45,11 @@ body {
 }
 
 .nav-container {
-  max-width: 100%; /* dari 1200px jadi full */
-  padding: 0 50px; /* kasih ruang kiri kanan */
+  max-width: 1400px;
   margin: auto;
+  padding: 0 32px;
   height: 70px;
-  padding: 0 24px;
+
   display: flex;
   align-items: center;
 }
@@ -43,21 +58,31 @@ body {
 .nav-center {
   flex: 1;
   display: flex;
-  justify-content: flex-start; /* gak center lagi */
-  margin-left: 60px; /* jarak dari logo (atur feel di sini) */
+  justify-content: center;
+}
+
+.leaf {
+  width: 18px;
+  height: 18px;
+  background: #22c55e;
+  border-radius: 50% 0 50% 50%;
+  transform: rotate(45deg);
 }
 
 
 
 /* ================= LOGO ================= */
 .logo {
-  font-size: 20px;
-  font-weight: 700;
-  color: #16c35b;
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-right: 20px;
+
+  font-size: 20px;
+  font-weight: 600;
+  color: #16c35b;
+
+  line-height: 1;
+  transform: translateY(5px);
 }
 
 /* ================= NAV LINKS ================= */
@@ -78,10 +103,7 @@ body {
   padding: 10px 0;
 }
 
-/* garis pembatas */
-.nav-links li:not(:last-child) {
-  border-bottom: 1px solid rgba(22, 195, 91, 0.15);
-}
+
 
 .nav-links a {
   text-decoration: none;
@@ -131,8 +153,8 @@ body {
   border-radius: 30px;
   color: white;
   cursor: pointer;
+
   margin-left: auto;
-  margin-right: 20px; /* biar gak nempel kanan banget */
 }
 
 /* ================= DROPDOWN ================= */
@@ -156,6 +178,11 @@ body {
 
 .chevron {
   width: 14px;
+  height: 14px;
+
+  margin-left: 4px;        /* 👉 kasih jarak dari teks */
+  transform: translateY(2px); /* 👉 biar sejajar sama tulisan */
+
   transition: 0.3s;
 }
 
@@ -235,65 +262,59 @@ body {
   display: none;
   flex-direction: column;
   gap: 5px;
+  cursor: pointer;
 }
 
 .hamburger span {
   width: 25px;
   height: 3px;
   background: black;
+  transition: 0.3s;
 }
+
+/* animasi jadi X */
+.hamburger.open span:nth-child(1) {
+  transform: rotate(45deg) translateY(8px);
+}
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+.hamburger.open span:nth-child(3) {
+  transform: rotate(-45deg) translateY(-8px);
+}
+
 
 /* ================= MOBILE ================= */
 @media (max-width: 1200px) {
+
+  .nav-center {
+    justify-content: flex-start;
+  }
+
   .nav-links {
     position: fixed;
     top: 70px;
-    right: -100%;
-    width: 260px;
+    right: -100%; /* sembunyi */
+    width: 270px;
     height: calc(100vh - 70px);
     background: white;
-    flex-direction: column;
-    padding: 20px;
-    padding-bottom: 40px;
-    gap: 16px;
-    font-size: 14px;
-    transition: 0.4s;
-    z-index: 1000;
+    transition: 0.35s ease;
 
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    flex-direction: column;
+    padding: 24px;
+    gap: 18px;
+
+    transition: 0.35s ease; /* smooth slide */
+    box-shadow: -10px 0 30px rgba(0,0,0,0.1);
   }
 
   .nav-links.active {
-    right: 0;
+    right: 0; /* muncul */
   }
 
   .nav-links li {
     width: 100%;
-  }
-
-  /* dropdown mobile */
-  .dropdown-menu {
-    position: relative;
-    top: 0;
-    left: 0;
-    width: 100%;
-    box-shadow: none;
-    border-radius: 8px;
-
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-
-    display: none;
-  }
-
-  .dropdown-menu.show {
-    display: block;
-  }
-
-  .dropdown-menu li {
-    padding: 10px 10px 10px 20px;
+    padding: 12px 0;
   }
 
   .desktop-btn {
@@ -302,7 +323,29 @@ body {
 
   .hamburger {
     display: flex;
-    cursor: pointer;
+  }
+
+  /* dropdown mobile lebih clean */
+  .dropdown-menu {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+
+    background: #f9f9f9;
+    border-radius: 10px;
+
+    display: none;
+    padding: 8px;
+  }
+
+  .dropdown-menu.show {
+    display: block;
+  }
+
+  .dropdown-menu li {
+    padding: 10px 12px;
+    margin-bottom: 6px;
   }
 }
 

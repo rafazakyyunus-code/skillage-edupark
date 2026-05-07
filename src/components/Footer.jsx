@@ -2,10 +2,12 @@ import "./Footer.css";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { FaWhatsapp, FaInstagram, FaFacebook, FaTiktok } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 import L from "leaflet";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import { FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
 
 const customIcon = new L.Icon({
   iconUrl: markerIcon,
@@ -25,27 +27,60 @@ export default function Footer() {
             peternakan, dan perkebunan.
           </p>
 
-          {/* SOCIAL ICONS */}
           <div className="social-icons">
-            <a href="#" target="_blank"><FaWhatsapp /></a>
-            <a href="#" target="_blank"><FaInstagram /></a>
-            <a href="#" target="_blank"><FaFacebook /></a>
-            <a href="#" target="_blank"><FaTiktok /></a>
+            <a href="#"><FaWhatsapp /></a>
+            <a href="#"><FaInstagram /></a>
+            <a href="#"><FaFacebook /></a>
+            <a href="#"><FaTiktok /></a>
           </div>
         </div>
 
-        {/* MIDDLE */}
-        <div className="footer-middle">
-          <h3>Kontak</h3>
-          <p>Jonggol, Bogor, Jawa Barat</p>
+        {/* MENU */}
+        <div className="footer-menu">
+          <h3>Menu</h3>
+          <ul>
+            <li><Link to="/">Beranda</Link></li>
+            <li><Link to="/tentang-kami">Tentang Kami</Link></li>
+            <li><Link to="/program/hydroponic">Program</Link></li>
+            <li><Link to="/gallery">Gallery</Link></li>
+            <li><Link to="/produk">Produk</Link></li>
+            <li><Link to="/article">Artikel</Link></li>
+          </ul>
         </div>
 
-        {/* RIGHT */}
+        {/* CONTACT */}
+        <div className="footer-middle">
+  <h3>Kontak</h3>
+
+  <a
+    href="https://www.google.com/maps?q=-6.478,107.004"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="contact-item"
+  >
+    <FaMapMarkerAlt /> Jonggol, Bogor, Jawa Barat
+  </a>
+
+  <a
+  href="https://wa.me/6281234567890?text=Halo%20saya%20ingin%20bertanya%20tentang%20Edupark"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="contact-item"
+>
+  <FaPhoneAlt /> +62 812 3456 7890
+</a>
+
+  <a href="mailto:info@edupark.com" className="contact-item">
+    <FaEnvelope /> info@edupark.com
+  </a>
+</div>
+
+        {/* MAP */}
         <div className="footer-right">
           <MapContainer
             center={[-6.478, 107.004]}
             zoom={13}
-            scrollWheelZoom={true}
+            scrollWheelZoom={false}
             className="map"
           >
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />

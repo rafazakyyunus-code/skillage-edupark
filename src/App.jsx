@@ -13,7 +13,7 @@ import ProductSection from "./components/ProductSection";
 import ProgramSection from "./components/ProgramSection";
 import CTA from "./components/CTA";
 import GallerySection from "./components/GallerySection";
-import Tentangkami from "./components/Tentangkami";
+import Tentangkami from "./pages/TentangKami/Tentangkami";  
 
 /* ───────── PUBLIC PAGES ───────── */
 import Gallery from "./pages/gallery/Gallery";
@@ -40,7 +40,6 @@ function Home() {
       <About />
       <WhyChoose />
       <ProductSection />
-      <Tentangkami />
       <ProgramSection />
       <GallerySection />
       <CTA />
