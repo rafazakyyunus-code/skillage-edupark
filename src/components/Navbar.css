@@ -147,14 +147,33 @@ body {
 
 /* ================= BUTTON ================= */
 .btn-contact {
-  background: #16c35b;
+  background: linear-gradient(135deg, #16c35b, #0fa64b);
   border: none;
-  padding: 10px 22px;
-  border-radius: 30px;
+
+  padding: 12px 24px;
+  border-radius: 14px;
+
   color: white;
   cursor: pointer;
 
+  font-size: 14px;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
   margin-left: auto;
+
+  box-shadow: 0 10px 25px rgba(22, 195, 91, 0.25);
+  transition: all 0.3s ease;
+}
+
+.btn-contact:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(22, 195, 91, 0.35);
 }
 
 /* ================= DROPDOWN ================= */

@@ -6,15 +6,13 @@
     overflow-x: hidden;
   }
   /* ===== HERO ===== */
-  .program-page .program-hero {
+ .program-page .program-hero {
   width: 100%;
-    margin-top: 80px; /* jarak dari navbar */ /* 🔥 ini bikin dia ke tengah */
-    border-radius: 0;
-    overflow: hidden; /* 🔥 biar radius kepake */
-    box-shadow: 0 20px 60px rgba(0,0,0,0.25);  
-    border-bottom-left-radius: 30px;
-    border-bottom-right-radius: 30px;
-  }
+  margin-top: 80px;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
 
   .program-page .program-hero::before {
     content: "";
@@ -496,9 +494,9 @@
     text-align: center;
   }
 
-  .program-page section {
-    padding: 100px 0;
-  } 
+.program-page section {
+  padding: 60px 0;
+}
 
 
   /* ================= RESPONSIVE MOBILE ================= */

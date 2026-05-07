@@ -1,0 +1,221 @@
+.contact-page {
+  background: #f5f7f9;
+}
+
+/* HERO */
+.contact-hero {
+  height: 420px;
+  background:
+    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+    url("https://images.unsplash.com/photo-1497366754035-f200968a6e72");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  position: relative;
+}
+
+.contact-hero-content {
+  max-width: 700px;
+  padding: 20px;
+  z-index: 2;
+}
+
+.contact-hero h1 {
+  font-size: 4rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.contact-hero p {
+  line-height: 1.8;
+  opacity: 0.9;
+}
+
+/* CONTAINER */
+.contact-container {
+  width: 90%;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* CONTACT CARDS */
+.contact-cards {
+  margin-top: -70px;
+  position: relative;
+  z-index: 5;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 24px;
+}
+
+.contact-card {
+  background: white;
+  border-radius: 18px;
+  padding: 40px 25px;
+  text-align: center;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+}
+
+.contact-icon {
+  color: #39d353;
+  margin-bottom: 20px;
+}
+
+.contact-card h3 {
+  margin-bottom: 14px;
+}
+
+.contact-card p {
+  color: #666;
+  line-height: 1.7;
+}
+
+/* MAP */
+.map-section {
+  padding: 90px 0;
+}
+
+.map-box {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.map-box iframe {
+  width: 100%;
+  height: 450px;
+  border: none;
+}
+
+.map-overlay-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 35px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.map-overlay-box a {
+  display: inline-block;
+  margin-top: 15px;
+  background: #39d353;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 50px;
+  text-decoration: none;
+}
+
+/* TESTIMONIAL */
+.testimonial-section {
+  padding: 100px 0;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.section-header h2 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+
+.line {
+  width: 80px;
+  height: 5px;
+  background: #39d353;
+  margin: auto;
+  border-radius: 20px;
+}
+
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 24px;
+}
+
+.testimonial-card {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.stars {
+  color: #39d353;
+  display: flex;
+  gap: 5px;
+  margin-bottom: 18px;
+}
+
+.testimonial-user {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.testimonial-user img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+/* FAQ */
+.faq-section {
+  padding: 100px 0;
+}
+
+.faq-box {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.faq-item {
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+
+.faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.faq-item p {
+  margin-top: 16px;
+  color: #666;
+  line-height: 1.7;
+}
+
+/* RESPONSIVE */
+@media(max-width: 900px){
+
+  .cards-grid,
+  .testimonial-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-hero h1 {
+    font-size: 3rem;
+  }
+
+  .map-overlay-box {
+    width: 90%;
+  }
+
+}

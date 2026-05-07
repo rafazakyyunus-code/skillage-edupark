@@ -150,9 +150,9 @@ export default function Navbar() {
 
           {/* RIGHT */}
           <div className="nav-right">
-            <button className="btn-contact desktop-btn">
-              Hubungi Kami
-            </button>
+           <NavLink to="/contact" className="btn-contact desktop-btn">
+             Hubungi Kami
+              </NavLink>
 
             <div
               className={menuOpen ? "hamburger open" : "hamburger"}

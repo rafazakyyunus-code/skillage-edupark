@@ -5,6 +5,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
+import ContactPage from "./pages/contact/ContactPage";
+
 /* ───────── HOME ───────── */
 import Hero from "./components/Hero";
 import About from "./components/About";
@@ -143,6 +145,15 @@ function App() {
           {/* PUBLIC */}
           <Route path="/" element={<AnimatedPage><Home /></AnimatedPage>} />
           <Route path="/tentang-kami" element={<AnimatedPage><Tentangkami /></AnimatedPage>} />
+
+<Route
+  path="/contact"
+  element={
+    <AnimatedPage>
+      <ContactPage />
+    </AnimatedPage>
+  }
+/>
 
           {/* PROGRAM */}
           <Route path="/program/hydroponic" element={<AnimatedPage><Hydroponic /></AnimatedPage>} />
