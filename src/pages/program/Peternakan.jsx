@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import "./ProgramPage.css";
 import heroImage from "/src/assets/images/pertenakan domba.jpeg";
+import kambing from "/src/assets/images/kambing.jpg";
 export default function Peternakan() {
   const hewan = [
     { icon: "🪱", name: "Budidaya Maggot", desc: "Pelajari proses pemerahan susu segar" },
@@ -10,7 +11,7 @@ export default function Peternakan() {
   ];
 
   return (
-    <div className="program-page">
+    <div className="program-page">a
        <section
         className="program-hero peternakan-hero"
         style={{
@@ -50,7 +51,9 @@ export default function Peternakan() {
             </div>
             <div className="about-visual">
               <div className="visual-card">
-                <div className="visual-icon">🐄</div>
+                <div className="visual-image">
+                  <img src={kambing} alt="Kambing" />
+              </div>
                 <p>Area peternakan seluas 2 hektar yang asri!</p>
               </div>
             </div>

@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 import "./ProgramPage.css";
-import heroImage from "/src/assets/images/workshop.jpeg";
+import heroImage from "/src/assets/images/panen.jpg";
+import workshop from "/src/assets/images/workshop1.jpg";
 export default function VenueWorkshop() {
   const fasilitas = [
-    { icon: "🏛️", title: "Ruang Serbaguna", desc: "Kapasitas hingga 200 peserta dengan AC & sound system" },
-    { icon: "📽️", title: "Proyektor HD", desc: "Layar lebar untuk presentasi profesional" },
-    { icon: "🍽️", title: "Catering", desc: "Tersedia paket konsumsi sesuai kebutuhan acara" },
-    { icon: "🅿️", title: "Parkir Luas", desc: "Area parkir memadai untuk kendaraan roda 2 & 4" },
+    { icon: "🏛️", title: "Belajar Menanam", desc: "Kita akan belajar menanam tumbuhan yang benar" },
+    { icon: "📽️", title: "Proyektor HD", desc: "Belajar budidaya maggot" },
+    { icon: "🍽️", title: "Catering", desc: "Praktek memberimakan hewan dengan benar" },
+    { icon: "🅿️", title: "Parkir Luas", desc: "Belajar yang ada di alam Edupark Skillage" },
   ];
 
   return (
@@ -38,8 +39,7 @@ export default function VenueWorkshop() {
               <span className="tag">Tentang Venue</span>
               <h2>Belajar Lebih Bermakna <br /><span className="green">Di Alam Terbuka</span></h2>
               <p>
-                Venue Workshop Edupark dirancang untuk menciptakan pengalaman belajar yang berbeda.
-                Dikelilingi area hijau yang asri, peserta bisa fokus, kreatif, dan terinspirasi.
+Melalui workshop ini, peserta dapat belajar tentang cara merawat tanaman, mengenal siklus pertumbuhan, hingga memahami kehidupan hewan ternak secara nyata. Suasana alam yang asri membuat proses belajar menjadi lebih santai, seru, dan mudah dipahami.
               </p>
               <div className="stats-row">
                 <div className="stat"><strong>200+</strong><span>Kapasitas</span></div>
@@ -49,7 +49,9 @@ export default function VenueWorkshop() {
             </div>
             <div className="about-visual">
               <div className="visual-card">
-                <div className="visual-icon">🏛️</div>
+                <div className="visual-image">
+                               <img src={workshop} alt="Workshop" />
+                              </div>
                 <p>Venue nyaman dan profesional menanti Anda!</p>
               </div>
             </div>
@@ -59,7 +61,7 @@ export default function VenueWorkshop() {
 
       <section className="program-features" id="fasilitas">
         <div className="container">
-          <h2 className="section-title">Fasilitas Kami</h2>
+          <h2 className="section-title">Kami ajarkan </h2>
           <div className="features-grid">
             {fasilitas.map((f, i) => (
               <div className="feature-card" key={i}>

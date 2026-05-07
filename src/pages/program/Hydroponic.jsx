@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import "./ProgramPage.css";
 import heroImage from "/src/assets/images/hydroponicc.jpeg";
+import kambing from "/src/assets/images/hidroponik.jpg";
 
 export default function Hydroponic() {
   const features = [
@@ -71,7 +72,9 @@ export default function Hydroponic() {
             </div>
             <div className="about-visual">
               <div className="visual-card">
-                <div className="visual-icon">🌱</div>
+               <div className="visual-image">
+              <img src={kambing} alt="Kambing" />
+             </div>
                 <p>Skillage Edupark siap menyambutmu loh!!</p>
               </div>
             </div>
