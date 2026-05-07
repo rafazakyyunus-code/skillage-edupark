@@ -1,11 +1,7 @@
 .about {
-  background: #f8fafc;
-  padding: 100px 20px;
+  background: #fff;
+  padding: 70px 20px;
   transition: background 0.4s ease;
-}
-
-.about:hover {
-  background: #f1f5f9;
 }
 
 .about-container {

@@ -1,11 +1,12 @@
 .artikel {
   text-align: center;
-  padding: 60px 20px;
-  background: #f7f7f7;
+  padding: 20px;
+  background: #fff;
 }
 
 .artikel h2 {
   font-size: 28px;
+  font-weight: bold;
   margin-bottom: 10px;
 }
 
