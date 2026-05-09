@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { FaWhatsapp, FaInstagram, FaFacebook, FaTiktok } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { Leaf } from 'lucide-react';
 
 import L from "leaflet";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
@@ -21,7 +22,10 @@ export default function Footer() {
 
         {/* LEFT */}
         <div className="footer-left">
-          <h2 className="logo">🌿 Skillage Edupark</h2>
+        <h2 className="logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Leaf size={28} className="text-green-600" /> 
+          Skillage Edupark
+        </h2>
           <p>
             Tempat wisata edukasi terbaik di bidang pertanian,
             peternakan, dan perkebunan.

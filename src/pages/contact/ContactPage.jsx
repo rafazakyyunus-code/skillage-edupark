@@ -1,4 +1,5 @@
 import "./ContactPage.css";
+import { useState } from "react";
 import {
   MapPin,
   Phone,
@@ -6,55 +7,114 @@ import {
   Clock,
   ChevronDown,
   Star,
+  Leaf
 } from "lucide-react";
 
 export default function ContactPage() {
+  const [openFaq, setOpenFaq] = useState(null);
+
+  const faqData = [
+    {
+      question: "Bagaimana cara mengunjungi Edupark?",
+      answer:
+        "Anda dapat memesan tiket langsung melalui website kami atau datang langsung ke lokasi Edupark.",
+    },
+    {
+      question: "Bagaimana cara menghubungi Edupark?",
+      answer:
+        "Anda dapat menghubungi kami melalui WhatsApp, email resmi, atau media sosial Edupark.",
+    },
+    {
+      question: "Apakah Edupark terbuka untuk umum?",
+      answer:
+        "Ya, Edupark terbuka untuk umum setiap hari mulai pukul 08.00 - 17.00 WIB.",
+    },
+  ];
+
   return (
     <div className="contact-page">
 
       {/* HERO */}
       <section className="contact-hero">
-        <div className="contact-overlay"></div>
+        <div className="hero-overlay"></div>
 
         <div className="contact-hero-content">
-          <h1>Hubungi Kami</h1>
+          <span className="hero-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <Leaf size={18} className="text-green-500" />
+            Edu Wisata Alam
+          </span>
+
+          <h1>Hubungi Edupark</h1>
+
           <p>
-            Hubungi Edupark untuk informasi lebih lanjut mengenai program
-            pendidikan dan kunjungan wisata edukasi kami.
+            Nikmati pengalaman belajar di tengah alam hijau yang asri
+            bersama Edupark. Hubungi kami untuk informasi program,
+            kunjungan sekolah, dan wisata edukasi.
           </p>
+
+          <div className="hero-buttons">
+            <a href="#contact-card" className="hero-btn primary">
+              Hubungi Sekarang
+            </a>
+
+            <a
+              href="https://maps.google.com"
+              target="_blank"
+              rel="noreferrer"
+              className="hero-btn secondary"
+            >
+              Lihat Lokasi
+            </a>
+          </div>
         </div>
       </section>
 
       {/* CONTACT CARDS */}
-      <section className="contact-cards">
+      <section className="contact-cards" id="contact-card">
         <div className="contact-container cards-grid">
 
           <div className="contact-card">
-            <MapPin className="contact-icon" />
+            <div className="icon-wrap">
+              <MapPin className="contact-icon" />
+            </div>
+
             <h3>Alamat</h3>
+
             <p>
-              Jl. Edukasi Raya No. 123, BSD <br />
-              City, Tangerang Selatan
+              Jl. Edukasi Raya No. 123, BSD City,
+              Tangerang Selatan
             </p>
           </div>
 
           <div className="contact-card">
-            <Phone className="contact-icon" />
+            <div className="icon-wrap">
+              <Phone className="contact-icon" />
+            </div>
+
             <h3>Telepon</h3>
-            <p>+62 (21) 500-1234</p>
+
             <p>+62 812-3456-7890</p>
+            <p>+62 21-500-1234</p>
           </div>
 
           <div className="contact-card">
-            <Mail className="contact-icon" />
+            <div className="icon-wrap">
+              <Mail className="contact-icon" />
+            </div>
+
             <h3>Email</h3>
+
             <p>info@edupark.com</p>
             <p>support@edupark.com</p>
           </div>
 
           <div className="contact-card">
-            <Clock className="contact-icon" />
+            <div className="icon-wrap">
+              <Clock className="contact-icon" />
+            </div>
+
             <h3>Jam Operasional</h3>
+
             <p>Senin - Minggu</p>
             <p>08:00 - 17:00 WIB</p>
           </div>
@@ -63,40 +123,74 @@ export default function ContactPage() {
       </section>
 
       {/* MAP */}
-      <section className="map-section">
-        <div className="contact-container">
-          <div className="map-box">
+<section className="map-section">
+  <div className="contact-container">
 
-            <iframe
-              title="map"
-              src="https://www.google.com/maps/embed?pb=!1m18"
-              allowFullScreen=""
-              loading="lazy"
-            ></iframe>
+    <div className="section-header">
+      <h2>Explore Edupark</h2>
+      <div className="line"></div>
+    </div>
 
-            <div className="map-overlay-box">
-              <h3>📍 Peta Lokasi Edupark</h3>
-              <p>Klik untuk melihat peta interaktif di Google Maps</p>
+    <div className="map-box">
 
-              <a
-                href="https://maps.google.com"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Lihat di Google Maps
-              </a>
-            </div>
+      <iframe
+        title="Street View"
+        src="https://www.google.com/maps?q=-6.301693,106.652214&layer=c&cbll=-6.301693,106.652214&cbp=11,0,0,0,0&output=svembed"
+        allowFullScreen
+        loading="lazy"
+      ></iframe>
 
-          </div>
+      <div className="map-dark-overlay"></div>
+
+      <div className="map-overlay-box">
+
+        <span className="hero-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+          <Leaf size={18} className="text-green-500" />
+          Edu Wisata Alam
+        </span>
+
+        <h3>Street View Edupark</h3>
+
+        <p>
+          Jelajahi Edupark dengan tampilan
+          Street View 360° interaktif.
+        </p>
+
+        <div className="map-buttons">
+
+          <a
+            href="https://www.google.com/maps/place/-6.301693,106.652214"
+            target="_blank"
+            rel="noreferrer"
+            className="map-btn primary"
+          >
+            Buka Maps
+          </a>
+
+          <a
+            href="https://www.google.com/maps/dir/?api=1&destination=-6.301693,106.652214"
+            target="_blank"
+            rel="noreferrer"
+            className="map-btn secondary"
+          >
+            Lokasi Saya
+          </a>
+
         </div>
-      </section>
 
-      {/* TESTIMONI */}
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+      {/* TESTIMONIAL */}
       <section className="testimonial-section">
         <div className="contact-container">
 
           <div className="section-header">
-            <h2>Apa Kata Orang</h2>
+            <h2>Apa Kata Mereka</h2>
             <div className="line"></div>
           </div>
 
@@ -113,7 +207,7 @@ export default function ContactPage() {
 
               <p>
                 "Edupark memberikan pengalaman belajar yang luar biasa
-                bagi murid-murid saya."
+                dengan suasana alam yang sangat nyaman."
               </p>
 
               <div className="testimonial-user">
@@ -121,6 +215,7 @@ export default function ContactPage() {
                   src="https://i.pravatar.cc/100?img=12"
                   alt=""
                 />
+
                 <div>
                   <strong>Siti Rahma</strong>
                   <span>Guru SD</span>
@@ -138,8 +233,8 @@ export default function ContactPage() {
               </div>
 
               <p>
-                "Tempat wisata edukasi terbaik dan sangat cocok
-                untuk keluarga."
+                "Tempatnya adem, hijau, bersih, dan sangat cocok
+                untuk wisata keluarga."
               </p>
 
               <div className="testimonial-user">
@@ -147,6 +242,7 @@ export default function ContactPage() {
                   src="https://i.pravatar.cc/100?img=15"
                   alt=""
                 />
+
                 <div>
                   <strong>Andi Wijaya</strong>
                   <span>Orang Tua Murid</span>
@@ -164,8 +260,7 @@ export default function ContactPage() {
               </div>
 
               <p>
-                "Staff ramah dan tempatnya bersih.
-                Sangat recommended!"
+                "Staff sangat ramah dan area edukasinya keren banget!"
               </p>
 
               <div className="testimonial-user">
@@ -173,6 +268,7 @@ export default function ContactPage() {
                   src="https://i.pravatar.cc/100?img=18"
                   alt=""
                 />
+
                 <div>
                   <strong>Budi Santoso</strong>
                   <span>Tour Organizer</span>
@@ -189,45 +285,48 @@ export default function ContactPage() {
         <div className="contact-container">
 
           <div className="section-header">
-            <h2>Pertanyaan yang Sering Diajukan</h2>
+            <h2>Pertanyaan Umum</h2>
+
             <p>
-              Jawaban cepat untuk pertanyaan yang sering diajukan kepada kami.
+              Beberapa pertanyaan yang sering ditanyakan pengunjung.
             </p>
           </div>
 
           <div className="faq-box">
-            <div className="faq-item">
-              <div className="faq-question">
-                <h4>How to visit Edupark?</h4>
-                <ChevronDown size={18} />
+
+            {faqData.map((faq, index) => (
+              <div
+                className={`faq-item ${
+                  openFaq === index ? "active" : ""
+                }`}
+                key={index}
+              >
+                <div
+                  className="faq-question"
+                  onClick={() =>
+                    setOpenFaq(openFaq === index ? null : index)
+                  }
+                >
+                  <h4>{faq.question}</h4>
+
+                  <ChevronDown
+                    size={20}
+                    className={
+                      openFaq === index ? "rotate" : ""
+                    }
+                  />
+                </div>
+
+                <div
+                  className={`faq-answer ${
+                    openFaq === index ? "show" : ""
+                  }`}
+                >
+                  <p>{faq.answer}</p>
+                </div>
               </div>
+            ))}
 
-              <p>
-                Anda dapat memesan tiket langsung melalui website kami.
-              </p>
-            </div>
-
-            <div className="faq-item">
-              <div className="faq-question">
-                <h4>How to contact Edupark?</h4>
-                <ChevronDown size={18} />
-              </div>
-
-              <p>
-                Anda dapat menghubungi kami melalui WhatsApp dan email resmi.
-              </p>
-            </div>
-
-            <div className="faq-item">
-              <div className="faq-question">
-                <h4>Is Edupark open for public?</h4>
-                <ChevronDown size={18} />
-              </div>
-
-              <p>
-                Ya, Edupark terbuka untuk umum setiap hari.
-              </p>
-            </div>
           </div>
 
         </div>

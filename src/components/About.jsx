@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Leaf, Target } from 'lucide-react';
 import "./About.css";
 
 export default function About() {
@@ -49,7 +50,9 @@ export default function About() {
           <div className="features">
 
             <motion.div className="feature" whileHover={{ y: -6 }}>
-              <div className="icon">🌿</div>
+              <div className="icon">
+                <Leaf size={24} className="text-green-600" /> {/* Ganti emoji dengan komponen ikon */}
+              </div>
               <div>
                 <h4>Eco-Certified</h4>
                 <p>Sustainable facilities and practices.</p>
@@ -57,7 +60,9 @@ export default function About() {
             </motion.div>
 
             <motion.div className="feature" whileHover={{ y: -6 }}>
-              <div className="icon">🎯</div>
+              <div className="icon">
+                <Target size={24} className="text-blue-600" /> {/* Mengganti 🎯 dengan ikon Target */}
+              </div>
               <div>
                 <h4>Active Learning</h4>
                 <p>Engaging hands-on curriculum.</p>
