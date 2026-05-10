@@ -133,7 +133,6 @@ html, body {
   }
 
   .hero-buttons {
-    justify-content: center;
     flex-direction: column;
   }
 }

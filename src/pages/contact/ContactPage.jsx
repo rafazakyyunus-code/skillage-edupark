@@ -134,11 +134,12 @@ export default function ContactPage() {
     <div className="map-box">
 
       <iframe
-        title="Street View"
-        src="https://www.google.com/maps?q=-6.301693,106.652214&layer=c&cbll=-6.301693,106.652214&cbp=11,0,0,0,0&output=svembed"
-        allowFullScreen
-        loading="lazy"
-      ></iframe>
+          title="Street View"
+          src="https://www.google.com/maps/embed?pb=!4v1778395217229!6m8!1m7!1sCAoSLEFGMVFpcE5ybXh0T0xkY2V1dVh4T2N5c0hMZm1hU1pOV0x4QmJ0cXh5!2m2!1d-6.49517589349693!2d107.052314!3f0!4f0!5f0.7820865974627469"
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        ></iframe>
 
       <div className="map-dark-overlay"></div>
 
@@ -159,7 +160,7 @@ export default function ContactPage() {
         <div className="map-buttons">
 
           <a
-            href="https://www.google.com/maps/place/-6.301693,106.652214"
+            href="https://maps.google.com/?q=Skill+Village+Islamic+School"
             target="_blank"
             rel="noreferrer"
             className="map-btn primary"
@@ -168,7 +169,7 @@ export default function ContactPage() {
           </a>
 
           <a
-            href="https://www.google.com/maps/dir/?api=1&destination=-6.301693,106.652214"
+            href="https://www.google.com/maps/dir/?api=1&destination=Skill+Village+Islamic+School"
             target="_blank"
             rel="noreferrer"
             className="map-btn secondary"

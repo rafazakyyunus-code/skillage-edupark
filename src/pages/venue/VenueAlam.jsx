@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import "./VenueAlam.css";
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Leaf } from 'lucide-react';
 
 export default function VenueAlam() {
   const aktivitas = [
@@ -71,7 +71,10 @@ export default function VenueAlam() {
   <div className="hero-overlay"></div>
 
   <div className="venue-hero-content">
-    <span className="hero-badge">🌿 Edupark Experience</span>
+    <span className="hero-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+      <Leaf size={18} className="text-green-500" />
+      Edupark Experience
+    </span>
     <h1>Venue Alam</h1>
     <p>
       Berbagai area alam yang dapat dinikmati dan dipelajari,

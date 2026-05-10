@@ -40,11 +40,13 @@ body {
 }
 
 /* navbar show */
+
 .navbar.show {
   transform: translateY(0);
 }
 
 /* navbar hide */
+
 .navbar.hide {
   transform: translateY(-100%);
 }
@@ -62,7 +64,6 @@ body {
 
   display: flex;
   align-items: center;
-  justify-content: space-between;
 }
 
 /* ================= LOGO ================= */
@@ -70,7 +71,12 @@ body {
 .logo {
   display: flex;
   align-items: center;
+
   gap: 10px;
+
+  margin-right: 38px;
+
+  flex-shrink: 0;
 
   font-size: 23px;
   font-weight: 700;
@@ -85,6 +91,8 @@ body {
   width: 18px;
   height: 18px;
 
+  flex-shrink: 0;
+
   background: #16c35b;
 
   border-radius: 50% 0 50% 50%;
@@ -95,9 +103,11 @@ body {
 /* ================= CENTER ================= */
 
 .nav-center {
-  flex: 1;
   display: flex;
-  justify-content: center;
+  align-items: center;
+
+  flex: 1;
+  min-width: 0;
 }
 
 /* ================= NAV LINKS ================= */
@@ -107,11 +117,17 @@ body {
 
   display: flex;
   align-items: center;
-  gap: 34px;
+
+  gap: 38px;
+
+  margin-right: auto;
 }
 
 .nav-links li {
   position: relative;
+
+  display: flex;
+  align-items: center;
 }
 
 /* ================= LINKS ================= */
@@ -122,7 +138,10 @@ body {
 
   display: flex;
   align-items: center;
+
   gap: 6px;
+
+  height: 82px;
 
   text-decoration: none;
 
@@ -137,6 +156,8 @@ body {
   border: none;
 
   cursor: pointer;
+
+  white-space: nowrap;
 }
 
 /* hover */
@@ -166,7 +187,7 @@ body {
 
   position: absolute;
   left: 50%;
-  bottom: -10px;
+  bottom: 20px;
 
   width: 0%;
   height: 2px;
@@ -197,12 +218,21 @@ body {
 .nav-right {
   display: flex;
   align-items: center;
+
   gap: 18px;
+
+  margin-left: 30px;
+
+  flex-shrink: 0;
 }
 
 /* ================= CONTACT BUTTON ================= */
 
 .btn-contact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   padding: 12px 22px;
 
   border-radius: 14px;
@@ -223,7 +253,9 @@ body {
   box-shadow:
     0 12px 28px rgba(22, 195, 91, 0.28);
 
-  transition: 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .btn-contact:hover {
@@ -258,7 +290,8 @@ body {
   list-style: none;
 
   position: absolute;
-  top: 54px;
+
+  top: 72px;
   left: 0;
 
   min-width: 240px;
@@ -300,6 +333,8 @@ body {
 .dropdown-menu a {
   display: block;
 
+  height: auto;
+
   padding: 12px 15px;
 
   border-radius: 12px;
@@ -326,6 +361,7 @@ body {
 
   flex-direction: column;
   justify-content: center;
+
   gap: 5px;
 
   width: 30px;
@@ -455,6 +491,8 @@ body {
 @media (max-width: 1200px) {
 
   .nav-container {
+    justify-content: space-between;
+
     padding: 0 24px;
   }
 
@@ -507,11 +545,19 @@ body {
   .nav-links a,
   .dropdown-title {
     width: 100%;
+    height: auto;
 
     display: flex;
     justify-content: space-between;
 
+    padding: 4px 0;
+
     font-size: 16px;
+  }
+
+  .nav-links a::after,
+  .dropdown-title::after {
+    bottom: -6px;
   }
 
   /* dropdown mobile */
@@ -560,5 +606,11 @@ body {
 
   .logo {
     font-size: 20px;
+
+    margin-right: 0;
+  }
+
+  .nav-container {
+    padding: 0 18px;
   }
 }
