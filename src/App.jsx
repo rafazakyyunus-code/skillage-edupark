@@ -5,6 +5,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
+import ContactPage from "./pages/contact/ContactPage";
+
 /* ───────── HOME ───────── */
 import Hero from "./components/Hero";
 import About from "./components/About";
@@ -171,6 +173,15 @@ function App() {
               </AnimatedPage>
             }
           />
+
+<Route
+  path="/contact"
+  element={
+    <AnimatedPage>
+      <ContactPage />
+    </AnimatedPage>
+  }
+/>
 
           {/* PROGRAM */}
           <Route

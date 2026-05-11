@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import "./VenueAlam.css";
+import { MessageCircle, Leaf } from 'lucide-react';
 
 export default function VenueAlam() {
   const aktivitas = [
@@ -70,7 +71,10 @@ export default function VenueAlam() {
   <div className="hero-overlay"></div>
 
   <div className="venue-hero-content">
-    <span className="hero-badge">🌿 Edupark Experience</span>
+    <span className="hero-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+      <Leaf size={18} className="text-green-500" />
+      Edupark Experience
+    </span>
     <h1>Venue Alam</h1>
     <p>
       Berbagai area alam yang dapat dinikmati dan dipelajari,
@@ -109,13 +113,15 @@ export default function VenueAlam() {
       <section className="venue-cta">
         <h2>Ayo ke Venue Alam!</h2>
         <p>Hubungi kami untuk reservasi dan informasi lebih lanjut</p>
-        <a
-          href="https://wa.me/6281234567890"
-          target="_blank"
+        <a 
+          href="https://wa.me/6281234567890" 
+          className="btn-primary" 
+          target="_blank" 
           rel="noreferrer"
-          className="venue-btn"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
         >
-          📱 WhatsApp Kami
+          <MessageCircle size={20} /> 
+          WhatsApp Kami
         </a>
       </section>
     </div>

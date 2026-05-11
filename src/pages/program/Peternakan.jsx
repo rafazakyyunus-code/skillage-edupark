@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import "./ProgramPage.css";
 import heroImage from "/src/assets/images/pertenakan domba.jpeg";
 import kambing from "/src/assets/images/kambing.jpg";
+import { MessageCircle, Leaf } from 'lucide-react';
 export default function Peternakan() {
   const hewan = [
     { icon: "🪱", name: "Budidaya Maggot", desc: "Pelajari proses pemerahan susu segar" },
@@ -22,7 +23,10 @@ export default function Peternakan() {
       >
         <div className="hero-overlay" />
         <div className="hero-content">
-          <span className="badge">🌿 Program Kami</span>
+          <span className="badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Leaf size={16} />
+            Program Kami
+          </span>
           <h1>Peternakan</h1>
           <p>Kenali, rawat, dan pelajari hewan ternak langsung di lapangan bersama ahlinya.</p>
           <div className="hero-btns">
@@ -81,9 +85,16 @@ export default function Peternakan() {
           <h2>Tertarik Bergabung?</h2>
           <p>Hubungi kami untuk informasi jadwal program Peternakan Edupark</p>
           <div className="cta-btns">
-            <a href="https://wa.me/6281234567890" className="btn-primary" target="_blank" rel="noreferrer">
-              📱 WhatsApp Kami
-            </a>
+          <a 
+            href="https://wa.me/6281234567890" 
+            className="btn-primary" 
+            target="_blank" 
+            rel="noreferrer"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+          >
+            <MessageCircle size={20} /> 
+            WhatsApp Kami
+          </a>
             <Link to="/" className="btn-outline">← Kembali ke Beranda</Link>
           </div>
         </div>

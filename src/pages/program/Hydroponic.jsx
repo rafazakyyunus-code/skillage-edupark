@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import "./ProgramPage.css";
 import heroImage from "/src/assets/images/hydroponicc.jpeg";
 import kambing from "/src/assets/images/hidroponik.jpg";
+import { MessageCircle, Leaf,} from 'lucide-react';
 
 export default function Hydroponic() {
   const features = [
@@ -35,7 +36,10 @@ export default function Hydroponic() {
 >
         <div className="hero-overlay" />
         <div className="hero-content">
-          <span className="badge">🌿 Program Kami</span>
+          <span className="badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Leaf size={16} />
+            Program Kami
+          </span>
           <h1>Hydroponic</h1>
           <p>Belajar bercocok tanam modern tanpa tanah. Teknologi masa depan, hasil nyata.</p>
           <div className="hero-btns">
@@ -119,8 +123,15 @@ export default function Hydroponic() {
           <h2>Tertarik Bergabung?</h2>
           <p>Hubungi kami untuk informasi jadwal dan harga program Hydroponic</p>
           <div className="cta-btns">
-            <a href="https://wa.me/6281234567890" className="btn-primary" target="_blank" rel="noreferrer">
-              📱 WhatsApp Kami
+            <a 
+              href="https://wa.me/6281234567890" 
+              className="btn-primary" 
+              target="_blank" 
+              rel="noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+            >
+              <MessageCircle size={20} /> 
+              WhatsApp Kami
             </a>
             <Link to="/" className="btn-outline">← Kembali ke Beranda</Link>
           </div>

@@ -36,7 +36,7 @@ html, body {
   color: #e5e5e5;
 }
 
-.hero-buttons {
+.hero-buttonss {
   margin-top: 25px;
   display: flex;
   gap: 15px;
@@ -133,7 +133,7 @@ html, body {
   }
 
   .hero-buttons {
-    justify-content: center;
+    /* justify-content: center; */
     flex-direction: column;
   }
 }

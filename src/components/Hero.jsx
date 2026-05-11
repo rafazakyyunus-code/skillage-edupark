@@ -1,4 +1,3 @@
-
 import "./Hero.css";
 
 export default function Hero() {
@@ -15,7 +14,7 @@ export default function Hero() {
           environments that bridge the gap between classroom theory and natural world applications.
         </p>
 
-        <div className="hero-buttons">
+        <div className="hero-buttonss">
           <button className="btn-primary">Tentang Kami</button>
           <button className="btn-outline">Selengkapnya</button>
         </div>

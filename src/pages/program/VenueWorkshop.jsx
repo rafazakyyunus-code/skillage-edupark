@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import "./ProgramPage.css";
 import heroImage from "/src/assets/images/panen.jpg";
 import workshop from "/src/assets/images/workshop1.jpg";
+import { MessageCircle, Leaf } from 'lucide-react';
 export default function VenueWorkshop() {
   const fasilitas = [
     { icon: "🏛️", title: "Belajar Menanam", desc: "Kita akan belajar menanam tumbuhan yang benar" },
@@ -22,7 +23,10 @@ export default function VenueWorkshop() {
       >
         <div className="hero-overlay" />
         <div className="hero-content">
-          <span className="badge">🌿 Program Kami</span>
+          <span className="badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Leaf size={16} />
+            Program Kami
+          </span>
           <h1>Venue Workshop</h1>
           <p>Ruang ideal untuk pelatihan, seminar, dan kegiatan edukatif bersama alam.</p>
           <div className="hero-btns">
@@ -79,9 +83,16 @@ Melalui workshop ini, peserta dapat belajar tentang cara merawat tanaman, mengen
           <h2>Siap Booking Venue?</h2>
           <p>Hubungi kami untuk informasi ketersediaan dan harga sewa venue</p>
           <div className="cta-btns">
-            <a href="https://wa.me/6281234567890" className="btn-primary" target="_blank" rel="noreferrer">
-              📱 WhatsApp Kami
-            </a>
+           <a 
+            href="https://wa.me/6281234567890" 
+            className="btn-primary" 
+            target="_blank" 
+            rel="noreferrer"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+          >
+            <MessageCircle size={20} /> 
+            WhatsApp Kami
+          </a>
             <Link to="/" className="btn-outline">← Kembali ke Beranda</Link>
           </div>
         </div>
