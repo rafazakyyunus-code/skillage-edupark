@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, Link, useLocation } from "react-router-dom";
 import "./Navbar.css";
 
 export default function Navbar() {
@@ -23,12 +23,15 @@ export default function Navbar() {
 
   const isProgramActive = location.pathname.startsWith("/program");
   const isProdukActive = location.pathname.startsWith("/produk");
+  const isEtiketActive = location.pathname.startsWith("/e-ticket");
 
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 1200) closeMenu();
     };
+
     window.addEventListener("resize", handleResize);
+
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -38,7 +41,9 @@ export default function Navbar() {
         setOpenDropdown(null);
       }
     };
+
     document.addEventListener("click", handleClickOutside);
+
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
@@ -59,6 +64,7 @@ export default function Navbar() {
     };
 
     window.addEventListener("scroll", handleScroll);
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
@@ -75,10 +81,13 @@ export default function Navbar() {
 
           {/* MENU */}
           <div className="nav-center">
+
             <ul className={menuOpen ? "nav-links active" : "nav-links"}>
 
               <li>
-                <NavLink to="/" onClick={closeMenu}>Beranda</NavLink>
+                <NavLink to="/" onClick={closeMenu}>
+                  Beranda
+                </NavLink>
               </li>
 
               <li>
@@ -88,7 +97,11 @@ export default function Navbar() {
               </li>
 
               {/* PROGRAM */}
-              <li className={`dropdown ${openDropdown === "program" ? "open" : ""} ${isProgramActive ? "active" : ""}`}>
+              <li
+                className={`dropdown ${
+                  openDropdown === "program" ? "open" : ""
+                } ${isProgramActive ? "active" : ""}`}
+              >
                 <span
                   className="dropdown-title"
                   onClick={(e) => {
@@ -97,25 +110,74 @@ export default function Navbar() {
                   }}
                 >
                   Program Kami
+
                   <svg className="chevron" viewBox="0 0 24 24">
-                    <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" fill="none"/>
+                    <path
+                      d="M6 9L12 15L18 9"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      fill="none"
+                    />
                   </svg>
                 </span>
 
-                <ul className={openDropdown === "program" ? "dropdown-menu show" : "dropdown-menu"}>
-                  <li><NavLink to="/program/hydroponic" onClick={closeMenu}>Hydroponic</NavLink></li>
-                  <li><NavLink to="/program/venue-workshop" onClick={closeMenu}>Venue Workshop</NavLink></li>
-                  <li><NavLink to="/program/peternakan" onClick={closeMenu}>Peternakan</NavLink></li>
-                  <li><NavLink to="/program/venue-alam" onClick={closeMenu}>Venue Alam</NavLink></li>
+                <ul
+                  className={
+                    openDropdown === "program"
+                      ? "dropdown-menu show"
+                      : "dropdown-menu"
+                  }
+                >
+                  <li>
+                    <NavLink
+                      to="/program/hydroponic"
+                      onClick={closeMenu}
+                    >
+                      Hydroponic
+                    </NavLink>
+                  </li>
+
+                  <li>
+                    <NavLink
+                      to="/program/venue-workshop"
+                      onClick={closeMenu}
+                    >
+                      Venue Workshop
+                    </NavLink>
+                  </li>
+
+                  <li>
+                    <NavLink
+                      to="/program/peternakan"
+                      onClick={closeMenu}
+                    >
+                      Peternakan
+                    </NavLink>
+                  </li>
+
+                  <li>
+                    <NavLink
+                      to="/program/venue-alam"
+                      onClick={closeMenu}
+                    >
+                      Venue Alam
+                    </NavLink>
+                  </li>
                 </ul>
               </li>
 
               <li>
-                <NavLink to="/gallery" onClick={closeMenu}>Galeri</NavLink>
+                <NavLink to="/gallery" onClick={closeMenu}>
+                  Galeri
+                </NavLink>
               </li>
 
               {/* PRODUK */}
-              <li className={`dropdown ${openDropdown === "produk" ? "open" : ""} ${isProdukActive ? "active" : ""}`}>
+              <li
+                className={`dropdown ${
+                  openDropdown === "produk" ? "open" : ""
+                } ${isProdukActive ? "active" : ""}`}
+              >
                 <span
                   className="dropdown-title"
                   onClick={(e) => {
@@ -124,25 +186,70 @@ export default function Navbar() {
                   }}
                 >
                   Produk
+
                   <svg className="chevron" viewBox="0 0 24 24">
-                    <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" fill="none"/>
+                    <path
+                      d="M6 9L12 15L18 9"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      fill="none"
+                    />
                   </svg>
                 </span>
 
-                <ul className={openDropdown === "produk" ? "dropdown-menu show" : "dropdown-menu"}>
-                  <li><NavLink to="/produk" onClick={closeMenu}>Semua Produk</NavLink></li>
-                  <li><NavLink to="/produk/kategori/hewan-peternakan" onClick={closeMenu}>Peternakan</NavLink></li>
-                  <li><NavLink to="/produk/kategori/sayuran" onClick={closeMenu}>Sayuran</NavLink></li>
-                  <li><NavLink to="/produk/kategori/saprodi" onClick={closeMenu}>Saprodi</NavLink></li>
+                <ul
+                  className={
+                    openDropdown === "produk"
+                      ? "dropdown-menu show"
+                      : "dropdown-menu"
+                  }
+                >
+                  <li>
+                    <NavLink to="/produk" onClick={closeMenu}>
+                      Semua Produk
+                    </NavLink>
+                  </li>
+
+                  <li>
+                    <NavLink
+                      to="/produk/kategori/hewan-peternakan"
+                      onClick={closeMenu}
+                    >
+                      Peternakan
+                    </NavLink>
+                  </li>
+
+                  <li>
+                    <NavLink
+                      to="/produk/kategori/sayuran"
+                      onClick={closeMenu}
+                    >
+                      Sayuran
+                    </NavLink>
+                  </li>
+
+                  <li>
+                    <NavLink
+                      to="/produk/kategori/saprodi"
+                      onClick={closeMenu}
+                    >
+                      Saprodi
+                    </NavLink>
+                  </li>
                 </ul>
               </li>
 
               <li>
-                <NavLink to="/article" onClick={closeMenu}>Artikel</NavLink>
+                <NavLink to="/article" onClick={closeMenu}>
+                  Artikel
+                </NavLink>
               </li>
 
-              <li>
-                <NavLink to="/tiket" onClick={closeMenu}>E-Tiket</NavLink>
+              {/* E-TIKET */}
+              <li className={isEtiketActive ? "active" : ""}>
+                <NavLink to="/e-ticket" onClick={closeMenu}>
+                  E-tiket
+                </NavLink>
               </li>
 
             </ul>
@@ -150,6 +257,7 @@ export default function Navbar() {
 
           {/* RIGHT */}
           <div className="nav-right">
+
             <button className="btn-contact desktop-btn">
               Hubungi Kami
             </button>
@@ -165,12 +273,14 @@ export default function Navbar() {
               <span></span>
               <span></span>
             </div>
-          </div>
 
+          </div>
         </div>
       </nav>
 
-      {menuOpen && <div className="overlay" onClick={closeMenu} />}
+      {menuOpen && (
+        <div className="overlay" onClick={closeMenu} />
+      )}
     </>
   );
 }

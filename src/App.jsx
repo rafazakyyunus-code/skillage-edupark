@@ -13,7 +13,7 @@ import ProductSection from "./components/ProductSection";
 import ProgramSection from "./components/ProgramSection";
 import CTA from "./components/CTA";
 import GallerySection from "./components/GallerySection";
-import Tentangkami from "./pages/TentangKami/Tentangkami";  
+import Tentangkami from "./pages/TentangKami/Tentangkami";
 
 /* ───────── PUBLIC PAGES ───────── */
 import Gallery from "./pages/gallery/Gallery";
@@ -27,6 +27,9 @@ import VenueAlam from "./pages/venue/VenueAlam";
 import VenueDetail from "./pages/venue/VenueDetail";
 import Article from "./pages/article/Article";
 import ArticleDetail from "./pages/articleDetail/ArticleDetail";
+
+/* ───────── E-TIKET ───────── */
+import ETicket from "./pages/Etiket/ETicket";
 
 /* ───────── DASHBOARD ───────── */
 import CreateArticle from "./pages/dashboard/CreateArticle";
@@ -139,37 +142,155 @@ function App() {
 
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
-          
+
           {/* PUBLIC */}
-          <Route path="/" element={<AnimatedPage><Home /></AnimatedPage>} />
-          <Route path="/tentang-kami" element={<AnimatedPage><Tentangkami /></AnimatedPage>} />
+          <Route
+            path="/"
+            element={
+              <AnimatedPage>
+                <Home />
+              </AnimatedPage>
+            }
+          />
+
+          <Route
+            path="/tentang-kami"
+            element={
+              <AnimatedPage>
+                <Tentangkami />
+              </AnimatedPage>
+            }
+          />
+
+          {/* E-TIKET */}
+          <Route
+            path="/e-ticket"
+            element={
+              <AnimatedPage>
+                <ETicket />
+              </AnimatedPage>
+            }
+          />
 
           {/* PROGRAM */}
-          <Route path="/program/hydroponic" element={<AnimatedPage><Hydroponic /></AnimatedPage>} />
-          <Route path="/program/venue-workshop" element={<AnimatedPage><VenueWorkshop /></AnimatedPage>} />
-          <Route path="/program/peternakan" element={<AnimatedPage><Peternakan /></AnimatedPage>} />
-          <Route path="/program/venue-alam" element={<AnimatedPage><VenueAlam /></AnimatedPage>} />
+          <Route
+            path="/program/hydroponic"
+            element={
+              <AnimatedPage>
+                <Hydroponic />
+              </AnimatedPage>
+            }
+          />
+
+          <Route
+            path="/program/venue-workshop"
+            element={
+              <AnimatedPage>
+                <VenueWorkshop />
+              </AnimatedPage>
+            }
+          />
+
+          <Route
+            path="/program/peternakan"
+            element={
+              <AnimatedPage>
+                <Peternakan />
+              </AnimatedPage>
+            }
+          />
+
+          <Route
+            path="/program/venue-alam"
+            element={
+              <AnimatedPage>
+                <VenueAlam />
+              </AnimatedPage>
+            }
+          />
 
           {/* GALLERY */}
-          <Route path="/gallery" element={<AnimatedPage><Gallery /></AnimatedPage>} />
-          <Route path="/gallery/:id" element={<AnimatedPage><GalleryDetail /></AnimatedPage>} />
+          <Route
+            path="/gallery"
+            element={
+              <AnimatedPage>
+                <Gallery />
+              </AnimatedPage>
+            }
+          />
+
+          <Route
+            path="/gallery/:id"
+            element={
+              <AnimatedPage>
+                <GalleryDetail />
+              </AnimatedPage>
+            }
+          />
 
           {/* PRODUK */}
-          <Route path="/produk" element={<AnimatedPage><Produk /></AnimatedPage>} />
-          <Route path="/produk/kategori/:kategori" element={<AnimatedPage><Produk /></AnimatedPage>} />
-          <Route path="/produk/:id" element={<AnimatedPage><ProdukDetail /></AnimatedPage>} />
+          <Route
+            path="/produk"
+            element={
+              <AnimatedPage>
+                <Produk />
+              </AnimatedPage>
+            }
+          />
 
-          {/* ARTICLE (TERHUBUNG STATE) */}
-          <Route path="/article" element={<AnimatedPage><Article articles={articles} /></AnimatedPage>} />
-          <Route path="/article/:id" element={<AnimatedPage><ArticleDetail articles={articles} /></AnimatedPage>} />
+          <Route
+            path="/produk/kategori/:kategori"
+            element={
+              <AnimatedPage>
+                <Produk />
+              </AnimatedPage>
+            }
+          />
+
+          <Route
+            path="/produk/:id"
+            element={
+              <AnimatedPage>
+                <ProdukDetail />
+              </AnimatedPage>
+            }
+          />
+
+          {/* ARTICLE */}
+          <Route
+            path="/article"
+            element={
+              <AnimatedPage>
+                <Article articles={articles} />
+              </AnimatedPage>
+            }
+          />
+
+          <Route
+            path="/article/:id"
+            element={
+              <AnimatedPage>
+                <ArticleDetail articles={articles} />
+              </AnimatedPage>
+            }
+          />
 
           {/* VENUE */}
-          <Route path="/venue/:id" element={<AnimatedPage><VenueDetail /></AnimatedPage>} />
+          <Route
+            path="/venue/:id"
+            element={
+              <AnimatedPage>
+                <VenueDetail />
+              </AnimatedPage>
+            }
+          />
 
-          {/* 🔥 DASHBOARD (FIXED - NO NESTED BUG) */}
+          {/* DASHBOARD */}
           <Route
             path="/dashboard/create-article"
-            element={<CreateArticle onExternalSubmit={addArticle} />}
+            element={
+              <CreateArticle onExternalSubmit={addArticle} />
+            }
           />
 
           <Route
@@ -182,7 +303,7 @@ function App() {
             }
           />
 
-          {/* ❗ FALLBACK */}
+          {/* FALLBACK */}
           <Route path="*" element={<h1>404 Not Found</h1>} />
 
         </Routes>
