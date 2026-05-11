@@ -5,8 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
-import ContactPage from "./pages/contact/ContactPage";
-
 /* ───────── HOME ───────── */
 import Hero from "./components/Hero";
 import About from "./components/About";
@@ -124,8 +122,7 @@ function useArticles() {
       )
     );
 
-    console.log(`✅ Update: ${newStatus}`, articleId);
-  };
+    console.log(`Update: ${newStatus}`, articleId);  };
 
   return { articles: allArticles, addArticle, updateStatus };
 }
@@ -173,15 +170,6 @@ function App() {
               </AnimatedPage>
             }
           />
-
-<Route
-  path="/contact"
-  element={
-    <AnimatedPage>
-      <ContactPage />
-    </AnimatedPage>
-  }
-/>
 
           {/* PROGRAM */}
           <Route
