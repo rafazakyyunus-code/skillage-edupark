@@ -392,12 +392,12 @@ export default function Navbar() {
               {/* TIKET */}
               <li>
                 <NavLink
-                  to="/tiket"
+                  to="/e-ticket"
                   onClick={closeMenu}
                 >
                   E-Tiket
                 </NavLink>
-              </li>
+              </li> 
 
             </ul>
           </div>

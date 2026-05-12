@@ -153,6 +153,7 @@ function App() {
             }
           />
 
+          {/* TENTANG KAMI */}
           <Route
             path="/tentang-kami"
             element={
@@ -162,6 +163,7 @@ function App() {
             }
           />
 
+          {/* CONTACT */}
           <Route
             path="/contact"
             element={
