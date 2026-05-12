@@ -1,8 +1,23 @@
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { MoreVertical, User, LogOut, LogIn } from "lucide-react";
 import "./Navbar.css";
 
 export default function Navbar() {
+  // ================= AUTH =================
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [openProfile, setOpenProfile] = useState(false);
+  // ================= LOGIN =================
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setOpenProfile(false);
+  };
+
+  // ================= LOGOUT =================
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setOpenProfile(false);
+  };
 
   // ================= LOCATION =================
   const location = useLocation();
@@ -41,8 +56,8 @@ export default function Navbar() {
       return "82%";
     }
 
-    if (location.pathname === "/tiket") {
-      return "90%";
+    if (location.pathname === "/e-ticket") {
+    return "90%";
     }
 
     // HUBUNGI KAMI FULL
@@ -411,6 +426,45 @@ export default function Navbar() {
             >
               Hubungi Kami
             </NavLink>
+
+            {/* ================= PROFILE MENU ================= */}
+            <div className="profile-menu">
+
+              <button
+                className="profile-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenProfile(!openProfile);
+                }}
+              >
+                <MoreVertical size={24} />
+              </button>
+
+              <div
+                className={`profile-dropdown ${
+                  openProfile ? "show" : ""
+                }`}
+              >
+                {!isLoggedIn ? (
+                  <button onClick={handleLogin}>
+                    <LogIn size={18} />
+                    Login
+                  </button>
+                ) : (
+                  <>
+                    <button>
+                      <User size={18} />
+                      Profile
+                    </button>
+
+                    <button onClick={handleLogout}>
+                      <LogOut size={18} />
+                      Logout
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
 
             {/* ================= HAMBURGER ================= */}
             <button
