@@ -34,6 +34,7 @@ import ETicket from "./pages/Etiket/ETicket";
 /* ───────── DASHBOARD ───────── */
 import CreateArticle from "./pages/dashboard/CreateArticle";
 import Editor from "./pages/dashboard/Editor";
+import ContactPage from "./pages/contact/ContactPage";
 
 /* ───────── UI ───────── */
 function Home() {
@@ -157,6 +158,15 @@ function App() {
             element={
               <AnimatedPage>
                 <Tentangkami />
+              </AnimatedPage>
+            }
+          />
+
+          <Route
+            path="/contact"
+            element={
+              <AnimatedPage>
+                <ContactPage />
               </AnimatedPage>
             }
           />

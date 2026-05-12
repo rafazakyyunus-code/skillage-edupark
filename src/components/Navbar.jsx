@@ -1,40 +1,100 @@
 import { useState, useEffect } from "react";
-import { NavLink, Link, useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import "./Navbar.css";
 
 export default function Navbar() {
+
+  // ================= LOCATION =================
+  const location = useLocation();
+
+  // ================= STATE =================
   const [menuOpen, setMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
 
-  // 🔥 scroll behavior
+  // navbar show / hide
   const [showNavbar, setShowNavbar] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
 
-  const location = useLocation();
+  // ================= NAVBAR PROGRESS =================
+  const getNavProgress = () => {
 
-  const toggleDropdown = (name) => {
-    setOpenDropdown((prev) => (prev === name ? null : name));
+    if (location.pathname === "/") {
+      return "12%";
+    }
+
+    if (location.pathname === "/tentang-kami") {
+      return "24%";
+    }
+
+    if (location.pathname.startsWith("/program")) {
+      return "40%";
+    }
+
+    if (location.pathname === "/gallery") {
+      return "55%";
+    }
+
+    if (location.pathname.startsWith("/produk")) {
+      return "70%";
+    }
+
+    if (location.pathname === "/article") {
+      return "82%";
+    }
+
+    if (location.pathname === "/tiket") {
+      return "90%";
+    }
+
+    // HUBUNGI KAMI FULL
+    if (location.pathname === "/contact") {
+      return "100%";
+    }
+
+    return "0%";
   };
 
+  // ================= ACTIVE PAGE =================
+  const isProgramActive =
+    location.pathname.startsWith("/program");
+
+  const isProdukActive =
+    location.pathname.startsWith("/produk");
+
+  // ================= TOGGLE DROPDOWN =================
+  const toggleDropdown = (name) => {
+    setOpenDropdown((prev) =>
+      prev === name ? null : name
+    );
+  };
+
+  // ================= CLOSE MENU =================
   const closeMenu = () => {
     setMenuOpen(false);
     setOpenDropdown(null);
   };
 
-  const isProgramActive = location.pathname.startsWith("/program");
-  const isProdukActive = location.pathname.startsWith("/produk");
-  const isEtiketActive = location.pathname.startsWith("/e-ticket");
-
+  // ================= AUTO CLOSE MENU =================
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth > 1200) closeMenu();
+      if (window.innerWidth > 1200) {
+        closeMenu();
+      }
     };
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener(
+      "resize",
+      handleResize
+    );
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener(
+        "resize",
+        handleResize
+      );
+    };
   }, []);
 
+  // ================= CLICK OUTSIDE DROPDOWN =================
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (!e.target.closest(".dropdown")) {
@@ -42,76 +102,135 @@ export default function Navbar() {
       }
     };
 
-    document.addEventListener("click", handleClickOutside);
+    document.addEventListener(
+      "click",
+      handleClickOutside
+    );
 
-    return () => document.removeEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener(
+        "click",
+        handleClickOutside
+      );
+    };
   }, []);
 
+  // ================= NAVBAR SHOW / HIDE =================
   useEffect(() => {
+
+    let lastScrollY = window.scrollY;
+
     const handleScroll = () => {
-      if (window.scrollY < 80) {
+
+      const currentScrollY = window.scrollY;
+
+      // tampil di atas halaman
+      if (currentScrollY < 80) {
         setShowNavbar(true);
-        return;
       }
 
-      if (window.scrollY > lastScrollY) {
+      // scroll bawah
+      else if (
+        currentScrollY > lastScrollY
+      ) {
         setShowNavbar(false);
-      } else {
+      }
+
+      // scroll atas
+      else {
         setShowNavbar(true);
       }
 
-      setLastScrollY(window.scrollY);
+      lastScrollY = currentScrollY;
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener(
+      "scroll",
+      handleScroll
+    );
 
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+    return () => {
+      window.removeEventListener(
+        "scroll",
+        handleScroll
+      );
+    };
+  }, []);
 
   return (
     <>
-      <nav className={`navbar ${showNavbar ? "show" : "hide"}`}>
+      {/* ================= NAVBAR ================= */}
+      <nav
+        className={`navbar ${
+          showNavbar ? "show" : "hide"
+        }`}
+      >
+
         <div className="nav-container">
 
-          {/* LOGO */}
+          {/* ================= LOGO ================= */}
           <div className="logo">
             <span className="leaf"></span>
             <span>Edupark</span>
           </div>
 
-          {/* MENU */}
+          {/* ================= MENU ================= */}
           <div className="nav-center">
 
-            <ul className={menuOpen ? "nav-links active" : "nav-links"}>
+            <ul
+              className={`nav-links ${
+                menuOpen ? "active" : ""
+              }`}
+            >
 
+              {/* BERANDA */}
               <li>
-                <NavLink to="/" onClick={closeMenu}>
+                <NavLink
+                  to="/"
+                  onClick={closeMenu}
+                >
                   Beranda
                 </NavLink>
               </li>
 
+              {/* TENTANG */}
               <li>
-                <NavLink to="/tentang-kami" onClick={closeMenu}>
+                <NavLink
+                  to="/tentang-kami"
+                  onClick={closeMenu}
+                >
                   Tentang Kami
                 </NavLink>
               </li>
 
-              {/* PROGRAM */}
+              {/* ================= PROGRAM ================= */}
               <li
                 className={`dropdown ${
-                  openDropdown === "program" ? "open" : ""
-                } ${isProgramActive ? "active" : ""}`}
+                  openDropdown === "program"
+                    ? "open"
+                    : ""
+                } ${
+                  isProgramActive
+                    ? "active"
+                    : ""
+                }`}
               >
-                <span
+                <button
+                  type="button"
                   className="dropdown-title"
                   onClick={(e) => {
                     e.stopPropagation();
-                    toggleDropdown("program");
+                    toggleDropdown(
+                      "program"
+                    );
                   }}
                 >
                   Program Kami
 
-                  <svg className="chevron" viewBox="0 0 24 24">
+                  <svg
+                    className="chevron"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       d="M6 9L12 15L18 9"
                       stroke="currentColor"
@@ -119,14 +238,15 @@ export default function Navbar() {
                       fill="none"
                     />
                   </svg>
-                </span>
+                </button>
 
                 <ul
-                  className={
-                    openDropdown === "program"
-                      ? "dropdown-menu show"
-                      : "dropdown-menu"
-                  }
+                  className={`dropdown-menu ${
+                    openDropdown ===
+                    "program"
+                      ? "show"
+                      : ""
+                  }`}
                 >
                   <li>
                     <NavLink
@@ -166,28 +286,44 @@ export default function Navbar() {
                 </ul>
               </li>
 
+              {/* GALERI */}
               <li>
-                <NavLink to="/gallery" onClick={closeMenu}>
+                <NavLink
+                  to="/gallery"
+                  onClick={closeMenu}
+                >
                   Galeri
                 </NavLink>
               </li>
 
-              {/* PRODUK */}
+              {/* ================= PRODUK ================= */}
               <li
                 className={`dropdown ${
-                  openDropdown === "produk" ? "open" : ""
-                } ${isProdukActive ? "active" : ""}`}
+                  openDropdown === "produk"
+                    ? "open"
+                    : ""
+                } ${
+                  isProdukActive
+                    ? "active"
+                    : ""
+                }`}
               >
-                <span
+                <button
+                  type="button"
                   className="dropdown-title"
                   onClick={(e) => {
                     e.stopPropagation();
-                    toggleDropdown("produk");
+                    toggleDropdown(
+                      "produk"
+                    );
                   }}
                 >
                   Produk
 
-                  <svg className="chevron" viewBox="0 0 24 24">
+                  <svg
+                    className="chevron"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       d="M6 9L12 15L18 9"
                       stroke="currentColor"
@@ -195,17 +331,21 @@ export default function Navbar() {
                       fill="none"
                     />
                   </svg>
-                </span>
+                </button>
 
                 <ul
-                  className={
-                    openDropdown === "produk"
-                      ? "dropdown-menu show"
-                      : "dropdown-menu"
-                  }
+                  className={`dropdown-menu ${
+                    openDropdown ===
+                    "produk"
+                      ? "show"
+                      : ""
+                  }`}
                 >
                   <li>
-                    <NavLink to="/produk" onClick={closeMenu}>
+                    <NavLink
+                      to="/produk"
+                      onClick={closeMenu}
+                    >
                       Semua Produk
                     </NavLink>
                   </li>
@@ -239,31 +379,45 @@ export default function Navbar() {
                 </ul>
               </li>
 
+              {/* ARTIKEL */}
               <li>
-                <NavLink to="/article" onClick={closeMenu}>
+                <NavLink
+                  to="/article"
+                  onClick={closeMenu}
+                >
                   Artikel
                 </NavLink>
               </li>
 
-              {/* E-TIKET */}
-              <li className={isEtiketActive ? "active" : ""}>
-                <NavLink to="/e-ticket" onClick={closeMenu}>
-                  E-tiket
+              {/* TIKET */}
+              <li>
+                <NavLink
+                  to="/tiket"
+                  onClick={closeMenu}
+                >
+                  E-Tiket
                 </NavLink>
               </li>
 
             </ul>
           </div>
 
-          {/* RIGHT */}
+          {/* ================= RIGHT ================= */}
           <div className="nav-right">
 
-            <button className="btn-contact desktop-btn">
+            <NavLink
+              to="/contact"
+              className="btn-contact desktop-btn"
+            >
               Hubungi Kami
-            </button>
+            </NavLink>
 
-            <div
-              className={menuOpen ? "hamburger open" : "hamburger"}
+            {/* ================= HAMBURGER ================= */}
+            <button
+              type="button"
+              className={`hamburger ${
+                menuOpen ? "open" : ""
+              }`}
               onClick={(e) => {
                 e.stopPropagation();
                 setMenuOpen(!menuOpen);
@@ -272,14 +426,29 @@ export default function Navbar() {
               <span></span>
               <span></span>
               <span></span>
-            </div>
+            </button>
 
           </div>
         </div>
+
+        {/* ================= NAVBAR PROGRESS ================= */}
+        <div className="scroll-progress">
+          <div
+            className="scroll-progress-bar"
+            style={{
+              width: getNavProgress(),
+            }}
+          ></div>
+        </div>
+
       </nav>
 
+      {/* ================= OVERLAY ================= */}
       {menuOpen && (
-        <div className="overlay" onClick={closeMenu} />
+        <div
+          className="overlay"
+          onClick={closeMenu}
+        ></div>
       )}
     </>
   );
