@@ -446,21 +446,22 @@ export default function Navbar() {
                 }`}
               >
                 {!isLoggedIn ? (
-                  <button onClick={handleLogin}>
-                    <LogIn size={18} />
-                    Login
-                  </button>
+                  <NavLink
+                    to="/login">
+                    <button>
+                      <LogIn size={18} />
+                      Login
+                    </button>
+                  </NavLink>
                 ) : (
                   <>
-                    <button>
-                      <User size={18} />
-                      Profile
-                    </button>
-
+                  <NavLink
+                    to="/">
                     <button onClick={handleLogout}>
                       <LogOut size={18} />
                       Logout
                     </button>
+                  </NavLink>
                   </>
                 )}
               </div>
