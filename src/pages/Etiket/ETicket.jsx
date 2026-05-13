@@ -245,7 +245,7 @@ export default function ETicket() {
               with our fast online booking.
             </p>
 
-            <button>
+            <button className="et-card-beli">
               Beli Tiket secara online
             </button>
 
@@ -265,7 +265,7 @@ export default function ETicket() {
               placeholder="Masukkan ID Booking"
             />
 
-            <button className="et-secondary-btn">
+            <button className="et-secondary-btn et-status-btn">
               Cek status tiket
             </button>
 

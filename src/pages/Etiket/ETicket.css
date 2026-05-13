@@ -9,6 +9,7 @@
 }
 
 .eticket-page{
+  padding: 0px;
   width:100%;
   min-height:100vh;
   background:#f7f8f7;
@@ -23,7 +24,7 @@
 
 .et-hero{
   width:100%;
-  padding:70px 90px 100px;
+  padding:160px 90px 100px;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -266,6 +267,9 @@
     transform .32s cubic-bezier(.2,.8,.2,1),
     box-shadow .32s ease,
     border-color .32s ease;
+  
+  display:flex;
+  flex-direction:column;
 }
 
 .et-card:hover{
@@ -391,6 +395,7 @@
   font-weight:700;
 
   cursor:pointer;
+  margin-top:auto;
 
   transition:
     transform .28s cubic-bezier(.2,.8,.2,1),
@@ -589,10 +594,19 @@
     0 25px 40px rgba(25,223,88,0.3);
 }
 
+.et-card-beli{
+  margin-top:36px;
+}
+
 .et-secondary-btn{
   background:transparent !important;
   border:2px solid #d4dce0 !important;
   color:#10182f !important;
+  margin-top:28px;
+}
+
+.et-status-btn {
+  margin-top:48px;
 }
 
 /* =========================
