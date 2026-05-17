@@ -30,6 +30,7 @@ import ArticleDetail from "./pages/articleDetail/ArticleDetail";
 
 /* ───────── E-TIKET ───────── */
 import ETicket from "./pages/Etiket/ETicket";
+import Attractions from "./pages/Etiket/Attractions";
 
 /* ───────── DASHBOARD ───────── */
 import CreateArticle from "./pages/dashboard/CreateArticle";
@@ -182,6 +183,15 @@ function App() {
               </AnimatedPage>
             }
           />
+
+        <Route
+          path="/attractions"
+          element={
+            <AnimatedPage>
+              <Attractions />
+            </AnimatedPage>
+          }
+        />
 
           {/* PROGRAM */}
           <Route

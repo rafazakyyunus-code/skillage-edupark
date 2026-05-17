@@ -42,9 +42,13 @@ export default function ETicket() {
               Buy Tickets Online
             </button>
 
-            <button className="et-view-btn">
+            <button
+              className="et-view-btn"
+              onClick={() => navigate("/attractions")}
+            >
               View Attractions
             </button>
+
 
           </div>
         </div>

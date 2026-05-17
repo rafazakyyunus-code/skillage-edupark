@@ -1,0 +1,473 @@
+/* =========================
+   RESET
+========================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* =========================
+   PAGE
+========================= */
+
+.attractions-page {
+  min-height: 100vh;
+  padding: 40px;
+  background: #f5f5f3;
+  font-family: sans-serif;
+}
+
+/* =========================
+   HERO SECTION
+========================= */
+.hero-section {
+  position: relative;
+
+  width: calc(100% - 120px);
+  height: 380px;
+
+  margin: 105px auto 55px;
+
+  border-radius: 26px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 18px 40px rgba(0,0,0,0.12);
+}
+
+/* IMAGE */
+.hero-section img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+/* OVERLAY */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.12),
+      rgba(0,0,0,0.38)
+    );
+}
+
+/* CONTENT */
+.hero-content {
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  width: 100%;
+  max-width: 760px;
+
+  padding: 0 20px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  z-index: 5;
+}
+
+/* BADGE */
+.hero-content span {
+  background: #39ff14;
+
+  color: #111;
+
+  padding: 8px 18px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 1px;
+
+  text-transform: uppercase;
+
+  margin-bottom: 18px;
+}
+
+/* TITLE */
+.hero-content h1 {
+  font-size: 58px;
+
+  line-height: 1.02;
+
+  font-weight: 800;
+
+  color: white;
+
+  letter-spacing: -2px;
+
+  text-align: center;
+
+  margin-bottom: 16px;
+}
+
+/* DESC */
+.hero-content p {
+  max-width: 620px;
+
+  color: rgba(255,255,255,0.9);
+
+  font-size: 15px;
+  line-height: 1.7;
+
+  margin-bottom: 28px;
+
+  text-align: center;
+}
+
+/* BUTTON WRAPPER */
+.hero-buttons {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  flex-direction: row;
+
+  gap: 14px;
+
+  width: 100%;
+
+  margin-top: 4px;
+}
+
+/* BUTTON BASE */
+.primary-btn,
+.secondary-btn {
+  width: 165px;
+  height: 52px;
+
+  margin: 0;
+
+  border-radius: 999px;
+
+  border: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition: .3s ease;
+}
+
+/* PRIMARY */
+.primary-btn {
+  background: #39ff14;
+
+  color: #111;
+
+  box-shadow:
+    0 10px 25px rgba(57,255,20,0.28);
+}
+
+/* SECONDARY */
+.secondary-btn {
+  background: rgba(255,255,255,0.14);
+
+  color: white;
+
+  border: 1px solid rgba(255,255,255,0.35);
+
+  backdrop-filter: blur(10px);
+}
+
+/* HOVER */
+.primary-btn:hover,
+.secondary-btn:hover{
+  transform:
+    translateY(-6px)
+    scale(1.03);
+}
+
+
+
+/* =========================
+   FILTER BUTTONS
+========================= */
+
+.filter-buttons {
+  display: flex;
+  gap: 12px;
+
+  flex-wrap: wrap;
+}
+
+.filter-buttons button {
+  height: 48px;
+
+  padding: 0 22px;
+
+  border-radius: 999px;
+
+  border: none;
+
+  background: #eef2eb;
+
+  color: #111827;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  cursor: pointer;
+
+  transition: 0.3s ease;
+}
+
+.filter-buttons button.active {
+  background: #39ff14;
+}
+
+.filter-buttons button:hover {
+  transform: translateY(-2px);
+}
+
+/* =========================
+   GRID
+========================= */
+
+.attractions-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(320px, 1fr));
+
+  gap: 28px;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.attraction-card {
+  background: white;
+
+  border-radius: 24px;
+
+  overflow: hidden;
+
+  transition: 0.4s ease;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.06);
+}
+
+.attraction-card:hover {
+  transform: translateY(-8px);
+}
+
+/* IMAGE */
+.card-image {
+  position: relative;
+
+  width: 100%;
+  height: 220px;
+
+  overflow: hidden;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition: 0.5s ease;
+}
+
+.attraction-card:hover img {
+  transform: scale(1.08);
+}
+
+/* BADGE */
+.card-badge {
+  position: absolute;
+
+  top: 15px;
+  right: 15px;
+
+  background: #39ff14;
+
+  color: black;
+
+  padding: 7px 14px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* CONTENT */
+.card-content {
+  padding: 24px;
+}
+
+.card-content h3 {
+  font-size: 24px;
+
+  color: #111827;
+
+  margin-bottom: 14px;
+}
+
+.card-content p {
+  color: #6b7280;
+
+  font-size: 15px;
+
+  line-height: 1.8;
+
+  margin-bottom: 25px;
+}
+
+/* FOOTER */
+.card-footer {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.card-footer span {
+  color: #22c55e;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.card-footer button {
+  border: none;
+
+  background: transparent;
+
+  color: #111827;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+/* =========================
+   PAGINATION
+========================= */
+
+.pagination {
+  display: flex;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  margin-top: 55px;
+}
+
+.pagination button {
+  width: 45px;
+  height: 45px;
+
+  border-radius: 50%;
+
+  border: none;
+
+  background: white;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.3s ease;
+}
+
+.pagination button.active {
+  background: #39ff14;
+}
+
+.pagination button:hover {
+  transform: translateY(-3px);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 992px) {
+
+  .hero-content h1 {
+    font-size: 56px;
+  }
+
+  .section-header h2 {
+    font-size: 42px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .attractions-page {
+    padding: 20px;
+  }
+
+  .hero-section {
+    height: 520px;
+  }
+
+  .hero-content h1 {
+    font-size: 40px;
+
+    line-height: 1.05;
+  }
+
+  .hero-content p {
+    font-size: 15px;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+  }
+
+  .primary-btn,
+  .secondary-btn {
+    width: 220px;
+  }
+
+  .section-header h2 {
+    font-size: 34px;
+  }
+
+  .attractions-grid {
+    grid-template-columns: 1fr;
+  }
+}
