@@ -1,6 +1,8 @@
 // src/pages/Etiket/ETicket.jsx
 
 import "./ETicket.css";
+import { useNavigate } from "react-router-dom";
+
 import {
   FaTicketAlt,
   FaUsers,
@@ -12,6 +14,9 @@ import {
 } from "react-icons/fa";
 
 export default function ETicket() {
+
+  const navigate = useNavigate();
+
   return (
     <div className="eticket-page">
 
@@ -43,11 +48,11 @@ export default function ETicket() {
             </button>
 
             <button
-              className="et-view-btn"
-              onClick={() => navigate("/attractions")}
-            >
-              View Attractions
-            </button>
+                className="et-view-btn"
+                  onClick={() => navigate("/attractions")}
+>
+                View Attractions
+          </button>
 
 
           </div>
