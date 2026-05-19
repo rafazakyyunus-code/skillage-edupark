@@ -37,27 +37,17 @@ import CreateArticle from "./pages/dashboard/CreateArticle";
 import Editor from "./pages/dashboard/Editor";
 import ContactPage from "./pages/contact/ContactPage";
 
-/* ───────── UI ───────── */
-function Home() {
-  return (
-    <>
-      <Hero />
-      <About />
-      <WhyChoose />
-      <ProductSection />
-      <ProgramSection />
-      <GallerySection />
-      <CTA />
-    </>
-  );
-}
+/* ───────── FIREBASE ───────── */
+import { db } from "./firebase";
+import { ref, onValue, set, update } from "firebase/database";
 
+/* ───────── FRAMER MOTION WRAPPER ───────── */
 function AnimatedPage({ children }) {
   return (
     <motion.div
-      initial={{ x: 20, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: -20, opacity: 0 }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.3 }}
     >
       {children}
@@ -65,96 +55,104 @@ function AnimatedPage({ children }) {
   );
 }
 
-/* ───────── GLOBAL ARTICLE STATE ───────── */
+/* ───────── CUSTOM HOOK FIREBASE ───────── */
 function useArticles() {
   const [allArticles, setAllArticles] = useState([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("edupark_articles");
+    const articlesRef = ref(db, "articles");
 
-    if (saved) {
-      setAllArticles(JSON.parse(saved));
-    } else {
-      const seed = [
-        {
-          id: Date.now(),
-          title: "Welcome to Edupark - Demo Article",
-          author: "Demo Writer",
-          category: "Education Technology",
-          tags: ["demo", "edtech"],
-          submitted: "2 hours ago",
-          wordCount: 350,
-          status: "pending",
-          content:
-            "<p>Demo article for testing writer & editor workflow...</p>",
-        },
-      ];
+    const unsubscribe = onValue(articlesRef, (snapshot) => {
+      const data = snapshot.val();
 
-      setAllArticles(seed);
-      localStorage.setItem("edupark_articles", JSON.stringify(seed));
-    }
+      if (data) {
+        const list = Object.keys(data).map((key) => ({
+          id: key,
+          ...data[key],
+        }));
+
+        setAllArticles(list);
+      } else {
+        setAllArticles([]);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("edupark_articles", JSON.stringify(allArticles));
-  }, [allArticles]);
+  const addArticle = async (newArticle) => {
+    // Selalu buat ID baru dari timestamp agar tidak konflik
+    const articleId = `art_${Date.now()}`;
+    const { id: _ignore, ...cleanArticle } = newArticle; // buang id lama kalau ada
 
-  /* 🔥 WRITER → ADD ARTICLE */
-  const addArticle = (articleData) => {
-    const newArticle = {
-      ...articleData,
-      id: Date.now(),
-      author: "Alex Thompson",
-      role: "Writer",
-      submitted: new Date().toLocaleString(),
-      status: "pending",
-    };
-
-    setAllArticles((prev) => [newArticle, ...prev]);
-    console.log("✅ Masuk ke Editor:", newArticle.title);
+    await set(ref(db, `articles/${articleId}`), {
+      ...cleanArticle,
+      id: articleId,
+    });
   };
 
-  /* 🔥 EDITOR → UPDATE STATUS */
-  const updateStatus = (articleId, newStatus, feedback = "") => {
-    setAllArticles((prev) =>
-      prev.map((a) =>
-        a.id === articleId
-          ? { ...a, status: newStatus, feedback }
-          : a
-      )
+  const updateStatus = async (
+    articleId,
+    newStatus,
+    feedback = ""
+  ) => {
+    await update(ref(db, `articles/${articleId}`), {
+      status: newStatus,
+      feedback,
+    });
+
+    console.log(
+      `Firebase Update: ${newStatus}`,
+      articleId
     );
+  };
 
-    console.log(`Update: ${newStatus}`, articleId);  };
-
-  return { articles: allArticles, addArticle, updateStatus };
+  return {
+    articles: allArticles,
+    addArticle,
+    updateStatus,
+  };
 }
 
 /* ───────── APP ───────── */
 function App() {
   const location = useLocation();
-  const { articles, addArticle, updateStatus } = useArticles();
 
-  /* Hide navbar/footer di dashboard */
-  const hideLayout = location.pathname.startsWith("/dashboard");
+  const {
+    articles,
+    addArticle,
+    updateStatus,
+  } = useArticles();
+
+  /* Hide navbar/footer dashboard */
+  const hideLayout =
+    location.pathname.startsWith("/dashboard");
 
   return (
     <>
       {!hideLayout && <Navbar />}
 
       <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-
-          {/* PUBLIC */}
+        <Routes
+          location={location}
+          key={location.pathname}
+        >
+          {/* HOME */}
           <Route
             path="/"
             element={
               <AnimatedPage>
-                <Home />
+                <Hero />
+                <About />
+                <WhyChoose />
+                <ProductSection />
+                <ProgramSection />
+                <GallerySection />
+                <CTA />
               </AnimatedPage>
             }
           />
 
-          {/* TENTANG KAMI */}
           <Route
             path="/tentang-kami"
             element={
@@ -164,9 +162,8 @@ function App() {
             }
           />
 
-          {/* CONTACT */}
           <Route
-            path="/contact"
+            path="/kontak"
             element={
               <AnimatedPage>
                 <ContactPage />
@@ -176,7 +173,7 @@ function App() {
 
           {/* E-TIKET */}
           <Route
-            path="/e-ticket"
+            path="/e-tiket"
             element={
               <AnimatedPage>
                 <ETicket />
@@ -184,14 +181,33 @@ function App() {
             }
           />
 
-        <Route
-          path="/attractions"
-          element={
-            <AnimatedPage>
-              <Attractions />
-            </AnimatedPage>
-          }
-        />
+          <Route
+            path="/attractions"
+            element={
+              <AnimatedPage>
+                <Attractions />
+              </AnimatedPage>
+            }
+          />
+
+          {/* GALLERY */}
+          <Route
+            path="/gallery"
+            element={
+              <AnimatedPage>
+                <Gallery />
+              </AnimatedPage>
+            }
+          />
+
+          <Route
+            path="/gallery/:id"
+            element={
+              <AnimatedPage>
+                <GalleryDetail />
+              </AnimatedPage>
+            }
+          />
 
           {/* PROGRAM */}
           <Route
@@ -221,8 +237,9 @@ function App() {
             }
           />
 
+          {/* VENUE */}
           <Route
-            path="/program/venue-alam"
+            path="/venue"
             element={
               <AnimatedPage>
                 <VenueAlam />
@@ -230,21 +247,11 @@ function App() {
             }
           />
 
-          {/* GALLERY */}
           <Route
-            path="/gallery"
+            path="/venue/:id"
             element={
               <AnimatedPage>
-                <Gallery />
-              </AnimatedPage>
-            }
-          />
-
-          <Route
-            path="/gallery/:id"
-            element={
-              <AnimatedPage>
-                <GalleryDetail />
+                <VenueDetail />
               </AnimatedPage>
             }
           />
@@ -252,15 +259,6 @@ function App() {
           {/* PRODUK */}
           <Route
             path="/produk"
-            element={
-              <AnimatedPage>
-                <Produk />
-              </AnimatedPage>
-            }
-          />
-
-          <Route
-            path="/produk/kategori/:kategori"
             element={
               <AnimatedPage>
                 <Produk />
@@ -291,22 +289,14 @@ function App() {
             path="/article/:id"
             element={
               <AnimatedPage>
-                <ArticleDetail articles={articles} />
+                <ArticleDetail
+                  articles={articles}
+                />
               </AnimatedPage>
             }
           />
 
-          {/* VENUE */}
-          <Route
-            path="/venue/:id"
-            element={
-              <AnimatedPage>
-                <VenueDetail />
-              </AnimatedPage>
-            }
-          />
-
-          {/* DASHBOARD */}
+          {/* DASHBOARD ROUTES */}
           <Route
             path="/dashboard/create-article"
             element={
@@ -326,7 +316,6 @@ function App() {
 
           {/* FALLBACK */}
           <Route path="*" element={<h1>404 Not Found</h1>} />
-
         </Routes>
       </AnimatePresence>
 

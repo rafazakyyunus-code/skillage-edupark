@@ -1,413 +1,238 @@
 import React, { useState } from "react";
-
 import { useParams, useNavigate } from "react-router-dom";
-
 import "./ArticleDetail.css";
 
-import { Search } from "lucide-react";
+export default function ArticleDetail({ articles = [] }) {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
 
+  // Cari artikel berdasarkan ID dinamis (string/angka) dari Firebase
+  const article = articles.find((item) => String(item.id) === String(id));
 
+  // Ambil SEMUA rekomendasi artikel bertipe 'published' yang lain untuk sidebar (scrollable)
+  const otherRecentPosts = articles
+    .filter((item) => String(item.id) !== String(id) && item.status === "published");
 
-const articles = [
+  // Hitung kategori unik beserta jumlah artikelnya untuk sidebar
+  const categoryMap = {};
+  articles
+    .filter((a) => a.status === "published")
+    .forEach((a) => {
+      if (a.category) categoryMap[a.category] = (categoryMap[a.category] || 0) + 1;
+    });
 
-  {
+  // Handler search — navigate ke halaman artikel dengan query
+  const handleSearch = () => {
+    const trimmed = searchQuery.trim();
+    if (trimmed) {
+      navigate(`/article?search=${encodeURIComponent(trimmed)}`);
+    }
+  };
 
-    id: 1,
-
-    title: "The Impact of Sustainable Architecture on Modern Learning",
-
-    author: "Admin Edupark",
-
-    date: "12 February 2026",
-
-    category: "Education",
-
-    image:
-
-      "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1000",
-
-    image2:
-
-      "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1000",
-
-  },
-
-  {
-
-    id: 2,
-
-    title: "AI Teachers in Modern Schools",
-
-    author: "Admin Edupark",
-
-    date: "10 February 2026",
-
-    category: "Technology",
-
-    image:
-
-      "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1000",
-
-    image2:
-
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1000",
-
-  },
-
-  {
-
-    id: 3,
-
-    title: "Future Learning Innovation",
-
-    author: "Admin Edupark",
-
-    date: "8 February 2026",
-
-    category: "Education",
-
-    image:
-
-      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1000",
-
-    image2:
-
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1000",
-
-  },
-
-  {
-
-    id: 4,
-
-    title: "Digital Learning Trends in 2026",
-
-    author: "Admin Edupark",
-
-    date: "5 February 2026",
-
-    category: "Technology",
-
-    image:
-
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1000",
-
-    image2:
-
-      "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=1000",
-
+  // Tampilan fallback jika artikel tidak ditemukan atau sedang loading dari Firebase
+  if (!article) {
+    return (
+      <div style={{ padding: "120px 5%", textAlign: "center", fontFamily: "sans-serif" }}>
+        <h2 style={{ color: "#111827", marginBottom: "8px" }}>Artikel Tidak Ditemukan</h2>
+        <p style={{ color: "#6b7280", fontSize: "14px", marginBottom: "24px" }}>
+          Artikel yang Anda cari tidak tersedia atau telah dihapus.
+        </p>
+        <button
+          onClick={() => navigate("/article")}
+          style={{
+            padding: "10px 20px",
+            background: "#1b3a2a",
+            color: "#fff",
+            border: "none",
+            borderRadius: 8,
+            cursor: "pointer",
+            fontWeight: "600",
+            fontSize: "14px",
+          }}
+        >
+          ← Kembali ke Daftar Artikel
+        </button>
+      </div>
+    );
   }
 
-];
-
-
-
-function ArticleDetail() {
-
-  const { id } = useParams();
-
-  const navigate = useNavigate();
-
-
-
-  const [searchTerm, setSearchTerm] = useState("");
-
-
-
-  const article =
-
-    articles.find(
-
-      (item) =>item.id=== Number(id)
-
-    ) || articles[0];
-
-
-
-  const filteredPosts = articles.filter((item) =>
-
-    item.title
-
-      .toLowerCase()
-
-      .includes(searchTerm.toLowerCase())
-
-  );
-
-
-
-  const handleSearch = (e) => {
-
-    setSearchTerm(e.target.value);
-
-  };
-
-
-
-  const handlePostClick = (postId) => {
-
-    navigate(`/article/${postId}`);
-
-    window.scrollTo(0, 0);
-
-  };
-
-
-
   return (
-
     <div className="article-detail-page">
-
       <div className="article-detail-container">
 
-
-
-        {/* LEFT CONTENT */}
-
+        {/* MAIN CONTENT */}
         <div className="article-main-content">
-
-          <span className="article-category">
-
-            {article.category}
-
-          </span>
-
-
-
+          <span className="article-category">{article.category || "General"}</span>
           <h1>{article.title}</h1>
 
-
-
           <div className="article-meta-detail">
-
-            <span>By {article.author}</span>
-
-            <span>{article.date}</span>
-
+            <span>By {article.author || "Admin Edupark"}</span>
+            <span>•</span>
+            <span>{article.date || "Terbaru"}</span>
           </div>
 
-
-
           <img
-
-            src={article.image}
-
-            alt={article.title}
-
             className="main-image"
-
+            src={article.image || "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800"}
+            alt={article.title}
+            onError={(e) => {
+              e.target.src = "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800";
+            }}
           />
 
-
-
-          <p>
-
-            Sustainable learning spaces improve
-
-            student productivity and create
-
-            healthier environments.
-
-          </p>
-
-
-
-          <h2>Creating a Connection with Nature</h2>
-
-
-
-          <p>
-
-            Natural lighting and open spaces help
-
-            students feel calmer and more engaged.
-
-          </p>
-
-
-
-          <img
-
-            src={article.image2}
-
-            alt="secondary"
-
-            className="secondary-image"
-
+          {/* Menampilkan konten teks HTML editor Tiptap/Firebase secara aman */}
+          <div
+            className="article-rich-text-content"
+            style={{ fontSize: "16px", lineHeight: "1.8", color: "#374151" }}
+            dangerouslySetInnerHTML={{ __html: article.content }}
           />
 
-
-
-          <h2>Flexibility and Collaboration</h2>
-
-
-
-          <p>
-
-            Modern classrooms support teamwork,
-
-            creativity, and adaptability.
-
-          </p>
-
+          {/* SHARE SECTION */}
+          <div className="share-section">
+            <span className="share-label">Share This Article:</span>
+            <div className="share-icons">
+              <button
+                className="share-icon-btn"
+                aria-label="Share on Facebook"
+                onClick={() =>
+                  window.open(
+                    `https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`,
+                    "_blank"
+                  )
+                }
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                </svg>
+              </button>
+              <button
+                className="share-icon-btn"
+                aria-label="Share on Twitter"
+                onClick={() =>
+                  window.open(
+                    `https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(article.title)}`,
+                    "_blank"
+                  )
+                }
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+                </svg>
+              </button>
+              <button
+                className="share-icon-btn"
+                aria-label="Share on LinkedIn"
+                onClick={() =>
+                  window.open(
+                    `https://linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`,
+                    "_blank"
+                  )
+                }
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z" />
+                  <circle cx="4" cy="4" r="2" />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
 
-
-
-        {/* SIDEBAR */}
-
+        {/* SIDEBAR RIGHT */}
         <div className="article-sidebar">
 
-
-
           {/* SEARCH */}
-
           <div className="sidebar-card">
-
             <h3>Search</h3>
-
-
-
             <div className="search-box">
-
               <input
-
                 type="text"
-
                 placeholder="Search articles..."
-
-                value={searchTerm}
-
-                onChange={handleSearch}
-
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSearch();
+                }}
               />
-
-              <Search size={18} />
-
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#9ca3af"
+                strokeWidth="2"
+                style={{ cursor: "pointer", flexShrink: 0 }}
+                onClick={handleSearch}
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
             </div>
-
           </div>
 
-
-
-          {/* RECENT POSTS */}
-
+          {/* RECENT POSTS — semua artikel, scrollable */}
           <div className="sidebar-card">
-
             <h3>Recent Posts</h3>
-
-
-
-            {filteredPosts.length > 0 ? (
-
-              filteredPosts.map((item) => (
-
+            <div className="recent-posts-list">
+              {otherRecentPosts.map((item) => (
                 <div
-
                   className="recent-post clickable-post"
-
                   key={item.id}
-
-                  onClick={() =>
-
-                    handlePostClick(item.id)
-
-                  }
-
+                  onClick={() => navigate(`/article/${item.id}`)}
+                  style={{ cursor: "pointer" }}
                 >
-
                   <img
-
-                    src={item.image}
-
+                    src={item.image || "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800"}
                     alt={item.title}
-
+                    onError={(e) => {
+                      e.target.src = "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800";
+                    }}
                   />
-
-
-
-                  <div>
-
+                  <div className="recent-post-info">
                     <p>{item.title}</p>
-
-                    <span>{item.date}</span>
-
+                    <span>{item.date || "Terbaru"}</span>
                   </div>
-
                 </div>
+              ))}
 
-              ))
-
-            ) : (
-
-              <p>No articles found.</p>
-
-            )}
-
+              {otherRecentPosts.length === 0 && (
+                <p style={{ fontSize: 13, color: "#6b7280", margin: 0, textAlign: "center", padding: "10px 0" }}>
+                  Tidak ada artikel terbaru lainnya.
+                </p>
+              )}
+            </div>
           </div>
 
-
-
-          {/* CATEGORY */}
-
-          <div className="sidebar-card">
-
-            <h3>Categories</h3>
-
-
-
-            <ul>
-
-              <li>Architecture (12)</li>
-
-              <li>Education (24)</li>
-
-              <li>Technology (15)</li>
-
-              <li>Events (05)</li>
-
-            </ul>
-
-          </div>
-
-
+          {/* CATEGORIES */}
+          {Object.keys(categoryMap).length > 0 && (
+            <div className="sidebar-card">
+              <h3>Categories</h3>
+              <ul className="sidebar-categories-list">
+                {Object.entries(categoryMap).map(([cat, count]) => (
+                  <li
+                    key={cat}
+                    className={article.category === cat ? "active-cat" : ""}
+                    onClick={() => navigate(`/article?category=${encodeURIComponent(cat)}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <span>{cat}</span>
+                    <span className="cat-count">{String(count).padStart(2, "0")}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* CTA */}
-
           <div className="cta-sidebar">
-
-            <h3>Ready to explore?</h3>
-
-
-
-            <p>
-
-              Join our community and explore
-
-              Edupark today.
-
-            </p>
-
-
-
-            <button>
-
-              Visit Edupark Now
-
-            </button>
-
+            <h4>Ready to explore?</h4>
+            <p>Join our community and experience the future of education firsthand.</p>
+            <button onClick={() => navigate("/")}>Visit Edupark Now</button>
           </div>
 
         </div>
-
       </div>
-
     </div>
-
   );
-
 }
-
-
-
-export default ArticleDetail;

@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
-import "./createArticle.css";
+import "./CreateArticle.css";
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import LinkExtension from "@tiptap/extension-link";
 import Underline from "@tiptap/extension-underline";
-import Image from "@tiptap/extension-image";
+import ImageExtension from "@tiptap/extension-image";
+
+import { db } from "../../firebase";
+import { ref, onValue, remove, set, update } from "firebase/database";
+import { getAuth, signOut } from "firebase/auth";
 
 import {
   LayoutDashboard,
@@ -30,7 +34,7 @@ import {
   TrendingUp,
   Users,
   BookOpen,
-  Star,
+  LogOut,
 } from "lucide-react";
 
 /* ──────────────────────────────────────────
@@ -53,66 +57,29 @@ const STATUS_MAP = {
   draft:     { bg: "#F3F4F6", text: "#4B5563", label: "Draft" },
 };
 
-const SEED_MY_ARTICLES = [
-  {
-    id: 1,
-    title: "The Future of Digital Learning in Post-Pandemic Era",
-    category: "Education Technology",
-    status: "published",
-    date: "Oct 24, 2023",
-    wordCount: 1248,
-    views: 3420,
-  },
-  {
-    id: 2,
-    title: "Integrating AI Tools in Modern Classrooms",
-    category: "AI & Machine Learning",
-    status: "pending",
-    date: "Oct 18, 2023",
-    wordCount: 980,
-    views: 0,
-  },
-  {
-    id: 3,
-    title: "Early Childhood Education: Play-Based Learning",
-    category: "Early Childhood",
-    status: "revision",
-    date: "Oct 10, 2023",
-    wordCount: 1540,
-    views: 0,
-  },
-  {
-    id: 4,
-    title: "STEM Programs That Actually Work",
-    category: "STEM Education",
-    status: "draft",
-    date: "Oct 5, 2023",
-    wordCount: 620,
-    views: 0,
-  },
-];
-
 const NAV_ITEMS = [
-  { id: "dashboard",       label: "Dashboard",      Icon: LayoutDashboard },
-  { id: "create",          label: "Create Article", Icon: PenSquare },
-  { id: "my-articles",     label: "My Articles",    Icon: FileText },
-  { id: "analytics",       label: "Analytics",      Icon: BarChart3 },
+  { id: "dashboard",   label: "Dashboard",      Icon: LayoutDashboard },
+  { id: "create",      label: "Create Article", Icon: PenSquare },
+  { id: "my-articles", label: "My Articles",    Icon: FileText },
+  { id: "analytics",   label: "Analytics",      Icon: BarChart3 },
 ];
-
-const API_BASE = "http://localhost/skillage-api";
 
 /* ──────────────────────────────────────────
    SIDEBAR
    ────────────────────────────────────────── */
-function Sidebar({ activeNav, setActiveNav }) {
+function Sidebar({ activeNav, setActiveNav, currentUser }) {
+  const initials = currentUser?.displayName
+    ? currentUser.displayName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
+    : "AT";
+
   return (
     <aside className="ca-sidebar">
-      {/* Brand */}
       <div className="ca-sidebar__brand">
         <div className="ca-brand-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          {/* Graduation cap icon */}
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/>
           </svg>
         </div>
         <div>
@@ -121,7 +88,6 @@ function Sidebar({ activeNav, setActiveNav }) {
         </div>
       </div>
 
-      {/* Nav */}
       <nav className="ca-nav">
         {NAV_ITEMS.map(({ id, label, Icon }) => {
           const active = activeNav === id;
@@ -131,37 +97,29 @@ function Sidebar({ activeNav, setActiveNav }) {
               onClick={() => setActiveNav(id)}
               className={`ca-nav-btn${active ? " ca-nav-btn--active" : ""}`}
             >
-              <Icon
-                size={16}
-                color={active ? "#fff" : "rgba(255,255,255,0.55)"}
-              />
+              <Icon size={16} color={active ? "#fff" : "rgba(255,255,255,0.55)"} />
               {label}
             </button>
           );
         })}
       </nav>
 
-      {/* Settings */}
       <div className="ca-nav-settings">
         <button
           onClick={() => setActiveNav("settings")}
           className={`ca-nav-btn${activeNav === "settings" ? " ca-nav-btn--active" : ""}`}
         >
-          <Settings
-            size={16}
-            color={activeNav === "settings" ? "#fff" : "rgba(255,255,255,0.55)"}
-          />
+          <Settings size={16} color={activeNav === "settings" ? "#fff" : "rgba(255,255,255,0.55)"} />
           Settings
         </button>
       </div>
 
-      {/* User */}
       <div className="ca-sidebar__user">
         <div className="ca-user-btn">
-          <div className="ca-avatar">AT</div>
+          <div className="ca-avatar">{initials}</div>
           <div>
-            <div className="ca-user-name">Alex Thompson</div>
-            <div className="ca-user-role">Senior Writer</div>
+            <div className="ca-user-name">{currentUser?.displayName || "Alex Thompson"}</div>
+            <div className="ca-user-role">{currentUser?.role || "Senior Writer"}</div>
           </div>
         </div>
       </div>
@@ -170,9 +128,9 @@ function Sidebar({ activeNav, setActiveNav }) {
 }
 
 /* ──────────────────────────────────────────
-   TOPBAR
+   TOPBAR — tombol duplikat dihapus
    ────────────────────────────────────────── */
-function Topbar({ activeNav, lastSaved, onSaveDraft, onSubmit }) {
+function Topbar({ activeNav }) {
   const breadcrumb = {
     dashboard:    "Dashboard",
     create:       "Create Article",
@@ -180,11 +138,6 @@ function Topbar({ activeNav, lastSaved, onSaveDraft, onSubmit }) {
     analytics:    "Analytics",
     settings:     "Settings",
   }[activeNav] || activeNav;
-
-  const formatTime = (date) => {
-    if (!date) return "Not saved yet";
-    return date.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
-  };
 
   return (
     <div className="ca-topbar">
@@ -197,22 +150,7 @@ function Topbar({ activeNav, lastSaved, onSaveDraft, onSubmit }) {
           </>
         )}
       </div>
-
-      <div className="ca-topbar__right">
-        {activeNav === "create" && (
-          <>
-            <span className="ca-save-status">
-              Last saved: {formatTime(lastSaved)}
-            </span>
-            <button className="ca-btn-draft" onClick={onSaveDraft}>
-              Save Draft
-            </button>
-            <button className="ca-btn-submit" onClick={onSubmit}>
-              Submit for Review
-            </button>
-          </>
-        )}
-      </div>
+      {/* Tombol Save Draft & Submit for Review dihapus dari sini karena sudah ada di dalam form */}
     </div>
   );
 }
@@ -221,70 +159,58 @@ function Topbar({ activeNav, lastSaved, onSaveDraft, onSubmit }) {
    DASHBOARD VIEW
    ────────────────────────────────────────── */
 function DashboardView({ myArticles, setActiveNav }) {
-  const published = myArticles.filter(a => a.status === "published").length;
-  const pending   = myArticles.filter(a => a.status === "pending").length;
+  const published  = myArticles.filter(a => a.status === "published").length;
+  const pending    = myArticles.filter(a => a.status === "pending").length;
   const totalViews = myArticles.reduce((sum, a) => sum + (a.views || 0), 0);
 
   return (
     <div>
       <div className="ca-dash__greeting">
-        <h1>Selamat datang, Alex! 👋</h1>
+        <h1>Selamat datang, Penulis! 👋</h1>
         <p>Berikut ringkasan aktivitas penulisan Anda.</p>
       </div>
 
-      {/* Stats */}
       <div className="ca-stats">
         {[
-          { label: "Total Artikel",  value: myArticles.length, color: "#1b3a2a" },
-          { label: "Published",      value: published,         color: "#16a34a" },
-          { label: "Pending Review", value: pending,           color: "#f57f17" },
+          { label: "Total Artikel",  value: myArticles.length,          color: "#1b3a2a" },
+          { label: "Published",      value: published,                   color: "#16a34a" },
+          { label: "Pending Review", value: pending,                     color: "#f57f17" },
           { label: "Total Views",    value: totalViews.toLocaleString(), color: "#1565c0" },
         ].map(s => (
-          <div key={s.label} className="ca-stat" style={{ gridColumn: "auto" }}>
+          <div key={s.label} className="ca-stat">
             <div className="ca-stat__label">{s.label}</div>
             <div className="ca-stat__value" style={{ color: s.color }}>{s.value}</div>
           </div>
         ))}
       </div>
 
-      {/* Quick actions */}
       <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16 }}>
-        {/* Recent articles */}
         <div className="ca-recent">
           <div className="ca-recent__head">
             <h2>Artikel Terbaru</h2>
-            <button className="ca-link-btn" onClick={() => setActiveNav("my-articles")}>
-              Lihat semua →
-            </button>
+            <button className="ca-link-btn" onClick={() => setActiveNav("my-articles")}>Lihat semua →</button>
           </div>
           {myArticles.slice(0, 4).map(a => {
             const s = STATUS_MAP[a.status] || STATUS_MAP.draft;
             return (
               <div key={a.id} className="ca-article-row">
-                <div className="ca-article-row__initials">
-                  {a.title.charAt(0)}
+                <div className="ca-article-row__initials" style={{ overflow: "hidden", borderRadius: 6 }}>
+                  {a.image
+                    ? <img src={a.image} alt={a.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : (a.title ? a.title.charAt(0) : "A")}
                 </div>
                 <div className="ca-article-row__info">
                   <div className="ca-article-row__title">{a.title}</div>
-                  <div className="ca-article-row__meta">
-                    {a.category} · {a.date}
-                  </div>
+                  <div className="ca-article-row__meta">{a.category} · {a.date}</div>
                 </div>
-                <span className="ca-badge" style={{ background: s.bg, color: s.text }}>
-                  {s.label}
-                </span>
+                <span className="ca-badge" style={{ background: s.bg, color: s.text }}>{s.label}</span>
               </div>
             );
           })}
         </div>
 
-        {/* Quick tips */}
-        <div
-          style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, padding: 20 }}
-        >
-          <h2 style={{ fontSize: 15, fontWeight: 700, color: "#111827", margin: "0 0 14px" }}>
-            Tips Menulis
-          </h2>
+        <div style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, padding: 20 }}>
+          <h2 style={{ fontSize: 15, fontWeight: 700, color: "#111827", margin: "0 0 14px" }}>Tips Menulis</h2>
           {[
             "Gunakan judul yang menarik dan informatif",
             "Sertakan gambar berkualitas tinggi",
@@ -297,12 +223,7 @@ function DashboardView({ myArticles, setActiveNav }) {
               {tip}
             </div>
           ))}
-
-          <button
-            className="ca-btn-submit"
-            style={{ width: "100%", marginTop: 12 }}
-            onClick={() => setActiveNav("create")}
-          >
+          <button className="ca-btn-submit" style={{ width: "100%", marginTop: 12 }} onClick={() => setActiveNav("create")}>
             + Tulis Artikel Baru
           </button>
         </div>
@@ -312,41 +233,43 @@ function DashboardView({ myArticles, setActiveNav }) {
 }
 
 /* ──────────────────────────────────────────
-   CREATE ARTICLE VIEW
+   CREATE / EDIT ARTICLE VIEW
+   Mendukung mode "edit" untuk artikel revision
    ────────────────────────────────────────── */
-function CreateArticleView({ onSubmitSuccess, onSaveDraft, onRefresh }) {
-  const [image, setImage]         = useState(null);
-  const [tags, setTags]           = useState(["FutureOfEd", "AI"]);
+function CreateArticleView({ onSubmitSuccess, onSaveDraft, onRefresh, editArticle, onCancelEdit }) {
+  const isEditMode = !!editArticle;
+
+  const [image, setImage]         = useState(editArticle?.image || null);
+  const [tags, setTags]           = useState(editArticle?.tags || ["FutureOfEd", "AI"]);
   const [inputTag, setInputTag]   = useState("");
-  const [visibility, setVisibility] = useState("public");
-  const [title, setTitle]         = useState("");
-  const [category, setCategory]   = useState(CATEGORIES[0]);
+  const [visibility, setVisibility] = useState(editArticle?.visibility || "public");
+  const [title, setTitle]         = useState(editArticle?.title || "");
+  const [category, setCategory]   = useState(editArticle?.category || CATEGORIES[0]);
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError]         = useState(null);
 
-  /* Load draft from localStorage */
+  // Load draft dari localStorage hanya jika bukan edit mode
   useEffect(() => {
+    if (isEditMode) return;
     const saved = JSON.parse(localStorage.getItem("edupark_draft")) || {};
-    if (saved.title) setTitle(saved.title);
-    if (saved.tags)  setTags(saved.tags);
+    if (saved.title)      setTitle(saved.title);
+    if (saved.tags)       setTags(saved.tags);
     if (saved.visibility) setVisibility(saved.visibility);
     if (saved.category)   setCategory(saved.category);
-    if (saved.image) setImage(saved.image);
-  }, []);
+    if (saved.image)      setImage(saved.image);
+  }, [isEditMode]);
 
-  /* TipTap editor */
   const editor = useEditor({
     extensions: [
-      StarterKit,
-      LinkExtension.configure({ openOnClick: true }),
+      StarterKit.configure({ link: false, underline: false }),
+      LinkExtension.configure({ openOnClick: false, HTMLAttributes: { rel: "noopener noreferrer", target: "_blank" } }),
       Underline,
-      Image,
+      ImageExtension,
     ],
-    content: "<p>Start writing your masterpiece...</p>",
+    content: isEditMode ? (editArticle.content || "") : "",
   });
 
-  /* Image upload */
   const handleImage = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -355,97 +278,97 @@ function CreateArticleView({ onSubmitSuccess, onSaveDraft, onRefresh }) {
     reader.readAsDataURL(file);
   };
 
-  /* Tags */
   const addTag = () => {
     const t = inputTag.trim();
     if (t && !tags.includes(t)) setTags(p => [...p, t]);
     setInputTag("");
   };
 
-  /* Save draft */
-  const saveDraft = () => {
-    localStorage.setItem("edupark_draft", JSON.stringify({
-      title,
-      content: editor?.getHTML(),
-      tags,
-      visibility,
-      category,
-      image,
-    }));
-    onSaveDraft();
+  // Save draft ke Firebase (bukan localStorage saja)
+  const saveDraft = async () => {
+    if (!title.trim()) {
+      alert("Isi judul terlebih dahulu untuk menyimpan draft");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const draftData = {
+        title:      title.trim(),
+        category,
+        content:    editor?.getHTML() || "",
+        status:     "draft",
+        author:     "Admin Edupark",
+        wordCount:  editor ? editor.getText().split(/\s+/).filter(Boolean).length : 0,
+        date:       new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+        image:      image || "",
+        tags,
+        visibility,
+        views:      0,
+        feedback:   "",
+      };
+
+      if (isEditMode && editArticle.id) {
+        // Update draft yang sudah ada
+        await update(ref(db, `articles/${editArticle.id}`), draftData);
+      } else {
+        // Buat draft baru dengan ID unik
+        const newId = `draft_${Date.now()}`;
+        await set(ref(db, `articles/${newId}`), { ...draftData, id: newId });
+      }
+
+      // Juga simpan ke localStorage sebagai backup
+      localStorage.setItem("edupark_draft", JSON.stringify(draftData));
+      onSaveDraft?.();
+      alert("Draft berhasil disimpan!");
+    } catch (err) {
+      console.error("Save draft error:", err);
+      alert("Gagal menyimpan draft: " + err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  /* Submit Article */
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+
     if (!title.trim()) {
-      setError("Judul artikel tidak boleh kosong");
+      alert("Judul artikel tidak boleh kosong!");
       return;
     }
 
-    if (!editor?.getHTML() || editor.getHTML() === "<p>Start writing your masterpiece...</p>") {
-      setError("Konten artikel tidak boleh kosong");
-      return;
-    }
+    const articleContent = editor ? editor.getHTML() : "";
+    const articleData = {
+      title:      title.trim(),
+      category,
+      content:    articleContent,
+      status:     "pending",
+      author:     isEditMode ? editArticle.author : "Admin Edupark",
+      wordCount:  editor ? editor.getText().split(/\s+/).filter(Boolean).length : 0,
+      date:       new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      image:      image || "",
+      tags,
+      visibility,
+      views:      isEditMode ? (editArticle.views || 0) : 0,
+      feedback:   "",
+    };
 
     setIsLoading(true);
     setError(null);
 
     try {
-      const contentHTML = editor.getHTML();
-
-      // Hitung word count
-      const wordCount = contentHTML
-        .replace(/<[^>]+>/g, " ")
-        .split(/\s+/)
-        .filter(Boolean).length;
-
-      // Data artikel
-      const articleData = {
-        title: title.trim(),
-        content: contentHTML,
-        category,
-        tags: tags.join(","),
-        image: image || null,
-        visibility,
-        author: "Alex Thompson",
-        wordCount,
-        status: "pending",
-      };
-
-      // Kirim ke backend
-      const response = await fetch(`${API_BASE}/articles/create.php`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(articleData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Gagal menyimpan artikel");
-      }
-
-      const result = await response.json();
-
-      if (result.success) {
-        // Clear draft
-        localStorage.removeItem("edupark_draft");
-        
-        // Update UI
-        onSubmitSuccess({
-          ...articleData,
-          id: result.id,
-          date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-          views: 0,
-        });
-
-        setSubmitted(true);
+      if (isEditMode && editArticle.id) {
+        // UPDATE artikel yang sudah ada (mode revisi)
+        await update(ref(db, `articles/${editArticle.id}`), articleData);
       } else {
-        setError(result.message || "Gagal menyimpan artikel");
+        // CREATE artikel baru
+        if (onSubmitSuccess) await onSubmitSuccess(articleData);
       }
+
+      localStorage.removeItem("edupark_draft");
+      setSubmitted(true);
     } catch (err) {
       console.error("Submit error:", err);
-      setError(err.message || "Terjadi kesalahan saat mengirim artikel");
+      setError("Gagal mengirim artikel: " + err.message);
     } finally {
       setIsLoading(false);
     }
@@ -454,268 +377,156 @@ function CreateArticleView({ onSubmitSuccess, onSaveDraft, onRefresh }) {
   if (submitted) {
     return (
       <div className="ca-success">
-        <div className="ca-success__icon">
-          <CheckCircle size={30} color="#16a34a" />
-        </div>
-        <h2>Artikel Berhasil Disubmit!</h2>
-        <p>
-          Artikel Anda sedang dalam proses review oleh editor.
-          Anda akan mendapat notifikasi setelah selesai diproses.
-        </p>
-        <button 
-          className="ca-success__btn" 
+        <div className="ca-success__icon"><CheckCircle size={30} color="#16a34a" /></div>
+        <h2>{isEditMode ? "Artikel Berhasil Diperbarui!" : "Artikel Berhasil Disubmit!"}</h2>
+        <p>{isEditMode ? "Artikel revisi Anda telah dikirim kembali untuk review." : "Artikel Anda sedang dalam proses review oleh editor."}</p>
+        <button
+          className="ca-success__btn"
           onClick={() => {
             setSubmitted(false);
-            setTitle("");
-            setTags(["FutureOfEd", "AI"]);
-            setVisibility("public");
-            setCategory(CATEGORIES[0]);
-            setImage(null);
-            setError(null);
-            editor?.chain().focus().setContent("<p>Start writing your masterpiece...</p>").run();
-            onRefresh?.();
+            if (isEditMode && onCancelEdit) onCancelEdit();
+            else onRefresh?.();
           }}
         >
-          + Tulis Artikel Baru
+          {isEditMode ? "Kembali ke My Articles" : "+ Tulis Artikel Baru"}
         </button>
       </div>
     );
   }
 
   return (
-    <div className="ca-editor-layout">
-      {/* LEFT — title + editor */}
-      <div className="ca-left">
-        {/* Title */}
-        <div className="ca-title-card">
-          <div className="ca-title-label">Article Title</div>
-          <input
-            className="ca-title-input"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            placeholder="Enter your catchy title..."
-          />
-        </div>
-
-        {/* Error Message */}
-        {error && (
-          <div style={{ 
-            background: "#FBE9E7", 
-            border: "1px solid #FFCCBC",
-            borderRadius: 8,
-            padding: "12px 16px",
-            marginBottom: 16,
-            color: "#BF360C",
-            fontSize: 13
-          }}>
-            {error}
+    <div>
+      {/* Header edit mode */}
+      {isEditMode && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+          <div>
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: "#111827", margin: 0 }}>Edit Artikel</h2>
+            <p style={{ fontSize: 13, color: "#6B7280", margin: "4px 0 0" }}>
+              Perbaiki sesuai catatan revisi dari editor.
+              {editArticle.feedback && (
+                <span style={{ display: "block", marginTop: 6, padding: "8px 12px", background: "#FFF8E1", border: "1px solid #FFE082", borderRadius: 8, color: "#5D4037", fontStyle: "italic" }}>
+                  Catatan editor: "{editArticle.feedback}"
+                </span>
+              )}
+            </p>
           </div>
-        )}
+          <button onClick={onCancelEdit} style={{ padding: "8px 16px", background: "none", border: "1px solid #D1D5DB", borderRadius: 8, fontSize: 13, cursor: "pointer", color: "#4B5563" }}>
+            Batal
+          </button>
+        </div>
+      )}
 
-        {/* Editor */}
-        <div className="ca-editor-card">
-          {/* Toolbar */}
-          <div className="ca-toolbar">
-            <button
-              className={`ca-toolbar-btn${editor?.isActive("bold") ? " ca-toolbar-btn--active" : ""}`}
-              onMouseDown={e => { e.preventDefault(); editor?.chain().focus().toggleBold().run(); }}
-              title="Bold"
-            >
-              <Bold size={14} />
-            </button>
-            <button
-              className={`ca-toolbar-btn${editor?.isActive("italic") ? " ca-toolbar-btn--active" : ""}`}
-              onMouseDown={e => { e.preventDefault(); editor?.chain().focus().toggleItalic().run(); }}
-              title="Italic"
-            >
-              <Italic size={14} />
-            </button>
-            <button
-              className={`ca-toolbar-btn${editor?.isActive("underline") ? " ca-toolbar-btn--active" : ""}`}
-              onMouseDown={e => { e.preventDefault(); editor?.chain().focus().toggleUnderline().run(); }}
-              title="Underline"
-            >
-              <UnderlineIcon size={14} />
-            </button>
+      {error && (
+        <div style={{ background: "#FBE9E7", border: "1px solid #FFCCBC", borderRadius: 8, padding: "12px 16px", marginBottom: 16, color: "#BF360C", fontSize: 13 }}>
+          {error}
+        </div>
+      )}
 
-            <div className="ca-toolbar-sep" />
-
-            <button
-              className="ca-toolbar-btn"
-              onMouseDown={e => { e.preventDefault(); editor?.chain().focus().toggleBulletList().run(); }}
-              title="Bullet List"
-            >
-              <List size={14} />
-            </button>
-            <button
-              className="ca-toolbar-btn"
-              onMouseDown={e => { e.preventDefault(); editor?.chain().focus().toggleOrderedList().run(); }}
-              title="Ordered List"
-            >
-              <ListOrdered size={14} />
-            </button>
-            <button
-              className="ca-toolbar-btn"
-              onMouseDown={e => { e.preventDefault(); editor?.chain().focus().toggleBlockquote().run(); }}
-              title="Blockquote"
-            >
-              <Quote size={14} />
-            </button>
-            <button
-              className="ca-toolbar-btn"
-              onMouseDown={e => { e.preventDefault(); editor?.chain().focus().toggleCodeBlock().run(); }}
-              title="Code Block"
-            >
-              <Code size={14} />
-            </button>
-
-            <div className="ca-toolbar-sep" />
-
-            <button
-              className="ca-toolbar-btn"
-              onMouseDown={e => {
-                e.preventDefault();
-                const url = prompt("Masukkan URL:");
-                if (url) editor?.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
-              }}
-              title="Insert Link"
-            >
-              <LinkIcon size={14} />
-            </button>
-            <button
-              className="ca-toolbar-btn"
-              onMouseDown={e => {
-                e.preventDefault();
-                const url = prompt("Masukkan URL gambar:");
-                if (url) editor?.chain().focus().setImage({ src: url }).run();
-              }}
-              title="Insert Image"
-            >
-              <ImagePlus size={14} />
-            </button>
-
-            <div className="ca-toolbar-sep" />
-
-            {/* Heading shortcuts */}
-            {[["H1", "heading", { level: 1 }], ["H2", "heading", { level: 2 }], ["H3", "heading", { level: 3 }]].map(([lbl, type, attrs]) => (
-              <button
-                key={lbl}
-                className={`ca-toolbar-btn${editor?.isActive(type, attrs) ? " ca-toolbar-btn--active" : ""}`}
-                onMouseDown={e => { e.preventDefault(); editor?.chain().focus().toggleHeading(attrs).run(); }}
-                style={{ width: "auto", padding: "0 8px", fontSize: 11, fontWeight: 700 }}
-              >
-                {lbl}
-              </button>
-            ))}
+      <div className="ca-editor-layout">
+        <div className="ca-left">
+          <div className="ca-title-card">
+            <div className="ca-title-label">Article Title</div>
+            <input
+              className="ca-title-input"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              placeholder="Enter your catchy title..."
+            />
           </div>
 
-          {/* Editor content */}
-          <EditorContent editor={editor} className="ca-editor-content" />
+          <div className="ca-editor-card">
+            <div className="ca-toolbar">
+              <button className={`ca-toolbar-btn${editor?.isActive("bold") ? " ca-toolbar-btn--active" : ""}`} onMouseDown={e => { e.preventDefault(); editor?.chain().focus().toggleBold().run(); }} title="Bold"><Bold size={14} /></button>
+              <button className={`ca-toolbar-btn${editor?.isActive("italic") ? " ca-toolbar-btn--active" : ""}`} onMouseDown={e => { e.preventDefault(); editor?.chain().focus().toggleItalic().run(); }} title="Italic"><Italic size={14} /></button>
+              <button className={`ca-toolbar-btn${editor?.isActive("underline") ? " ca-toolbar-btn--active" : ""}`} onMouseDown={e => { e.preventDefault(); editor?.chain().focus().toggleUnderline().run(); }} title="Underline"><UnderlineIcon size={14} /></button>
+              <div className="ca-toolbar-sep" />
+              <button className="ca-toolbar-btn" onMouseDown={e => { e.preventDefault(); editor?.chain().focus().toggleBulletList().run(); }}><List size={14} /></button>
+              <button className="ca-toolbar-btn" onMouseDown={e => { e.preventDefault(); editor?.chain().focus().toggleOrderedList().run(); }}><ListOrdered size={14} /></button>
+              <button className="ca-toolbar-btn" onMouseDown={e => { e.preventDefault(); editor?.chain().focus().toggleBlockquote().run(); }}><Quote size={14} /></button>
+              <button className="ca-toolbar-btn" onMouseDown={e => { e.preventDefault(); editor?.chain().focus().toggleCodeBlock().run(); }}><Code size={14} /></button>
+              <div className="ca-toolbar-sep" />
+              <button className="ca-toolbar-btn" onMouseDown={e => { e.preventDefault(); const url = prompt("Masukkan URL:"); if (url) editor?.chain().focus().extendMarkRange("link").setLink({ href: url }).run(); }}><LinkIcon size={14} /></button>
+              <button className="ca-toolbar-btn" onMouseDown={e => { e.preventDefault(); const url = prompt("Masukkan URL gambar:"); if (url) editor?.chain().focus().setImage({ src: url }).run(); }}><ImagePlus size={14} /></button>
+              <div className="ca-toolbar-sep" />
+              {[["H1", "heading", { level: 1 }], ["H2", "heading", { level: 2 }], ["H3", "heading", { level: 3 }]].map(([lbl, type, attrs]) => (
+                <button key={lbl} className={`ca-toolbar-btn${editor?.isActive(type, attrs) ? " ca-toolbar-btn--active" : ""}`} onMouseDown={e => { e.preventDefault(); editor?.chain().focus().toggleHeading(attrs).run(); }} style={{ width: "auto", padding: "0 8px", fontSize: 11, fontWeight: 700 }}>{lbl}</button>
+              ))}
+            </div>
+            <EditorContent editor={editor} className="ca-editor-content" />
+          </div>
         </div>
-      </div>
 
-      {/* RIGHT — metadata panels */}
-      <div className="ca-right">
-        {/* Featured Image */}
-        <div className="ca-panel">
-          <h4 className="ca-panel__title">Featured Image</h4>
-          <label className="ca-upload">
-            {image ? (
-              <img src={image} alt="preview" />
-            ) : (
-              <>
-                <div className="ca-upload__icon">
-                  <ImagePlus size={20} color="#1b3a2a" />
-                </div>
-                <p>Click to upload</p>
-                <span>PNG, JPG or WEBP (Max 2MB)</span>
-              </>
+        <div className="ca-right">
+          <div className="ca-panel">
+            <h4 className="ca-panel__title">Featured Image</h4>
+            <label className="ca-upload">
+              {image ? <img src={image} alt="preview" /> : (
+                <>
+                  <div className="ca-upload__icon"><ImagePlus size={20} color="#1b3a2a" /></div>
+                  <p>Click to upload</p>
+                  <span>PNG, JPG or WEBP (Max 2MB)</span>
+                </>
+              )}
+              <input type="file" hidden accept="image/*" onChange={handleImage} />
+            </label>
+            {image && (
+              <button style={{ marginTop: 8, fontSize: 12, color: "#dc2626", background: "none", border: "none", cursor: "pointer" }} onClick={() => setImage(null)}>Hapus gambar</button>
             )}
-            <input type="file" hidden accept="image/*" onChange={handleImage} />
-          </label>
-          {image && (
+          </div>
+
+          <div className="ca-panel">
+            <h4 className="ca-panel__title">Category</h4>
+            <select className="ca-select" value={category} onChange={e => setCategory(e.target.value)}>
+              {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+            </select>
+          </div>
+
+          <div className="ca-panel">
+            <h4 className="ca-panel__title">Tags</h4>
+            <div className="ca-tags">
+              {tags.map((t, i) => (
+                <span key={i} className="ca-tag">{t}
+                  <button className="ca-tag__remove" onClick={() => setTags(tags.filter((_, j) => j !== i))}><X size={11} /></button>
+                </span>
+              ))}
+            </div>
+            <input className="ca-tag-input" value={inputTag} onChange={e => setInputTag(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addTag(); } }} placeholder="Add a tag..." />
+          </div>
+
+          <div className="ca-panel">
+            <h4 className="ca-panel__title">Visibility</h4>
+            <div className="ca-radio-group">
+              {[["public", "Public"], ["private", "Members Only"]].map(([val, lbl]) => (
+                <label key={val} className="ca-radio-item">
+                  <input type="radio" checked={visibility === val} onChange={() => setVisibility(val)} />
+                  {lbl}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Submit for Review */}
+          <button
+            className="ca-btn-submit"
+            onClick={handleSubmit}
+            disabled={isLoading}
+            style={{ width: "100%", opacity: isLoading ? 0.6 : 1, cursor: isLoading ? "not-allowed" : "pointer" }}
+          >
+            {isLoading ? "Mengirim..." : (isEditMode ? "Kirim Ulang untuk Review" : "Submit for Review")}
+          </button>
+
+          {/* Save Draft — hanya tampil jika bukan edit mode */}
+          {!isEditMode && (
             <button
-              style={{ marginTop: 8, fontSize: 12, color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontFamily: "Inter,sans-serif" }}
-              onClick={() => setImage(null)}
+              className="ca-btn-draft"
+              onClick={saveDraft}
+              disabled={isLoading}
+              style={{ width: "100%", marginTop: 8 }}
             >
-              Hapus gambar
+              Save as Draft
             </button>
           )}
         </div>
-
-        {/* Category */}
-        <div className="ca-panel">
-          <h4 className="ca-panel__title">Category</h4>
-          <select
-            className="ca-select"
-            value={category}
-            onChange={e => setCategory(e.target.value)}
-          >
-            {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-          </select>
-        </div>
-
-        {/* Tags */}
-        <div className="ca-panel">
-          <h4 className="ca-panel__title">Tags</h4>
-          <div className="ca-tags">
-            {tags.map((t, i) => (
-              <span key={i} className="ca-tag">
-                {t}
-                <button className="ca-tag__remove" onClick={() => setTags(tags.filter((_, j) => j !== i))}>
-                  <X size={11} />
-                </button>
-              </span>
-            ))}
-          </div>
-          <input
-            className="ca-tag-input"
-            value={inputTag}
-            onChange={e => setInputTag(e.target.value)}
-            onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addTag(); } }}
-            placeholder="Add a tag..."
-          />
-        </div>
-
-        {/* Visibility */}
-        <div className="ca-panel">
-          <h4 className="ca-panel__title">Visibility</h4>
-          <div className="ca-radio-group">
-            {[["public", "Public"], ["private", "Members Only"]].map(([val, lbl]) => (
-              <label key={val} className="ca-radio-item">
-                <input
-                  type="radio"
-                  checked={visibility === val}
-                  onChange={() => setVisibility(val)}
-                />
-                {lbl}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Submit Button */}
-        <button 
-          className="ca-btn-submit" 
-          onClick={handleSubmit}
-          disabled={isLoading}
-          style={{
-            width: "100%",
-            opacity: isLoading ? 0.6 : 1,
-            cursor: isLoading ? "not-allowed" : "pointer"
-          }}
-        >
-          {isLoading ? "Mengirim..." : "Submit for Review"}
-        </button>
-
-        {/* Save Draft Button */}
-        <button 
-          className="ca-btn-draft" 
-          onClick={saveDraft}
-          style={{ width: "100%", marginTop: 8 }}
-        >
-          Save as Draft
-        </button>
       </div>
     </div>
   );
@@ -724,9 +535,10 @@ function CreateArticleView({ onSubmitSuccess, onSaveDraft, onRefresh }) {
 /* ──────────────────────────────────────────
    MY ARTICLES VIEW
    ────────────────────────────────────────── */
-function MyArticlesView({ articles, setArticles, setActiveNav }) {
+function MyArticlesView({ articles, setActiveNav, onEditArticle }) {
   const [filter, setFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
+  const [viewingArticle, setViewingArticle] = useState(null);
 
   const filters = [
     { id: "all",       label: "Semua" },
@@ -736,30 +548,48 @@ function MyArticlesView({ articles, setArticles, setActiveNav }) {
     { id: "draft",     label: "Draft" },
   ];
 
-  const filtered =
-    filter === "all" ? articles : articles.filter(a => a.status === filter);
+  const filtered = filter === "all" ? articles : articles.filter(a => a.status === filter);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Hapus artikel ini?")) return;
-    
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/articles/delete.php`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
-
-      if (response.ok) {
-        setArticles(prev => prev.filter(a => a.id !== id));
-      }
+      await remove(ref(db, `articles/${id}`));
     } catch (err) {
       console.error("Delete error:", err);
-      alert("Gagal menghapus artikel");
+      alert("Gagal menghapus artikel: " + err.message);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Modal preview artikel
+  if (viewingArticle) {
+    return (
+      <div>
+        <button
+          onClick={() => setViewingArticle(null)}
+          style={{ background: "none", border: "none", color: "#6B7280", fontSize: 13, cursor: "pointer", marginBottom: 16, fontWeight: 500, padding: 0 }}
+        >
+          ← Kembali ke My Articles
+        </button>
+        <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, padding: "28px 32px" }}>
+          {viewingArticle.image && (
+            <img src={viewingArticle.image} alt={viewingArticle.title} style={{ width: "100%", maxHeight: 300, objectFit: "cover", borderRadius: 10, marginBottom: 20 }} />
+          )}
+          <div style={{ fontSize: 11, background: "#E8F4FD", color: "#1565C0", borderRadius: 4, padding: "2px 8px", fontWeight: 700, display: "inline-block", marginBottom: 12 }}>
+            {viewingArticle.category}
+          </div>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: "#111827", margin: "0 0 8px", fontFamily: "Georgia, serif" }}>{viewingArticle.title}</h1>
+          <div style={{ fontSize: 13, color: "#6B7280", marginBottom: 20 }}>
+            {viewingArticle.wordCount} kata · {viewingArticle.date}
+            {viewingArticle.views > 0 && ` · ${viewingArticle.views.toLocaleString()} views`}
+          </div>
+          <div style={{ color: "#374151", fontSize: 15, lineHeight: 1.7 }} dangerouslySetInnerHTML={{ __html: viewingArticle.content }} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -771,26 +601,16 @@ function MyArticlesView({ articles, setArticles, setActiveNav }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <div className="ca-myart-filters">
           {filters.map(f => (
-            <button
-              key={f.id}
-              onClick={() => setFilter(f.id)}
-              className={`ca-filter-btn${filter === f.id ? " ca-filter-btn--active" : ""}`}
-            >
-              {f.label}
-            </button>
+            <button key={f.id} onClick={() => setFilter(f.id)} className={`ca-filter-btn${filter === f.id ? " ca-filter-btn--active" : ""}`}>{f.label}</button>
           ))}
         </div>
-        <button className="ca-btn-submit" onClick={() => setActiveNav("create")}>
-          + Artikel Baru
-        </button>
+        <button className="ca-btn-submit" onClick={() => setActiveNav("create")}>+ Artikel Baru</button>
       </div>
 
       {filtered.length === 0 ? (
         <div className="ca-empty">
           <FileText size={40} />
-          <p style={{ margin: "8px 0 0", fontSize: 14 }}>
-            Tidak ada artikel dengan status ini.
-          </p>
+          <p style={{ margin: "8px 0 0", fontSize: 14 }}>Tidak ada artikel dengan status ini.</p>
         </div>
       ) : (
         <div className="ca-article-list">
@@ -798,42 +618,48 @@ function MyArticlesView({ articles, setArticles, setActiveNav }) {
             const s = STATUS_MAP[a.status] || STATUS_MAP.draft;
             return (
               <div key={a.id} className="ca-article-item">
-                {/* Thumb placeholder */}
                 <div className="ca-article-item__thumb">
-                  {a.image ? (
-                    <img src={a.image} alt={a.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  ) : (
-                    <div style={{ width: "100%", height: "100%", background: "#c8e6c9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
-                      📄
-                    </div>
-                  )}
+                  {a.image
+                    ? <img src={a.image} alt={a.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : <div style={{ width: "100%", height: "100%", background: "#c8e6c9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>📄</div>
+                  }
                 </div>
-
                 <div className="ca-article-item__body">
                   <div className="ca-article-item__title">{a.title}</div>
                   <div className="ca-article-item__meta">
-                    {a.category} · {a.wordCount.toLocaleString()} kata · {a.date}
+                    {a.category} · {(a.wordCount || 0).toLocaleString()} kata · {a.date}
                     {a.views > 0 && ` · ${a.views.toLocaleString()} views`}
                   </div>
+                  {/* Tampilkan catatan revision jika ada */}
+                  {a.status === "revision" && a.feedback && (
+                    <div style={{ fontSize: 12, color: "#BF360C", marginTop: 4, fontStyle: "italic" }}>
+                      Catatan: {a.feedback}
+                    </div>
+                  )}
                 </div>
-
-                <span className="ca-badge" style={{ background: s.bg, color: s.text }}>
-                  {s.label}
-                </span>
-
+                <span className="ca-badge" style={{ background: s.bg, color: s.text }}>{s.label}</span>
                 <div className="ca-article-item__actions">
+                  {/* Tombol Eye: hanya untuk artikel published, buka preview */}
                   {a.status === "published" && (
-                    <button className="ca-icon-btn" title="Lihat">
+                    <button
+                      className="ca-icon-btn"
+                      title="Lihat Artikel"
+                      onClick={() => setViewingArticle(a)}
+                    >
                       <Eye size={14} />
                     </button>
                   )}
-                  <button
-                    className="ca-icon-btn"
-                    title="Edit"
-                    onClick={() => setActiveNav("create")}
-                  >
-                    <Pencil size={14} />
-                  </button>
+                  {/* Tombol Pencil: untuk revision dan draft, buka edit mode */}
+                  {(a.status === "revision" || a.status === "draft") && (
+                    <button
+                      className="ca-icon-btn"
+                      title="Edit & Perbaiki"
+                      onClick={() => onEditArticle(a)}
+                    >
+                      <Pencil size={14} />
+                    </button>
+                  )}
+                  {/* Tombol Hapus */}
                   <button
                     className="ca-icon-btn"
                     title="Hapus"
@@ -854,111 +680,82 @@ function MyArticlesView({ articles, setArticles, setActiveNav }) {
 }
 
 /* ──────────────────────────────────────────
-   ANALYTICS VIEW
+   ANALYTICS VIEW — data realtime dari Firebase
    ────────────────────────────────────────── */
 function AnalyticsView({ myArticles }) {
-  const totalViews  = myArticles.reduce((s, a) => s + (a.views || 0), 0);
-  const published   = myArticles.filter(a => a.status === "published").length;
+  const totalViews    = myArticles.reduce((s, a) => s + (a.views || 0), 0);
+  const published     = myArticles.filter(a => a.status === "published").length;
+  const totalWords    = myArticles.reduce((s, a) => s + (a.wordCount || 0), 0);
+  const avgReadTime   = totalWords > 0 ? (totalWords / 200).toFixed(1) : "0";
+  const uniqueReaders = Math.round(totalViews * 0.72); // estimasi dari total views
 
-  const barData = [
-    { label: "Jan", val: 40 },
-    { label: "Feb", val: 65 },
-    { label: "Mar", val: 55 },
-    { label: "Apr", val: 80 },
-    { label: "May", val: 70 },
-    { label: "Jun", val: 95 },
-    { label: "Jul", val: 85 },
-    { label: "Aug", val: 110 },
-    { label: "Sep", val: 90 },
-    { label: "Oct", val: 130 },
-    { label: "Nov", val: 115 },
-    { label: "Dec", val: 100 },
-  ];
-  const maxVal = Math.max(...barData.map(d => d.val));
+  // Agregasi views per bulan dari data artikel (berdasarkan field date)
+  const monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const viewsByMonth = Array(12).fill(0);
+  myArticles.forEach(a => {
+    if (!a.date) return;
+    const d = new Date(a.date);
+    if (!isNaN(d)) viewsByMonth[d.getMonth()] += (a.views || 0);
+  });
+  const maxVal = Math.max(...viewsByMonth, 1);
 
-  const topArticles = [...myArticles]
-    .filter(a => a.views > 0)
-    .sort((a, b) => b.views - a.views);
+  const topArticles = [...myArticles].filter(a => a.views > 0).sort((a, b) => b.views - a.views).slice(0, 5);
 
   return (
     <div>
       <div className="ca-analytics__head">
         <h1>Analytics</h1>
-        <p>Pantau performa artikel Anda</p>
+        <p>Pantau performa artikel Anda secara realtime</p>
       </div>
 
-      {/* KPI cards */}
       <div className="ca-analytics-grid">
         {[
-          {
-            label: "Total Views",
-            value: totalViews.toLocaleString(),
-            change: "+18%",
-            up: true,
-            Icon: Eye,
-          },
-          {
-            label: "Artikel Published",
-            value: published,
-            change: "+2",
-            up: true,
-            Icon: BookOpen,
-          },
-          {
-            label: "Avg Read Time",
-            value: "4.2m",
-            change: "+0.3m",
-            up: true,
-            Icon: TrendingUp,
-          },
-          {
-            label: "Unique Readers",
-            value: "1,842",
-            change: "-5%",
-            up: false,
-            Icon: Users,
-          },
+          { label: "Total Views",       value: totalViews.toLocaleString(), Icon: Eye,       color: "#1565c0" },
+          { label: "Artikel Published", value: published,                   Icon: BookOpen,  color: "#16a34a" },
+          { label: "Avg Read Time",     value: `${avgReadTime}m`,           Icon: TrendingUp, color: "#f57f17" },
+          { label: "Est. Unique Readers", value: uniqueReaders.toLocaleString(), Icon: Users, color: "#6d28d9" },
         ].map(card => (
           <div key={card.label} className="ca-analytics-card">
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
               <div className="ca-analytics-card__label">{card.label}</div>
               <card.Icon size={16} color="#9ca3af" />
             </div>
-            <div className="ca-analytics-card__value">{card.value}</div>
-            <div className={`ca-analytics-card__change ${card.up ? "ca-analytics-card__change--up" : "ca-analytics-card__change--down"}`}>
-              {card.up ? "↑" : "↓"} {card.change} dari bulan lalu
-            </div>
+            <div className="ca-analytics-card__value" style={{ color: card.color }}>{card.value}</div>
+            <div style={{ fontSize: 12, color: "#6B7280", marginTop: 4 }}>Data realtime dari Firebase</div>
           </div>
         ))}
       </div>
 
-      {/* Bar chart */}
+      {/* Chart views per bulan */}
       <div className="ca-chart-placeholder">
-        <h3>Views per Bulan (2023)</h3>
+        <h3>Views per Bulan (berdasarkan data artikel)</h3>
         <div className="ca-bar-chart">
-          {barData.map((d, i) => (
+          {viewsByMonth.map((val, i) => (
             <div
-              key={d.label}
-              className={`ca-bar${i === 9 ? " ca-bar--highlight" : ""}`}
-              style={{ height: `${(d.val / maxVal) * 100}%` }}
-              title={`${d.label}: ${d.val} views`}
+              key={monthLabels[i]}
+              className="ca-bar"
+              style={{ height: `${(val / maxVal) * 100}%`, background: val > 0 ? "#1b3a2a" : "#e5e7eb" }}
+              title={`${monthLabels[i]}: ${val} views`}
             />
           ))}
         </div>
         <div className="ca-bar-labels">
-          {barData.map(d => (
-            <div key={d.label} className="ca-bar-label">{d.label}</div>
-          ))}
+          {monthLabels.map(m => <div key={m} className="ca-bar-label">{m}</div>)}
         </div>
       </div>
 
-      {/* Top articles */}
-      {topArticles.length > 0 && (
+      {topArticles.length > 0 ? (
         <div className="ca-top-articles">
           <h3>Artikel Terpopuler</h3>
           {topArticles.map((a, i) => (
             <div key={a.id} className="ca-top-article-row">
               <div className="ca-rank">{i + 1}</div>
+              <div style={{ width: 36, height: 36, borderRadius: 6, overflow: "hidden", flexShrink: 0, background: "#E8F4EE" }}>
+                {a.image
+                  ? <img src={a.image} alt={a.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>📄</div>
+                }
+              </div>
               <div className="ca-top-article-row__title">{a.title}</div>
               <div className="ca-top-article-row__views">
                 <Eye size={11} style={{ marginRight: 4, verticalAlign: "middle" }} />
@@ -967,23 +764,37 @@ function AnalyticsView({ myArticles }) {
             </div>
           ))}
         </div>
+      ) : (
+        <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, padding: 24, textAlign: "center", color: "#6B7280", fontSize: 14 }}>
+          Belum ada artikel dengan data views. Publish artikel untuk melihat statistik.
+        </div>
       )}
     </div>
   );
 }
 
 /* ──────────────────────────────────────────
-   SETTINGS VIEW
+   SETTINGS VIEW — dengan Login/Logout
    ────────────────────────────────────────── */
-function SettingsView() {
-  const [name, setName]   = useState("Alex Thompson");
-  const [email, setEmail] = useState("alex.thompson@edupark.id");
+function SettingsView({ currentUser }) {
+  const [name, setName]   = useState(currentUser?.displayName || "Alex Thompson");
+  const [email, setEmail] = useState(currentUser?.email || "alex.thompson@edupark.id");
   const [bio, setBio]     = useState("Senior writer and education enthusiast.");
   const [saved, setSaved] = useState(false);
 
   const handleSave = () => {
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const auth = getAuth();
+      await signOut(auth);
+    } catch (err) {
+      console.error("Logout error:", err);
+      alert("Gagal logout: " + err.message);
+    }
   };
 
   return (
@@ -1005,41 +816,27 @@ function SettingsView() {
         </div>
         <div className="ca-form-row">
           <label className="ca-form-label">Bio</label>
-          <textarea
-            className="ca-form-input"
-            value={bio}
-            onChange={e => setBio(e.target.value)}
-            rows={3}
-            style={{ resize: "vertical" }}
-          />
+          <textarea className="ca-form-input" value={bio} onChange={e => setBio(e.target.value)} rows={3} style={{ resize: "vertical" }} />
         </div>
       </div>
 
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+        <button className="ca-settings-save-btn" onClick={handleSave}>Simpan Perubahan</button>
+        {saved && <span style={{ fontSize: 13, color: "#16a34a", display: "flex", alignItems: "center", gap: 5 }}><CheckCircle size={14} /> Tersimpan!</span>}
+      </div>
+
+      {/* Logout Section */}
       <div className="ca-settings-card">
-        <h3>Ganti Password</h3>
-        <div className="ca-form-row">
-          <label className="ca-form-label">Password Lama</label>
-          <input className="ca-form-input" type="password" placeholder="••••••••" />
-        </div>
-        <div className="ca-form-row">
-          <label className="ca-form-label">Password Baru</label>
-          <input className="ca-form-input" type="password" placeholder="••••••••" />
-        </div>
-        <div className="ca-form-row">
-          <label className="ca-form-label">Konfirmasi Password Baru</label>
-          <input className="ca-form-input" type="password" placeholder="••••••••" />
-        </div>
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <button className="ca-settings-save-btn" onClick={handleSave}>
-          Simpan Perubahan
+        <h3>Akun & Keamanan</h3>
+        <p style={{ fontSize: 13, color: "#6B7280", marginBottom: 16 }}>
+          Keluar dari sesi penulis Anda. Anda perlu login kembali untuk mengakses portal.
+        </p>
+        <button
+          onClick={handleLogout}
+          style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 20px", background: "#dc2626", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: "pointer" }}
+        >
+          <LogOut size={15} /> Logout
         </button>
-        {saved && (
-          <span style={{ fontSize: 13, color: "#16a34a", display: "flex", alignItems: "center", gap: 5 }}>
-            <CheckCircle size={14} /> Tersimpan!
-          </span>
-        )}
       </div>
     </div>
   );
@@ -1048,66 +845,80 @@ function SettingsView() {
 /* ──────────────────────────────────────────
    MAIN EXPORT
    ────────────────────────────────────────── */
-export default function CreateArticle({ onExternalSubmit }) {
-  const [activeNav, setActiveNav]   = useState("create");
-  const [lastSaved, setLastSaved]   = useState(null);
-  const [myArticles, setMyArticles] = useState(SEED_MY_ARTICLES);
-  const [refreshKey, setRefreshKey] = useState(0);
+export default function CreateArticle({ onExternalSubmit, currentUser }) {
+  const [activeNav, setActiveNav]     = useState("dashboard");
+  const [myArticles, setMyArticles]   = useState([]);
+  const [editingArticle, setEditingArticle] = useState(null); // artikel yang sedang diedit
 
-  const handleSaveDraft = () => setLastSaved(new Date());
+  // Sync data artikel dari Firebase Realtime
+  useEffect(() => {
+    const articlesRef = ref(db, "articles");
+    const unsubscribe = onValue(articlesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const list = Object.keys(data).map((key) => ({ id: key, ...data[key] }));
+        setMyArticles(list);
+      } else {
+        setMyArticles([]);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
-  const handleSubmitSuccess = (articleData) => {
-    const newArticle = {
-      ...articleData,
-      id: Date.now(),
-      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-      views: 0,
-    };
-    setMyArticles(p => [newArticle, ...p]);
-    
-    // Kirim ke App.jsx jika ada callback
-    if (onExternalSubmit) {
-      onExternalSubmit(newArticle);
-    }
+  // Mulai edit artikel (mode revisi/draft)
+  const handleEditArticle = (article) => {
+    setEditingArticle(article);
+    setActiveNav("create");
   };
 
-  const handleRefresh = () => {
-    setRefreshKey(k => k + 1);
+  // Batal edit
+  const handleCancelEdit = () => {
+    setEditingArticle(null);
+    setActiveNav("my-articles");
+  };
+
+  // Navigasi sidebar — reset edit mode saat pindah ke create baru
+  const handleSetActiveNav = (nav) => {
+    if (nav === "create" && activeNav !== "create") {
+      setEditingArticle(null); // reset ke mode buat baru
+    }
+    setActiveNav(nav);
+  };
+
+  const handleSubmitSuccess = async (articleData) => {
+    if (onExternalSubmit) {
+      await onExternalSubmit(articleData);
+    }
+    setActiveNav("my-articles");
   };
 
   return (
-    <div className="ca-root" key={refreshKey}>
-      <Sidebar activeNav={activeNav} setActiveNav={setActiveNav} />
+    <div className="ca-root">
+      <Sidebar activeNav={activeNav} setActiveNav={handleSetActiveNav} currentUser={currentUser} />
 
       <div className="ca-main">
-        <Topbar
-          activeNav={activeNav}
-          lastSaved={lastSaved}
-          onSaveDraft={handleSaveDraft}
-          onSubmit={() => {}}
-        />
+        <Topbar activeNav={activeNav} />
 
         <div className="ca-body">
           {activeNav === "dashboard" && (
-            <DashboardView
-              myArticles={myArticles}
-              setActiveNav={setActiveNav}
-            />
+            <DashboardView myArticles={myArticles} setActiveNav={handleSetActiveNav} />
           )}
 
           {activeNav === "create" && (
             <CreateArticleView
               onSubmitSuccess={handleSubmitSuccess}
-              onSaveDraft={handleSaveDraft}
-              onRefresh={handleRefresh}
+              onSaveDraft={() => {}}
+              onRefresh={() => { setEditingArticle(null); setActiveNav("my-articles"); }}
+              editArticle={editingArticle}
+              onCancelEdit={handleCancelEdit}
             />
           )}
 
           {activeNav === "my-articles" && (
             <MyArticlesView
               articles={myArticles}
-              setArticles={setMyArticles}
-              setActiveNav={setActiveNav}
+              setActiveNav={handleSetActiveNav}
+              onEditArticle={handleEditArticle}
             />
           )}
 
@@ -1115,7 +926,9 @@ export default function CreateArticle({ onExternalSubmit }) {
             <AnalyticsView myArticles={myArticles} />
           )}
 
-          {activeNav === "settings" && <SettingsView />}
+          {activeNav === "settings" && (
+            <SettingsView currentUser={currentUser} />
+          )}
         </div>
       </div>
     </div>

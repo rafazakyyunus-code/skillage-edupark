@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "articles": {
+      ".read": true,
+      ".write": true,
+      "$articleId": {
+        ".validate": "newData.hasChildren(['title', 'status', 'author'])"
+      }
+    }
+  }
+}

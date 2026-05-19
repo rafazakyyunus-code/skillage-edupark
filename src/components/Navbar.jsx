@@ -407,7 +407,7 @@ export default function Navbar() {
               {/* TIKET */}
               <li>
                 <NavLink
-                  to="/e-ticket"
+                  to="/e-tiket"
                   onClick={closeMenu}
                 >
                   E-Tiket

@@ -30,6 +30,15 @@
   animation: fadeSlide 1s ease;
 }
 
+.article-hero-sub {
+  font-size: 16px;
+  color: rgba(255,255,255,0.7);
+  max-width: 520px;
+  line-height: 1.65;
+  margin-top: 12px;
+  animation: fadeSlide 1s 0.1s ease both;
+}
+
 /* FILTER GLASS */
 .article-filter {
   width: 85%;
@@ -213,25 +222,69 @@
 }
 
 /* PAGINATION */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 48px 0 64px;
+}
+
 .pagination button {
   width: 42px;
   height: 42px;
-  border-radius: 10px;
-  border: none;
+  border-radius: 12px;
+  border: 1.5px solid #e5e7eb;
+  background: #ffffff;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 
-/* GLOW BUTTON */
-.pagination button:hover {
-  background: #22c55e;
-  color: white;
-  box-shadow: 0 0 15px rgba(34,197,94,0.6);
+.pagination button:hover:not(:disabled) {
+  border-color: #22c55e;
+  color: #22c55e;
+  background: #f0fdf4;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(34,197,94,0.2);
 }
 
-.active-page {
+.pagination button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.pagination button.active-page {
   background: #22c55e;
-  color: white;
+  border-color: #22c55e;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(34,197,94,0.45);
+  transform: translateY(-1px);
+}
+
+.pagination-arrow {
+  color: #6b7280 !important;
+}
+
+.pagination-ellipsis {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  font-size: 14px;
+  letter-spacing: 1px;
+  user-select: none;
 }
 
 /* ANIMATIONS */
@@ -257,6 +310,70 @@
   }
 }
 
+/* FILTER COUNT */
+.filter-count {
+  font-size: 13px;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+/* CARD IMAGE WRAPPER */
+.card-image-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-category {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #22c55e;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 30px;
+}
+
+/* CARD CONTENT */
+.card-content {
+  padding: 18px 20px 22px;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-meta {
+  display: flex;
+  gap: 14px;
+  color: #6b7280;
+  font-size: 12.5px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.card-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-content h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.35;
+  margin-bottom: 8px;
+}
+
+.card-content p {
+  font-size: 13.5px;
+  color: #6b7280;
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+
 /* RESPONSIVE */
 @media (max-width: 992px) {
   .article-grid {
@@ -272,10 +389,10 @@
   .article-filter {
     flex-direction: column;
     gap: 15px;
+    align-items: flex-start;
   }
 
   .article-hero h1 {
     font-size: 38px;
   }
 }
-
