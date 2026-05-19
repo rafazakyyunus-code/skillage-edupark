@@ -58,12 +58,51 @@ function ProdukIcon({ active }) {
     </svg>
   );
 }
+function GalleryIcon({ active }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+      stroke={active ? "#fff" : "rgba(255,255,255,0.6)"} strokeWidth="2"
+      strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2"/>
+      <circle cx="8.5" cy="8.5" r="1.5"/>
+      <polyline points="21 15 16 10 5 21"/>
+    </svg>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   INLINE SVG ICONS (UI use – not sidebar)
+───────────────────────────────────────────── */
+const Ico = ({ d, size = 16, color = "currentColor", strokeWidth = 2, extra = null }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+    stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round"
+    style={{ display: "inline-block", flexShrink: 0 }}>
+    {d}{extra}
+  </svg>
+);
+// Specific icon shortcuts
+const IcoImage    = ({ size=16, color="currentColor" }) => <Ico size={size} color={color} d={<><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></>} />;
+const IcoInfo     = ({ size=16, color="currentColor" }) => <Ico size={size} color={color} d={<><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></>} />;
+const IcoStar     = ({ size=16, color="currentColor" }) => <Ico size={size} color={color} d={<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>} />;
+const IcoTag      = ({ size=16, color="currentColor" }) => <Ico size={size} color={color} d={<><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></>} />;
+const IcoEye      = ({ size=16, color="currentColor" }) => <Ico size={size} color={color} d={<><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>} />;
+const IcoEdit     = ({ size=16, color="currentColor" }) => <Ico size={size} color={color} d={<><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></>} />;
+const IcoTrash    = ({ size=16, color="currentColor" }) => <Ico size={size} color={color} d={<><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></>} />;
+const IcoPackage  = ({ size=40, color="currentColor" }) => <Ico size={size} color={color} d={<><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></>} />;
+const IcoLoader   = ({ size=28, color="#9CA3AF" }) => <Ico size={size} color={color} d={<><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></>} />;
+const IcoAlert    = ({ size=36, color="#DC2626" }) => <Ico size={size} color={color} d={<><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></>} />;
+const IcoCheck    = ({ size=14, color="#16a34a" }) => <Ico size={size} color={color} d={<polyline points="20 6 9 17 4 12"/>} />;
+const IcoSave     = ({ size=16, color="currentColor" }) => <Ico size={size} color={color} d={<><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></>} />;
+const IcoPlus     = ({ size=16, color="currentColor" }) => <Ico size={size} color={color} d={<><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>} />;
+const IcoDoc      = ({ size=22, color="#9CA3AF" }) => <Ico size={size} color={color} d={<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></>} />;
+const IcoLeaf     = ({ size=40, color="#9CA3AF" }) => <Ico size={size} color={color} d={<path d="M2 22 A10 10 0 0 1 12 12 A10 10 0 0 1 22 2 A10 10 0 0 1 12 12 A10 10 0 0 1 2 22Z"/>} />;
 
 const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard",       Icon: DashboardIcon },
   { id: "review",    label: "Review Articles", Icon: ReviewIcon },
   { id: "writers",   label: "Writer Directory",Icon: WritersIcon },
   { id: "produk",    label: "Produk",           Icon: ProdukIcon },
+  { id: "gallery",   label: "Gallery",          Icon: GalleryIcon },
 ];
 
 /* ─────────────────────────────────────────────
@@ -229,7 +268,7 @@ function ProdukView() {
   const handleDelete = async (id) => {
     try {
       await remove(ref(db, `produk/${id}`));
-      showToast("🗑 Produk dihapus.");
+      showToast("Produk dihapus.");
       setDeleteConfirm(null);
     } catch (err) {
       alert("Gagal menghapus: " + err.message);
@@ -246,7 +285,7 @@ function ProdukView() {
   if (loading) return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 300 }}>
       <div style={{ textAlign: "center", color: "#6B7280" }}>
-        <div style={{ fontSize: 28, marginBottom: 8 }}>⏳</div>
+        <div style={{ marginBottom: 8 }}><IcoLoader size={28} color="#9CA3AF" /></div>
         <div style={{ fontSize: 14 }}>Memuat data produk...</div>
       </div>
     </div>
@@ -272,7 +311,7 @@ function ProdukView() {
 
           {/* Foto Produk */}
           <div style={card}>
-            <label style={sectionLabel}>📷 Foto Produk</label>
+            <label style={sectionLabel}><span style={{ display:"flex", alignItems:"center", gap:6 }}><IcoImage size={15} color="#374151"/>Foto Produk</span></label>
             <div style={{ marginBottom: 10 }}>
               <label style={fieldLabel}>URL Gambar Produk *</label>
               <input
@@ -297,7 +336,7 @@ function ProdukView() {
 
           {/* Info Utama */}
           <div style={card}>
-            <label style={sectionLabel}>📝 Informasi Produk</label>
+            <label style={sectionLabel}><span style={{ display:"flex", alignItems:"center", gap:6 }}><IcoInfo size={15} color="#374151"/>Informasi Produk</span></label>
 
             <div style={{ marginBottom: 12 }}>
               <label style={fieldLabel}>Nama Produk *</label>
@@ -331,7 +370,7 @@ function ProdukView() {
 
           {/* Fitur / Keunggulan */}
           <div style={card}>
-            <label style={sectionLabel}>✅ Keunggulan Produk (muncul di halaman detail)</label>
+            <label style={sectionLabel}><span style={{ display:"flex", alignItems:"center", gap:6 }}><IcoStar size={15} color="#374151"/>Keunggulan Produk <span style={{ fontWeight:400, color:"#9CA3AF" }}>(muncul di halaman detail)</span></span></label>
             {[1, 2, 3].map(n => (
               <div key={n} style={{ marginBottom: 10 }}>
                 <label style={fieldLabel}>Keunggulan {n}</label>
@@ -351,7 +390,7 @@ function ProdukView() {
 
           {/* Badge */}
           <div style={card}>
-            <label style={sectionLabel}>🏷️ Badge Produk</label>
+            <label style={sectionLabel}><span style={{ display:"flex", alignItems:"center", gap:6 }}><IcoTag size={15} color="#374151"/>Badge Produk</span></label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {BADGE_OPTIONS.map(opt => (
                 <button key={opt.value}
@@ -388,12 +427,12 @@ function ProdukView() {
 
           {/* Preview Card */}
           <div style={card}>
-            <label style={sectionLabel}>👁️ Preview Card</label>
+            <label style={sectionLabel}><span style={{ display:"flex", alignItems:"center", gap:6 }}><IcoEye size={15} color="#374151"/>Preview Card</span></label>
             <div style={{ border: "1px solid #E5E7EB", borderRadius: 10, overflow: "hidden" }}>
               <div style={{ position: "relative", background: "#f0f0f0", height: 130 }}>
                 {form.image
                   ? <img src={form.image} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  : <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", fontSize: 32 }}>🖼️</div>
+                  : <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#CBD5E1" }}><IcoImage size={36} color="#CBD5E1" /></div>
                 }
                 {form.badge && (
                   <span style={{
@@ -422,7 +461,10 @@ function ProdukView() {
             style={{ width: "100%", padding: "14px", background: saving ? "#9CA3AF" : "#1B3A2A",
               color: "#fff", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700,
               cursor: saving ? "not-allowed" : "pointer" }}>
-            {saving ? "Menyimpan..." : editId ? "💾 Perbarui Produk" : "➕ Simpan Produk"}
+            {saving ? "Menyimpan..." : editId
+              ? <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}><IcoSave size={16} color="#fff"/>Perbarui Produk</span>
+              : <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}><IcoPlus size={16} color="#fff"/>Simpan Produk</span>
+            }
           </button>
           <button onClick={() => { setView("list"); resetForm(); }}
             style={{ width: "100%", padding: "12px", background: "#fff", border: "1px solid #E5E7EB",
@@ -478,7 +520,7 @@ function ProdukView() {
       {/* Empty */}
       {displayed.length === 0 && (
         <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, padding: "60px 20px", textAlign: "center" }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>📦</div>
+          <div style={{ marginBottom: 12 }}><IcoPackage size={40} color="#D1D5DB" /></div>
           <p style={{ color: "#6B7280", fontSize: 14 }}>Belum ada produk. Klik "Tambah Produk" untuk mulai.</p>
         </div>
       )}
@@ -495,7 +537,7 @@ function ProdukView() {
             <div style={{ position: "relative", height: 160, background: "#f0f0f0", overflow: "hidden" }}>
               {p.image
                 ? <img src={p.image} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                : <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", fontSize: 40 }}>🌿</div>
+                : <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#CBD5E1" }}><IcoImage size={40} color="#CBD5E1" /></div>
               }
               {p.badge && (
                 <span style={{
@@ -525,13 +567,15 @@ function ProdukView() {
             <div style={{ padding: "10px 16px", borderTop: "1px solid #F3F4F6", display: "flex", gap: 8 }}>
               <button onClick={() => handleEdit(p)}
                 style={{ flex: 1, padding: "8px", background: "#E8F4EE", color: "#1B3A2A",
-                  border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                ✏️ Edit
+                  border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer",
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                <IcoEdit size={14} color="#1B3A2A" /> Edit
               </button>
               <button onClick={() => setDeleteConfirm(p)}
                 style={{ flex: 1, padding: "8px", background: "#FEF2F2", color: "#DC2626",
-                  border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                🗑 Hapus
+                  border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer",
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                <IcoTrash size={14} color="#DC2626" /> Hapus
               </button>
             </div>
           </div>
@@ -543,7 +587,7 @@ function ProdukView() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex",
           alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
           <div style={{ background: "#fff", padding: 28, borderRadius: 14, width: 340, textAlign: "center" }}>
-            <div style={{ fontSize: 36, marginBottom: 10 }}>🗑️</div>
+            <div style={{ display:"flex", justifyContent:"center", marginBottom: 10 }}><IcoAlert size={36} color="#DC2626" /></div>
             <h3 style={{ margin: "0 0 8px", color: "#111827", fontSize: 17, fontWeight: 700 }}>Hapus Produk?</h3>
             <p style={{ color: "#6B7280", fontSize: 13, marginBottom: 20 }}>
               Produk <strong>"{deleteConfirm.name}"</strong> akan dihapus secara permanen dari database.
@@ -557,6 +601,418 @@ function ProdukView() {
               <button onClick={() => handleDelete(deleteConfirm.firebaseId)}
                 style={{ padding: "9px 20px", borderRadius: 8, border: "none",
                   background: "#DC2626", color: "#fff", fontSize: 14, cursor: "pointer", fontWeight: 700 }}>
+                Ya, Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   GALLERY MANAGEMENT VIEW
+───────────────────────────────────────────── */
+const GALLERY_CATEGORIES = ["Peternakan", "Perkebunan", "Workshop", "Pengunjung"];
+const GALLERY_BLANK = { title: "", category: "Peternakan", desc: "", image: "" };
+
+function GalleryView() {
+  const db = getDatabase();
+
+  const [items, setItems]               = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [view, setView]                 = useState("list"); // "list" | "form"
+  const [form, setForm]                 = useState(GALLERY_BLANK);
+  const [editId, setEditId]             = useState(null);
+  const [saving, setSaving]             = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [filterCat, setFilterCat]       = useState("Semua");
+  const [toast, setToast]               = useState("");
+  const [imagePreview, setImagePreview] = useState("");
+  const [uploading, setUploading]       = useState(false);
+  const fileInputRef                    = useState(null);
+
+  /* ── realtime listener ── */
+  useEffect(() => {
+    const galleryRef = ref(db, "gallery");
+    const unsub = onValue(galleryRef, (snap) => {
+      const data = snap.val();
+      if (data) {
+        const list = Object.entries(data).map(([key, val]) => ({ ...val, firebaseId: key }));
+        setItems(list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)));
+      } else {
+        setItems([]);
+      }
+      setLoading(false);
+    });
+    return () => unsub();
+  }, []);
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 3000);
+  };
+
+  /* ── upload file ke ImgBB ── */
+  const IMGBB_API_KEY = "6604bf748a40b7eaf83a5d4792bff01e"; // ganti dengan API key kamu dari imgbb.com
+  const uploadImage = async (file) => {
+    const fd = new FormData();
+    fd.append("image", file);
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: fd });
+    const json = await res.json();
+    if (!json.success) throw new Error("Upload gagal");
+    return json.data.url;
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImagePreview(URL.createObjectURL(file));
+    setUploading(true);
+    try {
+      const url = await uploadImage(file);
+      setForm(f => ({ ...f, image: url }));
+      showToast("✓ Foto berhasil diupload!");
+    } catch (err) {
+      showToast("✗ Upload foto gagal: " + err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  /* ── save (add / edit) ── */
+  const handleSave = async () => {
+    if (!form.title.trim()) return showToast("✗ Judul wajib diisi.");
+    if (!form.desc.trim())  return showToast("✗ Deskripsi wajib diisi.");
+    if (!form.image.trim()) return showToast("✗ Upload foto terlebih dahulu.");
+
+    setSaving(true);
+    try {
+      const payload = {
+        title:    form.title.trim(),
+        category: form.category,
+        desc:     form.desc.trim(),
+        image:    form.image.trim(),
+        updatedAt: Date.now(),
+      };
+      if (editId) {
+        await update(ref(db, `gallery/${editId}`), payload);
+        showToast("✓ Item gallery berhasil diperbarui!");
+      } else {
+        await push(ref(db, "gallery"), { ...payload, createdAt: Date.now() });
+        showToast("✓ Item gallery berhasil ditambahkan!");
+      }
+      setView("list");
+      resetForm();
+    } catch (err) {
+      showToast("✗ Gagal menyimpan: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const resetForm = () => {
+    setForm(GALLERY_BLANK);
+    setEditId(null);
+    setImagePreview("");
+  };
+
+  const handleEdit = (item) => {
+    setForm({ title: item.title, category: item.category, desc: item.desc, image: item.image || "" });
+    setEditId(item.firebaseId);
+    setImagePreview(item.image || "");
+    setView("form");
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await remove(ref(db, `gallery/${id}`));
+      showToast("Item dihapus.");
+      setDeleteConfirm(null);
+    } catch (err) {
+      showToast("✗ Gagal menghapus: " + err.message);
+    }
+  };
+
+  const displayed = filterCat === "Semua" ? items : items.filter(i => i.category === filterCat);
+
+  /* ════════ FORM VIEW ════════ */
+  if (view === "form") return (
+    <div>
+      {/* Toast */}
+      {toast && (
+        <div style={{ position:"fixed", top:24, right:24, background: toast.startsWith("✓") ? "#1B3A2A" : "#DC2626",
+          color:"#fff", padding:"12px 20px", borderRadius:10, fontSize:14, fontWeight:600, zIndex:999,
+          boxShadow:"0 4px 20px rgba(0,0,0,0.15)" }}>{toast}</div>
+      )}
+
+      {/* Header */}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24 }}>
+        <div>
+          <button onClick={() => { setView("list"); resetForm(); }}
+            style={{ background:"none", border:"none", color:"#6B7280", fontSize:13, cursor:"pointer", marginBottom:4, fontWeight:500 }}>
+            ← Kembali ke daftar
+          </button>
+          <h1 style={{ fontSize:22, fontWeight:700, color:"#111827", margin:0 }}>
+            {editId ? "Edit Item Gallery" : "Tambah Item Gallery"}
+          </h1>
+        </div>
+      </div>
+
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 320px", gap:20, alignItems:"flex-start" }}>
+
+        {/* LEFT */}
+        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+
+          {/* Upload Foto */}
+          <div style={card}>
+            <label style={sectionLabel}>Upload Foto</label>
+            <div
+              onClick={() => document.getElementById("gal-file-input").click()}
+              style={{
+                border: "2px dashed #D1D5DB", borderRadius:12, cursor:"pointer",
+                overflow:"hidden", transition:"border-color 0.2s",
+                minHeight: imagePreview ? "auto" : 160,
+                display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+              }}
+              onMouseEnter={e => e.currentTarget.style.borderColor="#16c35b"}
+              onMouseLeave={e => e.currentTarget.style.borderColor="#D1D5DB"}
+            >
+              {imagePreview ? (
+                <div style={{ position:"relative", width:"100%" }}>
+                  <img src={imagePreview} alt="preview"
+                    style={{ width:"100%", height:240, objectFit:"cover", display:"block" }} />
+                  <div style={{
+                    position:"absolute", inset:0, background:"rgba(0,0,0,0.4)",
+                    display:"flex", alignItems:"center", justifyContent:"center",
+                    opacity:0, transition:"0.3s",
+                  }}
+                    onMouseEnter={e => e.currentTarget.style.opacity=1}
+                    onMouseLeave={e => e.currentTarget.style.opacity=0}>
+                    <span style={{ color:"#fff", fontWeight:600, fontSize:14 }}>Klik untuk ganti foto</span>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ padding:"40px 20px", textAlign:"center" }}>
+                  <div style={{ display:"flex", justifyContent:"center", marginBottom:10 }}><IcoImage size={36} color="#D1D5DB" /></div>
+                  <p style={{ fontSize:15, fontWeight:600, color:"#374151", margin:"0 0 6px" }}>
+                    {uploading ? "Mengupload..." : "Klik untuk pilih foto"}
+                  </p>
+                  <span style={{ fontSize:12, color:"#9CA3AF" }}>JPG, PNG, WEBP • Maks 10MB</span>
+                </div>
+              )}
+            </div>
+            <input id="gal-file-input" type="file" accept="image/*"
+              onChange={handleFileChange} style={{ display:"none" }} />
+            {uploading && (
+              <p style={{ fontSize:12, color:"#16c35b", marginTop:8, fontWeight:600 }}>⏳ Sedang mengupload foto...</p>
+            )}
+            {form.image && !uploading && (
+              <div style={{ marginTop:10 }}>
+                <label style={fieldLabel}>Atau ganti dengan URL foto</label>
+                <input value={form.image} onChange={e => { setForm(f => ({ ...f, image: e.target.value })); setImagePreview(e.target.value); }}
+                  placeholder="https://..." style={input} />
+              </div>
+            )}
+            {!imagePreview && (
+              <div style={{ marginTop:10 }}>
+                <label style={fieldLabel}>Atau masukkan URL foto langsung</label>
+                <input value={form.image} onChange={e => { setForm(f => ({ ...f, image: e.target.value })); setImagePreview(e.target.value); }}
+                  placeholder="https://..." style={input} />
+              </div>
+            )}
+          </div>
+
+          {/* Info Dasar */}
+          <div style={card}>
+            <label style={sectionLabel}>Informasi Item</label>
+            <div style={{ marginBottom:12 }}>
+              <label style={fieldLabel}>Judul *</label>
+              <input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                placeholder="cth: Kandang Sapi Modern" style={input} />
+            </div>
+            <div style={{ marginBottom:12 }}>
+              <label style={fieldLabel}>Kategori *</label>
+              <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} style={input}>
+                {GALLERY_CATEGORIES.map(c => <option key={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={fieldLabel}>Deskripsi *</label>
+              <textarea value={form.desc} onChange={e => setForm(f => ({ ...f, desc: e.target.value }))}
+                placeholder="Tuliskan deskripsi singkat tentang foto ini..."
+                style={{ ...input, height:100, resize:"vertical" }} />
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT – Preview + Simpan */}
+        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+          <div style={card}>
+            <label style={sectionLabel}><span style={{ display:"flex", alignItems:"center", gap:6 }}><IcoEye size={15} color="#374151"/>Preview Card</span></label>
+            <div style={{ border:"1px solid #E5E7EB", borderRadius:10, overflow:"hidden" }}>
+              <div style={{ position:"relative", background:"#f0f0f0", height:160 }}>
+                {imagePreview
+                  ? <img src={imagePreview} alt="preview" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                  : <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%", color:"#CBD5E1" }}><IcoImage size={36} color="#CBD5E1" /></div>
+                }
+                <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.7), transparent)", display:"flex", alignItems:"flex-end" }}>
+                  <div style={{ padding:"12px 14px", color:"#fff" }}>
+                    <div style={{ fontWeight:700, fontSize:14 }}>{form.title || "Judul Item"}</div>
+                    <div style={{ fontSize:11, opacity:0.8 }}>{form.category}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button onClick={handleSave} disabled={saving || uploading}
+            style={{ width:"100%", padding:"14px", background: (saving || uploading) ? "#9CA3AF" : "#1B3A2A",
+              color:"#fff", border:"none", borderRadius:10, fontSize:15, fontWeight:700,
+              cursor: (saving || uploading) ? "not-allowed" : "pointer" }}>
+            {saving ? "Menyimpan..." : editId
+              ? <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}><IcoSave size={16} color="#fff"/>Perbarui Item</span>
+              : <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}><IcoPlus size={16} color="#fff"/>Simpan Item</span>
+            }
+          </button>
+          <button onClick={() => { setView("list"); resetForm(); }}
+            style={{ width:"100%", padding:"12px", background:"#fff", border:"1px solid #E5E7EB",
+              color:"#374151", borderRadius:10, fontSize:14, fontWeight:600, cursor:"pointer" }}>
+            Batal
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  /* ════════ LIST VIEW ════════ */
+  return (
+    <div>
+      {/* Toast */}
+      {toast && (
+        <div style={{ position:"fixed", top:24, right:24, background: toast.startsWith("✓") ? "#1B3A2A" : "#DC2626",
+          color:"#fff", padding:"12px 20px", borderRadius:10, fontSize:14, fontWeight:600, zIndex:999,
+          boxShadow:"0 4px 20px rgba(0,0,0,0.15)" }}>{toast}</div>
+      )}
+
+      {/* Header */}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20 }}>
+        <div>
+          <h1 style={{ fontSize:22, fontWeight:700, color:"#111827", margin:0 }}>Manajemen Gallery</h1>
+          <p style={{ color:"#6B7280", fontSize:14, margin:"4px 0 0" }}>
+            {items.length} item · data realtime dari Firebase
+          </p>
+        </div>
+        <button onClick={() => { resetForm(); setView("form"); }}
+          style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 18px",
+            background:"#1B3A2A", color:"#fff", border:"none", borderRadius:10,
+            fontSize:14, fontWeight:600, cursor:"pointer" }}>
+          + Tambah Item
+        </button>
+      </div>
+
+      {/* Stats filter bar */}
+      <div style={{ display:"flex", gap:8, marginBottom:20, flexWrap:"wrap" }}>
+        {["Semua", ...GALLERY_CATEGORIES].map(cat => {
+          const count = cat === "Semua" ? items.length : items.filter(i => i.category === cat).length;
+          return (
+            <button key={cat} onClick={() => setFilterCat(cat)}
+              style={{ padding:"6px 14px", borderRadius:20, fontSize:13,
+                fontWeight: filterCat === cat ? 600 : 400,
+                border:"1px solid " + (filterCat === cat ? "#1B3A2A" : "#E5E7EB"),
+                background: filterCat === cat ? "#1B3A2A" : "#fff",
+                color: filterCat === cat ? "#fff" : "#374151", cursor:"pointer" }}>
+              {cat} <span style={{ opacity:0.7, fontSize:11 }}>({count})</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Loading */}
+      {loading && (
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:200 }}>
+          <IcoLoader size={28} color="#9CA3AF" />
+        </div>
+      )}
+
+      {/* Empty */}
+      {!loading && displayed.length === 0 && (
+        <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:12,
+          padding:"60px 20px", textAlign:"center" }}>
+          <div style={{ display:"flex", justifyContent:"center", marginBottom:12 }}><IcoImage size={40} color="#D1D5DB" /></div>
+          <p style={{ color:"#6B7280", fontSize:14 }}>Belum ada item. Klik "Tambah Item" untuk mulai.</p>
+        </div>
+      )}
+
+      {/* Grid */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(260px, 1fr))", gap:16 }}>
+        {displayed.map(item => (
+          <div key={item.firebaseId} style={{
+            background:"#fff", border:"1px solid #E5E7EB", borderRadius:12,
+            overflow:"hidden", boxShadow:"0 2px 8px rgba(0,0,0,0.05)",
+            display:"flex", flexDirection:"column",
+          }}>
+            {/* Image */}
+            <div style={{ position:"relative", height:180, background:"#f0f0f0", overflow:"hidden" }}>
+              {item.image
+                ? <img src={item.image} alt={item.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                : <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%", color:"#CBD5E1" }}><IcoImage size={40} color="#CBD5E1" /></div>
+              }
+              <span style={{
+                position:"absolute", top:8, right:8,
+                background:"rgba(22,195,91,0.9)", color:"#fff",
+                fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:20,
+              }}>{item.category}</span>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding:"14px 16px", flex:1 }}>
+              <div style={{ fontSize:16, fontWeight:700, color:"#111827", marginBottom:6, lineHeight:1.3 }}>{item.title}</div>
+              <div style={{ fontSize:12, color:"#6B7280", lineHeight:1.6,
+                display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>
+                {item.desc}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div style={{ padding:"10px 16px", borderTop:"1px solid #F3F4F6", display:"flex", gap:8 }}>
+              <button onClick={() => handleEdit(item)}
+                style={{ flex:1, padding:"8px", background:"#E8F4EE", color:"#1B3A2A",
+                  border:"none", borderRadius:8, fontSize:13, fontWeight:600, cursor:"pointer",
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                <IcoEdit size={14} color="#1B3A2A" /> Edit
+              </button>
+              <button onClick={() => setDeleteConfirm(item)}
+                style={{ flex:1, padding:"8px", background:"#FEF2F2", color:"#DC2626",
+                  border:"none", borderRadius:8, fontSize:13, fontWeight:600, cursor:"pointer",
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                <IcoTrash size={14} color="#DC2626" /> Hapus
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Delete Confirm Modal */}
+      {deleteConfirm && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.45)", display:"flex",
+          alignItems:"center", justifyContent:"center", zIndex:1000 }}>
+          <div style={{ background:"#fff", padding:28, borderRadius:14, width:340, textAlign:"center" }}>
+            <div style={{ display:"flex", justifyContent:"center", marginBottom:10 }}><IcoAlert size={36} color="#DC2626" /></div>
+            <h3 style={{ margin:"0 0 8px", color:"#111827", fontSize:17, fontWeight:700 }}>Hapus Item Gallery?</h3>
+            <p style={{ color:"#6B7280", fontSize:13, marginBottom:20 }}>
+              Item <strong>"{deleteConfirm.title}"</strong> akan dihapus permanen dari database.
+            </p>
+            <div style={{ display:"flex", gap:10, justifyContent:"center" }}>
+              <button onClick={() => setDeleteConfirm(null)}
+                style={{ padding:"9px 20px", borderRadius:8, border:"1px solid #E5E7EB",
+                  background:"#fff", color:"#374151", fontSize:14, cursor:"pointer", fontWeight:600 }}>
+                Batal
+              </button>
+              <button onClick={() => handleDelete(deleteConfirm.firebaseId)}
+                style={{ padding:"9px 20px", borderRadius:8, border:"none",
+                  background:"#DC2626", color:"#fff", fontSize:14, cursor:"pointer", fontWeight:700 }}>
                 Ya, Hapus
               </button>
             </div>
@@ -596,6 +1052,22 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
   const [showConfirm, setShowConfirm]     = useState(null);
   const [statusFilter, setStatusFilter]   = useState("pending");
 
+  // ── realtime data for dashboard ──
+  const [produkList, setProdukList]   = useState([]);
+  const [galleryList, setGalleryList] = useState([]);
+  useEffect(() => {
+    const db = getDatabase();
+    const unsubP = onValue(ref(db, "produk"), snap => {
+      const d = snap.val();
+      setProdukList(d ? Object.entries(d).map(([k,v])=>({...v, firebaseId:k})) : []);
+    });
+    const unsubG = onValue(ref(db, "gallery"), snap => {
+      const d = snap.val();
+      setGalleryList(d ? Object.entries(d).map(([k,v])=>({...v, firebaseId:k})) : []);
+    });
+    return () => { unsubP(); unsubG(); };
+  }, []);
+
   const articles  = externalArticles;
   const totalViews = articles.reduce((sum, a) => sum + (a.views || 0), 0);
 
@@ -616,68 +1088,92 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
     <div style={{ display: "flex", minHeight: "100vh", background: "#f5f7f5", fontFamily: "sans-serif" }}>
 
       {/* ── SIDEBAR ── */}
-      <aside style={{ width: 220, background: "#1b3a2a", height: "100vh", position: "fixed", display: "flex", flexDirection: "column", zIndex: 100 }}>
+      <aside style={{ width: 220, background: "linear-gradient(180deg, #1a3828 0%, #0f2318 100%)", height: "100vh", position: "fixed", display: "flex", flexDirection: "column", zIndex: 100, boxShadow: "4px 0 24px rgba(0,0,0,0.18)" }}>
         {/* Brand */}
-        <div style={{ padding: "18px 16px", borderBottom: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ background: "rgba(255,255,255,0.12)", width: 36, height: 36, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <div style={{ padding: "20px 18px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ background: "linear-gradient(135deg, #2d6a4f, #16c35b)", width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 2px 10px rgba(22,195,91,0.3)" }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
           </div>
           <div>
-            <div style={{ fontWeight: 700, color: "#fff", fontSize: 15, fontFamily: "Georgia, serif", lineHeight: 1.2 }}>Edupark</div>
-            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Editor Portal</div>
+            <div style={{ fontWeight: 800, color: "#fff", fontSize: 15, fontFamily: "Georgia, serif", lineHeight: 1.2, letterSpacing: "-0.01em" }}>Edupark</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 1 }}>Editor Portal</div>
           </div>
         </div>
 
+        {/* Section label */}
+        <div style={{ padding: "14px 18px 6px", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.12em" }}>Menu</div>
+
         {/* Nav */}
-        <nav style={{ flex: 1, padding: "10px 0", overflowY: "auto" }}>
+        <nav style={{ flex: 1, padding: "4px 10px", overflowY: "auto" }}>
           {NAV_ITEMS.map(({ id, label, Icon }) => {
             const active = activeNav === id;
+            // badge counts
+            const badge = id === "review" ? articles.filter(a=>a.status==="pending").length
+                        : id === "produk" ? produkList.length
+                        : id === "gallery" ? galleryList.length
+                        : id === "writers" ? [...new Set(articles.map(a=>a.author))].length
+                        : null;
             return (
               <button key={id}
                 onClick={() => { setActiveNav(id); setSelectedArticle(null); }}
                 style={{
-                  display: "flex", alignItems: "center", gap: 10, width: "100%",
-                  padding: "10px 18px",
-                  background: active ? "rgba(255,255,255,0.13)" : "transparent",
-                  border: "none", cursor: "pointer",
-                  color: active ? "#fff" : "rgba(255,255,255,0.55)",
+                  display: "flex", alignItems: "center", gap: 9, width: "100%",
+                  padding: "9px 10px", borderRadius: 8, marginBottom: 2,
+                  background: active ? "rgba(22,195,91,0.15)" : "transparent",
+                  border: active ? "1px solid rgba(22,195,91,0.2)" : "1px solid transparent",
+                  cursor: "pointer",
+                  color: active ? "#fff" : "rgba(255,255,255,0.5)",
                   textAlign: "left", fontSize: 13, fontFamily: "inherit",
-                  transition: "background 0.15s, color 0.15s", boxSizing: "border-box",
-                }}>
-                <Icon active={active} /> {label}
+                  fontWeight: active ? 600 : 400,
+                  transition: "all 0.15s", boxSizing: "border-box",
+                  position: "relative",
+                }}
+                onMouseEnter={e => { if (!active) { e.currentTarget.style.background="rgba(255,255,255,0.05)"; e.currentTarget.style.color="rgba(255,255,255,0.75)"; }}}
+                onMouseLeave={e => { if (!active) { e.currentTarget.style.background="transparent"; e.currentTarget.style.color="rgba(255,255,255,0.5)"; }}}>
+                {active && <div style={{ position:"absolute", left:0, top:"50%", transform:"translateY(-50%)", width:3, height:18, borderRadius:2, background:"#16c35b" }} />}
+                <Icon active={active} />
+                <span style={{ flex:1 }}>{label}</span>
+                {badge > 0 && (
+                  <span style={{ fontSize:10, fontWeight:700, background: id==="review" ? "#F57F17" : "rgba(22,195,91,0.3)", color: id==="review" ? "#fff" : "#16c35b", borderRadius:10, padding:"1px 6px", minWidth:18, textAlign:"center" }}>{badge}</span>
+                )}
               </button>
             );
           })}
         </nav>
 
         {/* Settings */}
-        <div style={{ padding: "10px 0", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+        <div style={{ padding: "6px 10px 4px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
           <button
             onClick={() => { setActiveNav("settings"); setSelectedArticle(null); }}
             style={{
-              display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "10px 18px",
-              background: activeNav === "settings" ? "rgba(255,255,255,0.13)" : "transparent",
-              border: "none", cursor: "pointer",
-              color: activeNav === "settings" ? "#fff" : "rgba(255,255,255,0.55)",
+              display: "flex", alignItems: "center", gap: 9, width: "100%", padding: "9px 10px",
+              borderRadius: 8,
+              background: activeNav === "settings" ? "rgba(22,195,91,0.15)" : "transparent",
+              border: activeNav === "settings" ? "1px solid rgba(22,195,91,0.2)" : "1px solid transparent",
+              cursor: "pointer",
+              color: activeNav === "settings" ? "#fff" : "rgba(255,255,255,0.5)",
               textAlign: "left", fontSize: 13, fontFamily: "inherit",
-              transition: "background 0.15s, color 0.15s", boxSizing: "border-box",
-            }}>
+              fontWeight: activeNav === "settings" ? 600 : 400,
+              transition: "all 0.15s", boxSizing: "border-box",
+            }}
+            onMouseEnter={e => { if (activeNav!=="settings") { e.currentTarget.style.background="rgba(255,255,255,0.05)"; e.currentTarget.style.color="rgba(255,255,255,0.75)"; }}}
+            onMouseLeave={e => { if (activeNav!=="settings") { e.currentTarget.style.background="transparent"; e.currentTarget.style.color="rgba(255,255,255,0.5)"; }}}>
             <SettingsIcon active={activeNav === "settings"} /> Settings
           </button>
         </div>
 
         {/* User */}
-        <div style={{ padding: "12px 18px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+        <div style={{ padding: "12px 16px 14px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#2d6a4f", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
+            <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg,#2d6a4f,#16c35b)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0, boxShadow:"0 2px 8px rgba(22,195,91,0.3)" }}>
               {currentUser?.displayName ? currentUser.displayName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() : "ED"}
             </div>
-            <div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#fff", lineHeight: 1.3 }}>{currentUser?.displayName || "Editor"}</div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)" }}>Editor Portal</div>
+            <div style={{ overflow:"hidden" }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "#fff", lineHeight: 1.3, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{currentUser?.displayName || "Editor"}</div>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>Editor Portal</div>
             </div>
           </div>
         </div>
@@ -687,52 +1183,240 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
       <main style={{ flex: 1, marginLeft: 220, padding: "32px 40px" }}>
 
         {/* DASHBOARD */}
-        {activeNav === "dashboard" && !selectedArticle && (
+        {activeNav === "dashboard" && !selectedArticle && (() => {
+          const now = new Date();
+          const greeting = now.getHours() < 11 ? "Selamat pagi" : now.getHours() < 15 ? "Selamat siang" : now.getHours() < 18 ? "Selamat sore" : "Selamat malam";
+          const pendingArts = articles.filter(a => a.status === "pending");
+          const publishedArts = articles.filter(a => a.status === "published");
+          const revisionArts = articles.filter(a => a.status === "revision");
+          const uniqueWriters = [...new Set(articles.map(a => a.author))];
+          const recentGallery = [...galleryList].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,4);
+          const recentProduk = [...produkList].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,3);
+
+          return (
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 24 }}>
+            {/* Header */}
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24 }}>
               <div>
-                <h1 style={{ fontSize: 24, fontWeight: 700, color: "#111827", margin: 0 }}>Overview</h1>
-                <p style={{ color: "#6B7280", fontSize: 13, margin: "4px 0 0" }}>Selamat datang kembali, Editor.</p>
+                <div style={{ fontSize:12, color:"#16c35b", fontWeight:600, letterSpacing:"0.04em", textTransform:"uppercase", marginBottom:4 }}>{greeting}, Editor</div>
+                <h1 style={{ fontSize:26, fontWeight:800, color:"#111827", margin:0, letterSpacing:"-0.02em" }}>Dashboard Overview</h1>
+                <p style={{ color:"#9CA3AF", fontSize:13, margin:"4px 0 0" }}>
+                  {now.toLocaleDateString("id-ID", { weekday:"long", day:"numeric", month:"long", year:"numeric" })} · Data realtime dari Firebase
+                </p>
+              </div>
+              <div style={{ display:"flex", gap:10 }}>
+                <button onClick={()=>setActiveNav("review")}
+                  style={{ padding:"9px 18px", background:"#1B3A2A", color:"#fff", border:"none", borderRadius:9, fontSize:13, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", gap:7 }}>
+                  <ReviewIcon active={true} /> Review Artikel
+                </button>
               </div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 28 }}>
+
+            {/* ── ROW 1: 4 stat cards (artikel) ── */}
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14, marginBottom:18 }}>
               {[
-                { label: "Pending Review", val: articles.filter(a => a.status === "pending").length, color: "#F57F17" },
-                { label: "Published",      val: articles.filter(a => a.status === "published").length, color: "#2E7D32" },
-                { label: "In Revision",    val: articles.filter(a => a.status === "revision").length, color: "#BF360C" },
-                { label: "Total Views",    val: totalViews, color: "#1565C0" },
-              ].map(s => (
-                <div key={s.label} style={{ background: "#fff", padding: 20, borderRadius: 12, border: "1px solid #E5E7EB" }}>
-                  <div style={{ fontSize: 12, color: "#6B7280", fontWeight: 500 }}>{s.label}</div>
-                  <div style={{ fontSize: 28, fontWeight: 700, color: s.color, marginTop: 4 }}>{s.val.toLocaleString()}</div>
+                { label:"Pending Review", val:pendingArts.length, bg:"#FFFBEB", border:"#FDE68A", valColor:"#D97706", sub:"artikel menunggu",
+                  icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
+                { label:"Published", val:publishedArts.length, bg:"#F0FDF4", border:"#BBF7D0", valColor:"#16a34a", sub:"artikel tayang",
+                  icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> },
+                { label:"In Revision", val:revisionArts.length, bg:"#FFF7ED", border:"#FED7AA", valColor:"#EA580C", sub:"perlu diperbaiki",
+                  icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EA580C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg> },
+                { label:"Total Views", val:totalViews, bg:"#EFF6FF", border:"#BFDBFE", valColor:"#2563EB", sub:"total pembaca",
+                  icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> },
+              ].map(s=>(
+                <div key={s.label} style={{ background:s.bg, border:`1px solid ${s.border}`, borderRadius:12, padding:"16px 18px 14px", position:"relative", overflow:"hidden" }}>
+                  <div style={{ position:"absolute", right:14, top:14, opacity:0.5 }}>{s.icon}</div>
+                  <div style={{ fontSize:11, color:"#6B7280", fontWeight:600, textTransform:"uppercase", letterSpacing:"0.05em", marginBottom:6 }}>{s.label}</div>
+                  <div style={{ fontSize:30, fontWeight:700, color:s.valColor, lineHeight:1, marginBottom:4 }}>{s.val.toLocaleString()}</div>
+                  <div style={{ fontSize:11, color:"#9CA3AF" }}>{s.sub}</div>
                 </div>
               ))}
             </div>
-            <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, padding: 20 }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                <h2 style={{ fontSize: 16, fontWeight: 700, color: "#111827", margin: 0 }}>Antrean Artikel Terbaru</h2>
-                <button onClick={() => setActiveNav("review")} style={{ fontSize: 13, color: "#1B3A2A", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>Lihat semua →</button>
-              </div>
-              {articles.filter(a => a.status === "pending").length === 0 ? (
-                <p style={{ color: "#6B7280", fontSize: 13, margin: 0 }}>Tidak ada antrean artikel baru saat ini.</p>
-              ) : (
-                articles.filter(a => a.status === "pending").map(a => (
-                  <div key={a.id} onClick={() => { setSelectedArticle(a); setActiveNav("review"); }}
-                    style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: "1px solid #F3F4F6", cursor: "pointer" }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 8, overflow: "hidden", flexShrink: 0, background: "#E8F4EE" }}>
-                      {a.image ? <img src={a.image} alt={a.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>📄</div>}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, color: "#111827", fontSize: 14 }}>{a.title}</div>
-                      <div style={{ fontSize: 12, color: "#6B7280", marginTop: 2 }}>Oleh {a.author} · {a.category}</div>
-                    </div>
-                    <span style={{ fontSize: 11, background: "#FFF8E1", color: "#F57F17", padding: "4px 8px", borderRadius: 6, fontWeight: 600 }}>Pending</span>
+
+            {/* ── ROW 2: 3 module stat cards (produk, gallery, writers) ── */}
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14, marginBottom:18 }}>
+              {[
+                { label:"Total Produk", val:produkList.length, sub:`${CATEGORIES.map(c=>produkList.filter(p=>p.category===c).length).join(" · ")} per kategori`, valColor:"#6D28D9", bg:"#FAF5FF", border:"#DDD6FE", onClick:()=>setActiveNav("produk"),
+                  icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6D28D9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> },
+                { label:"Gallery Item", val:galleryList.length, sub:`${GALLERY_CATEGORIES.map(c=>galleryList.filter(g=>g.category===c).length).join(" · ")} per kategori`, valColor:"#0E7490", bg:"#ECFEFF", border:"#A5F3FC", onClick:()=>setActiveNav("gallery"),
+                  icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0E7490" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> },
+                { label:"Total Penulis", val:uniqueWriters.length, sub:`${articles.length} total artikel ditulis`, valColor:"#BE185D", bg:"#FDF2F8", border:"#FBCFE8", onClick:()=>setActiveNav("writers"),
+                  icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#BE185D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
+              ].map(s=>(
+                <div key={s.label} onClick={s.onClick} style={{ background:s.bg, border:`1px solid ${s.border}`, borderRadius:12, padding:"16px 18px 14px", cursor:"pointer", transition:"box-shadow 0.15s", position:"relative", overflow:"hidden" }}
+                  onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,0.07)";}}
+                  onMouseLeave={e=>{e.currentTarget.style.boxShadow="none";}}>
+                  <div style={{ position:"absolute", right:14, top:14, opacity:0.45 }}>{s.icon}</div>
+                  <div style={{ fontSize:11, color:"#6B7280", fontWeight:600, textTransform:"uppercase", letterSpacing:"0.05em", marginBottom:6 }}>{s.label}</div>
+                  <div style={{ fontSize:30, fontWeight:700, color:s.valColor, lineHeight:1, marginBottom:4 }}>{s.val}</div>
+                  <div style={{ fontSize:11, color:"#9CA3AF" }}>{s.sub}</div>
+                  <div style={{ position:"absolute", bottom:12, right:14, fontSize:11, color:s.valColor, fontWeight:500, opacity:0.6 }}>Lihat →</div>
+                </div>
+              ))}
+            </div>
+
+            {/* ── ROW 3: Artikel pending + Produk terbaru ── */}
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 340px", gap:16, marginBottom:16 }}>
+
+              {/* Antrean artikel */}
+              <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:14, padding:20 }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14 }}>
+                  <div>
+                    <h2 style={{ fontSize:15, fontWeight:700, color:"#111827", margin:0 }}>Antrean Artikel Terbaru</h2>
+                    <p style={{ fontSize:12, color:"#9CA3AF", margin:"2px 0 0" }}>Artikel menunggu persetujuan editor</p>
                   </div>
-                ))
-              )}
+                  <button onClick={()=>setActiveNav("review")} style={{ fontSize:12, color:"#1B3A2A", background:"#E8F4EE", border:"none", borderRadius:7, padding:"6px 12px", cursor:"pointer", fontWeight:600 }}>Lihat semua →</button>
+                </div>
+                {pendingArts.length === 0 ? (
+                  <div style={{ padding:"28px 0", textAlign:"center" }}>
+                    <div style={{ display:"flex", justifyContent:"center", marginBottom:8 }}><IcoCheck size={32} color="#D1D5DB" /></div>
+                    <p style={{ color:"#9CA3AF", fontSize:13, margin:0 }}>Semua artikel sudah diproses!</p>
+                  </div>
+                ) : (
+                  pendingArts.slice(0,5).map((a,i) => (
+                    <div key={a.id} onClick={()=>{ setSelectedArticle(a); setActiveNav("review"); }}
+                      style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 0", borderBottom: i < Math.min(pendingArts.length,5)-1 ? "1px solid #F9FAFB" : "none", cursor:"pointer" }}
+                      onMouseEnter={e=>e.currentTarget.style.background="#FAFAFA"}
+                      onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                      <div style={{ width:42, height:42, borderRadius:9, overflow:"hidden", flexShrink:0, background:"#E8F4EE" }}>
+                        {a.image ? <img src={a.image} alt={a.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} /> : <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center" }}><IcoDoc size={20} color="#9CA3AF" /></div>}
+                      </div>
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontWeight:600, color:"#111827", fontSize:13, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{a.title}</div>
+                        <div style={{ fontSize:11, color:"#9CA3AF", marginTop:1 }}>Oleh <strong style={{color:"#6B7280"}}>{a.author}</strong> · {a.wordCount} kata</div>
+                      </div>
+                      <span style={{ fontSize:10, background:"#FFF8E1", color:"#D97706", padding:"3px 8px", borderRadius:5, fontWeight:700, flexShrink:0 }}>PENDING</span>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Produk terbaru */}
+              <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:14, padding:20, display:"flex", flexDirection:"column" }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14 }}>
+                  <div>
+                    <h2 style={{ fontSize:15, fontWeight:700, color:"#111827", margin:0 }}>Produk Terbaru</h2>
+                    <p style={{ fontSize:12, color:"#9CA3AF", margin:"2px 0 0" }}>{produkList.length} produk aktif</p>
+                  </div>
+                  <button onClick={()=>setActiveNav("produk")} style={{ fontSize:12, color:"#1B3A2A", background:"#E8F4EE", border:"none", borderRadius:7, padding:"6px 12px", cursor:"pointer", fontWeight:600 }}>Kelola →</button>
+                </div>
+                {recentProduk.length === 0 ? (
+                  <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column", gap:8, padding:"20px 0" }}>
+                    <IcoPackage size={32} color="#D1D5DB" />
+                    <p style={{ color:"#9CA3AF", fontSize:12, margin:0, textAlign:"center" }}>Belum ada produk</p>
+                  </div>
+                ) : (
+                  recentProduk.map((p,i)=>(
+                    <div key={p.firebaseId} style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 0", borderBottom: i < recentProduk.length-1 ? "1px solid #F9FAFB" : "none" }}>
+                      <div style={{ width:44, height:44, borderRadius:8, overflow:"hidden", flexShrink:0, background:"#f0f0f0" }}>
+                        {p.image ? <img src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} /> : <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center" }}><IcoPackage size={20} color="#D1D5DB" /></div>}
+                      </div>
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontWeight:600, fontSize:13, color:"#111827", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.name}</div>
+                        <div style={{ fontSize:11, color:"#16c35b", fontWeight:700 }}>Rp {p.price?.toLocaleString("id-ID")}</div>
+                      </div>
+                      <span style={{ fontSize:10, background:"#E8F4EE", color:"#1B3A2A", padding:"3px 7px", borderRadius:5, fontWeight:600, flexShrink:0 }}>{p.category?.split(" ")[0]}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* ── ROW 4: Gallery preview + Writer activity ── */}
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 300px", gap:16 }}>
+
+              {/* Gallery preview */}
+              <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:14, padding:20 }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14 }}>
+                  <div>
+                    <h2 style={{ fontSize:15, fontWeight:700, color:"#111827", margin:0 }}>Gallery Terbaru</h2>
+                    <p style={{ fontSize:12, color:"#9CA3AF", margin:"2px 0 0" }}>{galleryList.length} item di semua kategori</p>
+                  </div>
+                  <button onClick={()=>setActiveNav("gallery")} style={{ fontSize:12, color:"#1B3A2A", background:"#E8F4EE", border:"none", borderRadius:7, padding:"6px 12px", cursor:"pointer", fontWeight:600 }}>Kelola →</button>
+                </div>
+                {recentGallery.length === 0 ? (
+                  <div style={{ padding:"28px 0", textAlign:"center" }}>
+                    <div style={{ display:"flex", justifyContent:"center", marginBottom:8 }}><IcoImage size={32} color="#D1D5DB" /></div>
+                    <p style={{ color:"#9CA3AF", fontSize:13, margin:0 }}>Belum ada item gallery</p>
+                  </div>
+                ) : (
+                  <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10 }}>
+                    {recentGallery.map(item=>(
+                      <div key={item.firebaseId} style={{ borderRadius:10, overflow:"hidden", position:"relative", aspectRatio:"1", background:"#f0f0f0", cursor:"pointer" }}
+                        onClick={()=>setActiveNav("gallery")}>
+                        {item.image
+                          ? <img src={item.image} alt={item.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                          : <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center" }}><IcoImage size={24} color="#D1D5DB" /></div>
+                        }
+                        <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.65), transparent)", display:"flex", alignItems:"flex-end" }}>
+                          <div style={{ padding:"8px 8px 7px", width:"100%", boxSizing:"border-box" }}>
+                            <div style={{ fontSize:10, fontWeight:700, color:"#fff", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{item.title}</div>
+                            <div style={{ fontSize:9, color:"rgba(255,255,255,0.7)" }}>{item.category}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {/* category breakdown bar */}
+                {galleryList.length > 0 && (
+                  <div style={{ marginTop:14, display:"flex", gap:8, flexWrap:"wrap" }}>
+                    {GALLERY_CATEGORIES.map(cat=>{
+                      const cnt = galleryList.filter(g=>g.category===cat).length;
+                      const pct = galleryList.length ? Math.round(cnt/galleryList.length*100) : 0;
+                      return cnt > 0 ? (
+                        <div key={cat} style={{ display:"flex", alignItems:"center", gap:5 }}>
+                          <div style={{ width:8, height:8, borderRadius:"50%", background:"#16c35b", opacity: 0.4 + (pct/100)*0.6 }} />
+                          <span style={{ fontSize:11, color:"#6B7280" }}>{cat} <strong style={{color:"#374151"}}>{cnt}</strong></span>
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Writer leaderboard */}
+              <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:14, padding:20 }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14 }}>
+                  <div>
+                    <h2 style={{ fontSize:15, fontWeight:700, color:"#111827", margin:0 }}>Top Penulis</h2>
+                    <p style={{ fontSize:12, color:"#9CA3AF", margin:"2px 0 0" }}>Berdasarkan artikel published</p>
+                  </div>
+                  <button onClick={()=>setActiveNav("writers")} style={{ fontSize:12, color:"#1B3A2A", background:"#E8F4EE", border:"none", borderRadius:7, padding:"6px 12px", cursor:"pointer", fontWeight:600 }}>Semua →</button>
+                </div>
+                {uniqueWriters.length === 0 ? (
+                  <div style={{ padding:"28px 0", textAlign:"center" }}>
+                    <div style={{ display:"flex", justifyContent:"center", marginBottom:8 }}><WritersIcon active={false} /></div>
+                    <p style={{ color:"#9CA3AF", fontSize:12, margin:0 }}>Belum ada penulis</p>
+                  </div>
+                ) : (
+                  [...new Map(articles.map(a=>[a.author,{
+                    name:a.author, role:a.role||"Writer",
+                    total:articles.filter(x=>x.author===a.author).length,
+                    published:articles.filter(x=>x.author===a.author&&x.status==="published").length,
+                  }])).values()]
+                  .sort((a,b)=>b.published-a.published)
+                  .slice(0,5)
+                  .map((w,i)=>(
+                    <div key={w.name} style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 0", borderBottom: i < 4 ? "1px solid #F9FAFB" : "none" }}>
+                      <div style={{ width:22, height:22, borderRadius:6, background: i===0?"#FEF9C3":i===1?"#F1F5F9":i===2?"#FFF7ED":"#F9FAFB", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color: i===0?"#D97706":i===1?"#64748B":i===2?"#EA580C":"#9CA3AF", flexShrink:0 }}>
+                        {i+1}
+                      </div>
+                      <div style={{ width:30, height:30, borderRadius:"50%", background:"linear-gradient(135deg,#E8F4EE,#bbf7d0)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700, color:"#1B3A2A", flexShrink:0 }}>
+                        {w.name?.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase() || "W"}
+                      </div>
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontSize:12, fontWeight:600, color:"#111827", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{w.name}</div>
+                        <div style={{ fontSize:10, color:"#9CA3AF" }}>{w.published} published · {w.total} total</div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {/* REVIEW */}
         {activeNav === "review" && !selectedArticle && (
@@ -761,7 +1445,7 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
                       style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12,
                         padding: "16px 20px", cursor: "pointer", display: "flex", alignItems: "center", gap: 16 }}>
                       <div style={{ width: 56, height: 56, borderRadius: 8, overflow: "hidden", flexShrink: 0, background: "#E8F4EE" }}>
-                        {article.image ? <img src={article.image} alt={article.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>📄</div>}
+                        {article.image ? <img src={article.image} alt={article.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><IcoDoc size={22} color="#9CA3AF" /></div>}
                       </div>
                       <div style={{ flex: 1 }}>
                         <span style={{ fontSize: 10, background: cc.bg, color: cc.text, borderRadius: 4, padding: "2px 6px", fontWeight: 700 }}>{article.category ? article.category.toUpperCase() : "GENERAL"}</span>
@@ -849,6 +1533,9 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
 
         {/* PRODUK */}
         {activeNav === "produk" && <ProdukView />}
+
+        {/* GALLERY */}
+        {activeNav === "gallery" && <GalleryView />}
 
         {/* SETTINGS */}
         {activeNav === "settings" && <EditorSettingsView onLogout={handleLogout} />}

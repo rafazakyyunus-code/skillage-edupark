@@ -1,26 +1,55 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
+import { getDatabase, ref, onValue } from "firebase/database"
 import "./Gallery.css"
-import galleryData from "./GalleryData"
 
 const itemsPerPage = 6
+const CATEGORIES = ["Semua", "Peternakan", "Perkebunan", "Workshop", "Pengunjung"]
 
 export default function Gallery() {
-  const [currentPage, setCurrentPage] = useState(1)
+  const [galleryData, setGalleryData]       = useState([])
+  const [loading, setLoading]               = useState(true)
+  const [currentPage, setCurrentPage]       = useState(1)
   const [selectedCategory, setSelectedCategory] = useState("Semua")
 
-  const categories = ["Semua", "Peternakan", "Perkebunan", "Workshop", "Pengunjung"]
+  // ── Realtime listener dari Firebase ──────────────────────────────────
+  useEffect(() => {
+    const db  = getDatabase()
+    const galleryRef = ref(db, "gallery")
 
+    const unsub = onValue(galleryRef, (snapshot) => {
+      const data = snapshot.val()
+      if (data) {
+        const arr = Object.entries(data).map(([key, val]) => ({
+          id: key,   // Firebase key dipakai sebagai id (untuk link ke detail)
+          ...val,
+        }))
+        // Urutkan terbaru di atas
+        arr.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+        setGalleryData(arr)
+      } else {
+        setGalleryData([])
+      }
+      setLoading(false)
+    })
+
+    return () => unsub()
+  }, [])
+
+  // ── Filter & Pagination ───────────────────────────────────────────────
   const filteredData =
     selectedCategory === "Semua"
       ? galleryData
       : galleryData.filter(item => item.category === selectedCategory)
 
-  const indexOfLast = currentPage * itemsPerPage
-  const indexOfFirst = indexOfLast - itemsPerPage
-  const currentItems = filteredData.slice(indexOfFirst, indexOfLast)
+  const totalPages   = Math.ceil(filteredData.length / itemsPerPage)
+  const indexOfFirst = (currentPage - 1) * itemsPerPage
+  const currentItems = filteredData.slice(indexOfFirst, indexOfFirst + itemsPerPage)
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage)
+  const handleCategory = (cat) => {
+    setSelectedCategory(cat)
+    setCurrentPage(1)
+  }
 
   return (
     <div className="gallery-page">
@@ -33,28 +62,47 @@ export default function Gallery() {
 
       <div className="gallery-content">
 
-        {/* SIDEBAR */}
-        <div className="gallery-sidebar">
+        {/* SIDEBAR – sticky */}
+        <aside className="gallery-sidebar">
           <h3>Kategori</h3>
-
-          {categories.map(cat => (
-            <button
-              key={cat}
-              className={selectedCategory === cat ? "active" : ""}
-              onClick={() => {
-                setSelectedCategory(cat)
-                setCurrentPage(1)
-              }}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+          {CATEGORIES.map(cat => {
+            const count = cat === "Semua"
+              ? galleryData.length
+              : galleryData.filter(i => i.category === cat).length
+            return (
+              <button
+                key={cat}
+                className={selectedCategory === cat ? "active" : ""}
+                onClick={() => handleCategory(cat)}
+              >
+                <span>{cat}</span>
+                <span className="sidebar-badge">{count}</span>
+              </button>
+            )
+          })}
+        </aside>
 
         {/* GRID */}
         <div className="gallery-grid">
 
-          {currentItems.map((item, index) => (
+          {/* Loading state */}
+          {loading && (
+            <div className="gallery-feedback">
+              <div className="gallery-spinner" />
+              <p>Memuat gallery...</p>
+            </div>
+          )}
+
+          {/* Empty state */}
+          {!loading && currentItems.length === 0 && (
+            <div className="gallery-feedback">
+              <span className="gallery-feedback-icon">🖼️</span>
+              <p>Belum ada foto di kategori ini.</p>
+            </div>
+          )}
+
+          {/* Cards */}
+          {!loading && currentItems.map((item, index) => (
             <Link
               to={`/gallery/${item.id}`}
               key={item.id}
@@ -62,7 +110,6 @@ export default function Gallery() {
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <img src={item.image} alt={item.title} />
-
               <div className="card-overlay">
                 <h4>{item.title}</h4>
                 <span>{item.category}</span>
@@ -71,17 +118,29 @@ export default function Gallery() {
           ))}
 
           {/* PAGINATION */}
-          <div className="pagination">
-            {[...Array(totalPages)].map((_, i) => (
+          {!loading && totalPages > 1 && (
+            <div className="pagination">
               <button
-                key={i}
-                className={currentPage === i + 1 ? "active" : ""}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </div>
+                onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+                disabled={currentPage === 1}
+              >‹</button>
+
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  className={currentPage === i + 1 ? "active" : ""}
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+
+              <button
+                onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >›</button>
+            </div>
+          )}
 
         </div>
       </div>
