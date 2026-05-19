@@ -1,93 +1,94 @@
-import { useState } from "react"
+import "./Attractions.css";
+import { useState } from "react";
 
 import {
-  FaThLarge,
+  FaGlobe,
   FaTools,
   FaLeaf,
   FaPaw,
-} from "react-icons/fa"
-
-import "./Attractions.css"
+} from "react-icons/fa";
 
 const attractions = [
 
-  /* WORKSHOPS */
+  /* ================= WORKSHOPS ================= */
+
   {
     id: 1,
     title: "Eco-Craft Studio",
     image:
       "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
-    category: "WORKSHOPS",
-    location: "Indoor",
+    category: "Workshops",
+    location: "Creative Zone",
     desc:
       "Hands-on sustainable art and craft activities using recycled materials.",
   },
 
   {
     id: 2,
-    title: "Clay Workshop",
+    title: "Science Workshop",
     image:
-      "https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=1200&auto=format&fit=crop",
-    category: "WORKSHOPS",
-    location: "Indoor",
+      "https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1200&auto=format&fit=crop",
+    category: "Workshops",
+    location: "Indoor Lab",
     desc:
-      "Creative clay crafting experiences for children and students.",
+      "Interactive science experiments for young learners.",
   },
 
   {
     id: 3,
-    title: "Painting Corner",
+    title: "Art Experience",
     image:
       "https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=1200&auto=format&fit=crop",
-    category: "WORKSHOPS",
-    location: "Indoor",
+    category: "Workshops",
+    location: "Art Hall",
     desc:
-      "Interactive painting sessions guided by professional mentors.",
+      "Painting, sketching, and creative teamwork activities.",
   },
 
   {
     id: 4,
-    title: "Science Lab",
+    title: "Coding Camp",
     image:
-      "https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1200&auto=format&fit=crop",
-    category: "WORKSHOPS",
-    location: "Indoor",
+      "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1200&auto=format&fit=crop",
+    category: "Workshops",
+    location: "Tech Room",
     desc:
-      "Explore exciting science experiments in a fun environment.",
+      "Learn coding and digital creativity through fun activities.",
   },
 
   {
     id: 5,
-    title: "Cooking Class",
+    title: "Creative Lab",
     image:
-      "https://images.unsplash.com/photo-1556911220-bff31c812dba?q=80&w=1200&auto=format&fit=crop",
-    category: "WORKSHOPS",
-    location: "Indoor",
+      "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200&auto=format&fit=crop",
+    category: "Workshops",
+    location: "Workshop Area",
     desc:
-      "Learn healthy cooking techniques with local ingredients.",
+      "Educational group projects and interactive collaboration.",
   },
 
   {
     id: 6,
-    title: "Woodcraft Room",
+    title: "Innovation Hub",
     image:
-      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1200&auto=format&fit=crop",
-    category: "WORKSHOPS",
-    location: "Indoor",
+      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop",
+    category: "Workshops",
+    location: "Main Building",
     desc:
-      "Build creative wooden projects with hands-on guidance.",
+      "Build and explore innovative educational ideas together.",
   },
 
-  /* NATURE */
+  /* ================= NATURE ================= */
+
   {
     id: 7,
     title: "Adventure Trail",
     image:
       "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop",
-    category: "NATURE",
+    category: "Nature",
     location: "Outdoor",
     desc:
-      "Nature hiking paths with scenic landscapes and exploration routes.",
+      "Nature hiking paths with scenic landscapes.",
   },
 
   {
@@ -95,10 +96,10 @@ const attractions = [
     title: "Hydroponics Lab",
     image:
       "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=1200&auto=format&fit=crop",
-    category: "NATURE",
-    location: "Research",
+    category: "Nature",
+    location: "Research Zone",
     desc:
-      "Discover innovative farming systems and sustainable agriculture.",
+      "Explore innovative sustainable farming systems.",
   },
 
   {
@@ -106,32 +107,32 @@ const attractions = [
     title: "Botany Garden",
     image:
       "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?q=80&w=1200&auto=format&fit=crop",
-    category: "NATURE",
-    location: "Outdoor",
+    category: "Nature",
+    location: "Educational Garden",
     desc:
-      "Explore diverse tropical plants and educational greenery zones.",
+      "Discover tropical plants and green ecosystems.",
   },
 
   {
     id: 10,
-    title: "Forest Camping",
+    title: "Forest Camp",
     image:
       "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop",
-    category: "NATURE",
-    location: "Outdoor",
+    category: "Nature",
+    location: "Camping Area",
     desc:
-      "Camping activities surrounded by beautiful forest scenery.",
+      "Outdoor exploration and camping adventures.",
   },
 
   {
     id: 11,
-    title: "River Walk",
+    title: "Waterfall Trek",
     image:
-      "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1200&auto=format&fit=crop",
-    category: "NATURE",
-    location: "Outdoor",
+      "https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=1200&auto=format&fit=crop",
+    category: "Nature",
+    location: "Mountain Trail",
     desc:
-      "Relaxing educational river exploration with nature guides.",
+      "Exciting trekking routes with hidden waterfalls.",
   },
 
   {
@@ -139,22 +140,23 @@ const attractions = [
     title: "Greenhouse Tour",
     image:
       "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?q=80&w=1200&auto=format&fit=crop",
-    category: "NATURE",
-    location: "Indoor",
+    category: "Nature",
+    location: "Indoor Greenhouse",
     desc:
-      "Learn about plant ecosystems inside modern greenhouses.",
+      "Learn about sustainable plant cultivation.",
   },
 
-  /* ANIMALS */
+  /* ================= ANIMALS ================= */
+
   {
     id: 13,
     title: "Deer Sanctuary",
     image:
       "https://images.unsplash.com/photo-1474511320723-9a56873867b5?q=80&w=1200&auto=format&fit=crop",
-    category: "ANIMALS",
-    location: "Outdoor",
+    category: "Animals",
+    location: "Outdoor Habitat",
     desc:
-      "Observe deer families roaming naturally within protected habitats.",
+      "Observe deer families in protected habitats.",
   },
 
   {
@@ -162,21 +164,21 @@ const attractions = [
     title: "Butterfly Pavilion",
     image:
       "https://images.unsplash.com/photo-1444464666168-49d633b86797?q=80&w=1200&auto=format&fit=crop",
-    category: "ANIMALS",
-    location: "Indoor",
+    category: "Animals",
+    location: "Indoor Dome",
     desc:
-      "A colorful habitat showcasing beautiful butterfly species.",
+      "A vibrant habitat full of butterfly species.",
   },
 
   {
     id: 15,
-    title: "Bird House",
+    title: "Bird Sanctuary",
     image:
-      "https://images.unsplash.com/photo-1501706362039-c6e13b4a6c06?q=80&w=1200&auto=format&fit=crop",
-    category: "ANIMALS",
-    location: "Outdoor",
+      "https://images.unsplash.com/photo-1501706362039-c6e80948bb91?q=80&w=1200&auto=format&fit=crop",
+    category: "Animals",
+    location: "Forest Zone",
     desc:
-      "Discover rare bird species in natural habitats.",
+      "Explore tropical birds in natural environments.",
   },
 
   {
@@ -184,10 +186,10 @@ const attractions = [
     title: "Rabbit Garden",
     image:
       "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?q=80&w=1200&auto=format&fit=crop",
-    category: "ANIMALS",
-    location: "Outdoor",
+    category: "Animals",
+    location: "Kids Area",
     desc:
-      "Friendly rabbits that visitors can safely interact with.",
+      "Interactive feeding and play sessions with rabbits.",
   },
 
   {
@@ -195,77 +197,72 @@ const attractions = [
     title: "Mini Zoo",
     image:
       "https://images.unsplash.com/photo-1546182990-dffeafbe841d?q=80&w=1200&auto=format&fit=crop",
-    category: "ANIMALS",
-    location: "Outdoor",
+    category: "Animals",
+    location: "Family Zone",
     desc:
-      "Educational animal encounters designed for young learners.",
+      "Meet friendly farm animals and exotic species.",
   },
 
   {
     id: 18,
-    title: "Fish Pond",
+    title: "Aquatic World",
     image:
-      "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?q=80&w=1200&auto=format&fit=crop",
-    category: "ANIMALS",
-    location: "Outdoor",
+      "https://images.unsplash.com/photo-1520301255226-bf5f144451c1?q=80&w=1200&auto=format&fit=crop",
+    category: "Animals",
+    location: "Aquarium",
     desc:
-      "Interactive fish feeding and aquatic ecosystem learning.",
+      "Discover underwater creatures and marine life.",
   },
-]
+
+];
 
 export default function Attractions() {
 
-  const [activeFilter, setActiveFilter] =
-    useState("ALL")
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [page, setPage] = useState(1);
 
-  const [currentPage, setCurrentPage] =
-    useState(1)
-
-  const itemsPerPage = 6
+  const itemsPerPage = 6;
 
   const filteredData =
-    activeFilter === "ALL"
+    activeFilter === "All"
       ? attractions
       : attractions.filter(
-          (item) =>
-            item.category === activeFilter
-        )
+          (item) => item.category === activeFilter
+        );
 
   const totalPages = Math.ceil(
     filteredData.length / itemsPerPage
-  )
+  );
 
-  const startIndex =
-    (currentPage - 1) * itemsPerPage
+  const startIndex = (page - 1) * itemsPerPage;
 
-  const displayedItems =
-    filteredData.slice(
-      startIndex,
-      startIndex + itemsPerPage
-    )
+  const currentItems = filteredData.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   const handleFilter = (filter) => {
-    setActiveFilter(filter)
-    setCurrentPage(1)
-  }
+    setActiveFilter(filter);
+    setPage(1);
+  };
 
   return (
     <div className="attractions-page">
 
       {/* HERO */}
-      <section className="hero-section">
+      <section className="at-hero">
 
         <img
           src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1400&auto=format&fit=crop"
           alt=""
         />
 
-        <div className="hero-overlay"></div>
+        <div className="at-overlay"></div>
 
-        <div className="hero-content">
+        <div className="at-hero-content">
 
-          <span>
-            EDUPARK EXPERIENCE
+          <span className="at-badge">
+            ADVENTURE AWAITS
           </span>
 
           <h1>
@@ -280,13 +277,13 @@ export default function Attractions() {
             wildlife at Edupark Skillage.
           </p>
 
-          <div className="hero-buttons">
+          <div className="at-buttons">
 
-            <button className="primary-btn">
+            <button className="at-primary">
               Start Exploring
             </button>
 
-            <button className="secondary-btn">
+            <button className="at-secondary">
               View Map
             </button>
 
@@ -296,114 +293,80 @@ export default function Attractions() {
       </section>
 
       {/* HEADER */}
-      <div className="section-header">
+      <div className="at-header">
 
         <div>
-
-          <h2>
-            Explore Our Attractions
-          </h2>
+          <h2>Explore Our Attractions</h2>
 
           <p>
-            Curated educational experiences
-            for all ages.
+            Curated educational experiences for all ages.
           </p>
-
         </div>
 
-        {/* FILTER */}
-        <div className="filter-buttons">
+        <div className="at-filters">
 
           <button
-            className={
-              activeFilter === "ALL"
-                ? "active-filter"
-                : ""
-            }
-            onClick={() =>
-              handleFilter("ALL")
-            }
+            className={activeFilter === "All" ? "active" : ""}
+            onClick={() => handleFilter("All")}
           >
-            <FaThLarge />
+            <FaGlobe />
             All
           </button>
 
           <button
-            className={
-              activeFilter === "WORKSHOPS"
-                ? "active-filter"
-                : ""
-            }
-            onClick={() =>
-              handleFilter("WORKSHOPS")
-            }
+            className={activeFilter === "Workshops" ? "active" : ""}
+            onClick={() => handleFilter("Workshops")}
           >
             <FaTools />
             Workshops
           </button>
 
           <button
-            className={
-              activeFilter === "NATURE"
-                ? "active-filter"
-                : ""
-            }
-            onClick={() =>
-              handleFilter("NATURE")
-            }
+            className={activeFilter === "Nature" ? "active" : ""}
+            onClick={() => handleFilter("Nature")}
           >
             <FaLeaf />
             Nature
           </button>
 
           <button
-            className={
-              activeFilter === "ANIMALS"
-                ? "active-filter"
-                : ""
-            }
-            onClick={() =>
-              handleFilter("ANIMALS")
-            }
+            className={activeFilter === "Animals" ? "active" : ""}
+            onClick={() => handleFilter("Animals")}
           >
             <FaPaw />
             Animals
           </button>
 
         </div>
-
       </div>
 
       {/* GRID */}
-      <div className="attractions-grid">
+      <div className="at-grid">
 
-        {displayedItems.map((item) => (
+        {currentItems.map((item) => (
 
-          <div
-            className="attraction-card"
-            key={item.id}
-          >
+          <div className="at-card" key={item.id}>
 
-            <div className="card-image">
+            <div className="at-image">
 
               <img
                 src={item.image}
                 alt={item.title}
               />
 
-              <span className="card-badge">
+              <span className="at-tag">
                 {item.category}
               </span>
 
             </div>
 
-            <div className="card-content">
+            <div className="at-content">
 
               <h3>{item.title}</h3>
 
               <p>{item.desc}</p>
 
-              <div className="card-footer">
+              <div className="at-footer">
 
                 <span>
                   🌿 {item.location}
@@ -424,35 +387,24 @@ export default function Attractions() {
       </div>
 
       {/* PAGINATION */}
-      {totalPages > 1 && (
+      {activeFilter === "All" && (
+        <div className="at-pagination">
 
-        <div className="pagination">
+          {[...Array(totalPages)].map((_, i) => (
 
-          {[...Array(totalPages)].map(
-            (_, index) => (
+            <button
+              key={i}
+              className={page === i + 1 ? "active-page" : ""}
+              onClick={() => setPage(i + 1)}
+            >
+              {i + 1}
+            </button>
 
-              <button
-                key={index}
-                className={
-                  currentPage === index + 1
-                    ? "active-page"
-                    : ""
-                }
-                onClick={() =>
-                  setCurrentPage(index + 1)
-                }
-              >
-                {index + 1}
-              </button>
-
-            )
-          )}
+          ))}
 
         </div>
-
       )}
 
     </div>
-  )
+  );
 }
-
