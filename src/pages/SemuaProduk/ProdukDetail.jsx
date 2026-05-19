@@ -1,25 +1,64 @@
+// src/pages/SemuaProduk/ProdukDetail.jsx
 import { useParams, useNavigate } from "react-router-dom";
-import { ShieldCheck, Globe, Lock } from 'lucide-react';
-import { PRODUCTS } from "./SemuaProdukData";
+import { ShieldCheck, Globe, Lock } from "lucide-react";
+import { useProdukData } from "./SemuaProdukData";
 import "./ProdukDetail.css";
 
 export default function ProdukDetail() {
-  const { id } = useParams();
+  const { id }   = useParams();
   const navigate = useNavigate();
 
-  const product = PRODUCTS.find((p) => p.id === Number(id));
+  const { products, loading } = useProdukData(); // 🔥 realtime dari Firebase
 
-  if (!product) return <h2>Produk tidak ditemukan</h2>;
+  if (loading) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
+        <div style={{ textAlign: "center", color: "#64748b" }}>
+          <div style={{ fontSize: 36, marginBottom: 12 }}>⏳</div>
+          <p>Memuat detail produk...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // id dari URL bisa berupa Firebase key (string)
+  const product = products.find((p) => p.id === id || String(p.id) === id);
+
+  if (!product) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
+        <div style={{ textAlign: "center", color: "#64748b" }}>
+          <div style={{ fontSize: 40, marginBottom: 12 }}>📦</div>
+          <h2 style={{ color: "#1e293b" }}>Produk tidak ditemukan</h2>
+          <button onClick={() => navigate("/produk")}
+            style={{ marginTop: 16, padding: "10px 24px", background: "#16c35b", color: "#fff",
+              border: "none", borderRadius: 8, cursor: "pointer", fontWeight: 600 }}>
+            ← Kembali ke Katalog
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Keunggulan produk (dari Firebase atau fallback default) ── */
+  const features = [
+    product.feature1 || "Produk berkualitas tinggi dari peternakan organik.",
+    product.feature2 || "Hands-on experience dengan standar industri Fortune 500.",
+    product.feature3 || "Mendapatkan dukungan penuh dari tim ahli kami.",
+  ];
 
   return (
     <div className="pd-root">
       <div className="pd-container">
-        {/* LEFT IMAGE */}
+        {/* LEFT: IMAGE */}
         <div className="pd-image-section">
-          <img src={product.image} alt={product.name} className="pd-main-image" />
-
+          <img
+            src={product.image}
+            alt={product.name}
+            className="pd-main-image"
+            onError={(e) => { e.target.style.display = "none"; }}
+          />
           <div className="pd-thumbnails">
-            {/* Thumbnail dibuat dalam wrapper agar bisa diatur kelonjongannya */}
             <div className="pd-thumb-wrapper active">
               <img src={product.image} alt={product.name} />
             </div>
@@ -35,65 +74,68 @@ export default function ProdukDetail() {
           </div>
         </div>
 
-        {/* RIGHT CONTENT */}
+        {/* RIGHT: INFO */}
         <div className="pd-info">
+          {/* Badge */}
+          {product.badge && (
+            <span style={{
+              display: "inline-block", marginBottom: 10,
+              padding: "3px 12px", fontSize: 11, fontWeight: 700, borderRadius: 4, color: "#fff",
+              background: product.badgeColor === "red" ? "#ef4444" : "#16c35b",
+            }}>
+              {product.badge}
+            </span>
+          )}
+
+          {/* Category */}
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#16c35b", letterSpacing: 1.2,
+            textTransform: "uppercase", marginBottom: 8 }}>
+            {product.categoryLabel || product.category}
+          </div>
+
           <h1 className="pd-title">{product.name}</h1>
 
           <div className="pd-rating">
-            <span className="stars">⭐⭐⭐⭐⭐</span> 
+            <span className="stars">⭐⭐⭐⭐⭐</span>
             <span className="rating-text">(4.9 / 5, 2.4k Students)</span>
           </div>
 
           <h2 className="pd-price">
-            Rp {product.price.toLocaleString("id-ID")}
+            Rp {Number(product.price).toLocaleString("id-ID")}
           </h2>
           <p className="pd-price-note">One-time payment. Lifetime access included.</p>
 
           <p className="pd-desc">{product.desc}</p>
 
-          {/* List dengan icon centang custom */}
+          {/* Keunggulan dari Firebase */}
           <ul className="pd-features">
-            <li>
-              <span className="pd-check">✓</span> 
-              Produk berkualitas tinggi dari peternakan organik.
-            </li>
-            <li>
-              <span className="pd-check">✓</span> 
-              Hands-on experience dengan standar industri Fortune 500.
-            </li>
-            <li>
-              <span className="pd-check">✓</span> 
-              Mendapatkan dukungan penuh dari tim ahli kami.
-            </li>
+            {features.filter(Boolean).map((f, i) => (
+              <li key={i}>
+                <span className="pd-check">✓</span> {f}
+              </li>
+            ))}
           </ul>
 
           <div className="pd-actions">
             <button className="pd-buy">
               <span className="cart-icon">🛒</span> Beli Sekarang
             </button>
-
-            <button
-              className="pd-back"
-              onClick={() => navigate("/produk")}
-            >
+            <button className="pd-back" onClick={() => navigate("/produk")}>
               ← Kembali ke Katalog
             </button>
           </div>
 
-          {/* Footer Info Tambahan */}
           <div className="pd-footer-info flex gap-6 mt-8">
             <div className="pd-footer-item flex items-center gap-2 text-sm text-gray-600">
-              <ShieldCheck size={18} className="text-blue-500" /> 
+              <ShieldCheck size={18} className="text-blue-500" />
               <span>Verified Institution</span>
             </div>
-            
             <div className="pd-footer-item flex items-center gap-2 text-sm text-gray-600">
-              <Globe size={18} className="text-blue-500" /> 
+              <Globe size={18} className="text-blue-500" />
               <span>Global Certificate</span>
             </div>
-            
             <div className="pd-footer-item flex items-center gap-2 text-sm text-gray-600">
-              <Lock size={18} className="text-blue-500" /> 
+              <Lock size={18} className="text-blue-500" />
               <span>Secure Checkout</span>
             </div>
           </div>

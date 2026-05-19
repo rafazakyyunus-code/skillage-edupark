@@ -1,9 +1,10 @@
+// src/pages/SemuaProduk/Index.jsx
 import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ProductCard from "./ProdukCard";
 
 import {
-  PRODUCTS,
+  useProdukData,
   CATEGORIES,
   SORT_OPTIONS,
   ITEMS_PER_PAGE,
@@ -12,70 +13,67 @@ import {
 
 import "./SemuaProduk.css";
 
-/* 🔥 MAPPING URL → KATEGORI ASLI */
+/* ── URL slug → nama kategori asli ── */
 const kategoriMap = {
   "hewan-peternakan": "Hewan Peternakan",
-  "sayuran": "Sayuran",
-  "saprodi": "Saprodi",
+  "sayuran":          "Sayuran",
+  "saprodi":          "Saprodi",
 };
 
 export default function SemuaProduk() {
   const { kategori } = useParams();
-  const navigate = useNavigate();
+  const navigate     = useNavigate();
 
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("terbaru");
+  const { products, loading } = useProdukData(); // 🔥 realtime dari Firebase
+
+  const [search,      setSearch]      = useState("");
+  const [sort,        setSort]        = useState("terbaru");
   const [currentPage, setCurrentPage] = useState(1);
 
-  /* 🔥 DERIVE ACTIVE CATEGORY FROM URL */
+  /* ── Derive active category dari URL ── */
   const activeCategory = useMemo(() => {
     if (!kategori) return "Semua Produk";
     const key = decodeURIComponent(kategori).toLowerCase();
-    const mappedCategory =
+    return (
       kategoriMap[key] ||
-      CATEGORIES.find((cat) => cat.toLowerCase().replace(/\s+/g, "-") === key);
-    return mappedCategory || "Semua Produk";
+      CATEGORIES.find((cat) => cat.toLowerCase().replace(/\s+/g, "-") === key) ||
+      "Semua Produk"
+    );
   }, [kategori]);
 
-  /* ── FILTER & SORT ── */
+  /* ── Filter & sort ── */
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((p) => {
-      const matchCategory =
-        activeCategory === "Semua Produk" || p.category === activeCategory;
+    return products
+      .filter((p) => {
+        const matchCategory =
+          activeCategory === "Semua Produk" || p.category === activeCategory;
+        const matchSearch =
+          p.name.toLowerCase().includes(search.toLowerCase()) ||
+          (p.categoryLabel || p.category).toLowerCase().includes(search.toLowerCase());
+        return matchCategory && matchSearch;
+      })
+      .sort((a, b) => {
+        if (sort === "harga-asc")  return a.price - b.price;
+        if (sort === "harga-desc") return b.price - a.price;
+        return (b.createdAt || 0) - (a.createdAt || 0); // terbaru
+      });
+  }, [activeCategory, search, sort, products]);
 
-      const matchSearch =
-        p.name.toLowerCase().includes(search.toLowerCase()) ||
-        p.categoryLabel.toLowerCase().includes(search.toLowerCase());
-
-      return matchCategory && matchSearch;
-    }).sort((a, b) => {
-      if (sort === "harga-asc") return a.price - b.price;
-      if (sort === "harga-desc") return b.price - a.price;
-      return b.id - a.id;
-    });
-  }, [activeCategory, search, sort, PRODUCTS]);
-
-  /* ── PAGINATION ── */
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)
-  );
-
+  /* ── Pagination ── */
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / ITEMS_PER_PAGE));
   const paginatedProducts = filteredProducts.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
 
-  // Tambahkan baris ini di bagian handleCategory agar tidak terasa "lompat" ke atas
-const handleCategory = (cat) => {
-  setCurrentPage(1);
-  if (cat === "Semua Produk") {
-    navigate("/produk");
-  } else {
-    const slug = cat.toLowerCase().replace(/\s+/g, "-");
-    navigate(`/produk/kategori/${slug}`);
-  }
-};
+  const handleCategory = (cat) => {
+    setCurrentPage(1);
+    if (cat === "Semua Produk") {
+      navigate("/produk");
+    } else {
+      navigate(`/produk/kategori/${cat.toLowerCase().replace(/\s+/g, "-")}`);
+    }
+  };
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
@@ -84,7 +82,7 @@ const handleCategory = (cat) => {
 
   return (
     <div className="sp-root">
-      {/* HERO SECTION */}
+      {/* HERO */}
       <section className="sp-hero">
         <div className="sp-hero-overlay" />
         <div className="sp-hero-content">
@@ -108,24 +106,18 @@ const handleCategory = (cat) => {
         </div>
         <select
           value={sort}
-          onChange={(e) => {
-            setSort(e.target.value);
-            setCurrentPage(1);
-          }}
+          onChange={(e) => { setSort(e.target.value); setCurrentPage(1); }}
           className="sp-sort-select"
         >
           {SORT_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
       </div>
 
-      {/* MAIN CONTENT */}
+      {/* MAIN */}
       <div className="sp-container">
         <aside className="sp-sidebar">
-          {/* Kategori List */}
           <ul className="sp-cat-list">
             {CATEGORIES.map((cat) => (
               <li
@@ -138,22 +130,24 @@ const handleCategory = (cat) => {
             ))}
           </ul>
 
-          {/* 🔥 TAMBAHKAN PROMO BOX DI SINI */}
           <div className="sp-promo-box">
             <span className="sp-promo-label">PROMO MINGGU INI</span>
-            <p className="sp-promo-text">
-              Dapatkan diskon 20% untuk semua merchandise!
-            </p>
-            <a href="/promo" className="sp-promo-link">
-              Lihat Promo
-            </a>
+            <p className="sp-promo-text">Dapatkan diskon 20% untuk semua merchandise!</p>
+            <a href="/promo" className="sp-promo-link">Lihat Promo</a>
           </div>
         </aside>
 
         <main className="sp-main">
-          {paginatedProducts.length === 0 ? (
+          {/* Loading state */}
+          {loading ? (
+            <div style={{ padding: "80px 20px", textAlign: "center", color: "#64748b" }}>
+              <div style={{ fontSize: 36, marginBottom: 12 }}>⏳</div>
+              <p style={{ fontSize: 15 }}>Memuat produk...</p>
+            </div>
+          ) : paginatedProducts.length === 0 ? (
             <div className="sp-empty">
               <h3>Produk tidak ditemukan</h3>
+              <p>Coba ubah kata kunci atau pilih kategori lain.</p>
             </div>
           ) : (
             <div className="sp-grid">
@@ -163,8 +157,8 @@ const handleCategory = (cat) => {
             </div>
           )}
 
-          {/* PAGINATION */}
-          {totalPages > 1 && (
+          {/* Pagination */}
+          {!loading && totalPages > 1 && (
             <div className="sp-pagination">
               {getPages(currentPage, totalPages).map((page, i) =>
                 page === "..." ? (
