@@ -162,14 +162,14 @@ function App() {
             }
           />
 
-          <Route
-            path="/kontak"
-            element={
-              <AnimatedPage>
-                <ContactPage />
-              </AnimatedPage>
-            }
-          />
+            <Route
+              path="/contact"
+              element={
+                <AnimatedPage>
+                  <ContactPage />
+                </AnimatedPage>
+              }
+            />
 
           {/* E-TIKET */}
           <Route
@@ -238,14 +238,14 @@ function App() {
           />
 
           {/* VENUE */}
-          <Route
-            path="/venue"
-            element={
-              <AnimatedPage>
-                <VenueAlam />
-              </AnimatedPage>
-            }
-          />
+            <Route
+              path="/program/venue-alam"
+              element={
+                <AnimatedPage>  
+                  <VenueAlam />
+                </AnimatedPage>
+              }
+            />
 
           <Route
             path="/venue/:id"
@@ -256,7 +256,9 @@ function App() {
             }
           />
 
-          {/* PRODUK */}
+          {/* ✅ PRODUK — urutan penting: spesifik dulu, baru dinamis */}
+
+          {/* /produk → Semua Produk */}
           <Route
             path="/produk"
             element={
@@ -266,6 +268,23 @@ function App() {
             }
           />
 
+          {/* /produk/kategori/:kategori → Produk per kategori */}
+          {/* 
+            Contoh URL yang ditangani route ini:
+            /produk/kategori/hewan-peternakan  → Hewan Peternakan
+            /produk/kategori/sayuran           → Sayuran
+            /produk/kategori/saprodi           → Saprodi
+          */}
+          <Route
+            path="/produk/kategori/:kategori"
+            element={
+              <AnimatedPage>
+                <Produk />
+              </AnimatedPage>
+            }
+          />
+
+          {/* /produk/:id → Detail produk — HARUS setelah route kategori */}
           <Route
             path="/produk/:id"
             element={

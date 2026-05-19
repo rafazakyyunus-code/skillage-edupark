@@ -56,7 +56,7 @@ export default function Navbar() {
       return "82%";
     }
 
-    if (location.pathname === "/e-ticket") {
+    if (location.pathname === "/e-tiket") {
     return "90%";
     }
 
@@ -350,21 +350,23 @@ export default function Navbar() {
 
                 <ul
                   className={`dropdown-menu ${
-                    openDropdown ===
-                    "produk"
+                    openDropdown === "produk"
                       ? "show"
                       : ""
                   }`}
                 >
+                  {/* ✅ Semua Produk → /produk */}
                   <li>
                     <NavLink
                       to="/produk"
+                      end
                       onClick={closeMenu}
                     >
                       Semua Produk
                     </NavLink>
                   </li>
 
+                  {/* ✅ Peternakan → /produk/kategori/hewan-peternakan */}
                   <li>
                     <NavLink
                       to="/produk/kategori/hewan-peternakan"
@@ -374,6 +376,7 @@ export default function Navbar() {
                     </NavLink>
                   </li>
 
+                  {/* ✅ Sayuran → /produk/kategori/sayuran */}
                   <li>
                     <NavLink
                       to="/produk/kategori/sayuran"
@@ -383,6 +386,7 @@ export default function Navbar() {
                     </NavLink>
                   </li>
 
+                  {/* ✅ Saprodi → /produk/kategori/saprodi */}
                   <li>
                     <NavLink
                       to="/produk/kategori/saprodi"

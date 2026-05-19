@@ -3,28 +3,32 @@ import "./ProgramPage.css";
 import heroImage from "/src/assets/images/pertenakan domba.jpeg";
 import kambing from "/src/assets/images/kambing.jpg";
 import { MessageCircle, Leaf } from 'lucide-react';
+
 export default function Peternakan() {
   const hewan = [
-    { icon: "🪱", name: "Budidaya Maggot", desc: "Pelajari proses pemerahan susu segar" },
-    { icon: "🐑", name: "Domba", desc: "Mengenal jenis Domba yang lucu  dan cara merawatnya" },
-    { icon: "🐓", name: "Ayam Bertelur", desc: "Beternak ayam organik bebas kandang" },
-    { icon: "𓆟", name: "Ikan Lele", desc: "Budidaya ikan air tawar yang menguntungkan" },
+    { icon: "🪱", name: "Budidaya Maggot", desc: "Pelajari proses budidaya maggot BSF sebagai pakan ternak organik" },
+    { icon: "🐑", name: "Domba", desc: "Mengenal jenis domba yang lucu dan cara merawatnya dengan benar" },
+    { icon: "🐓", name: "Ayam Bertelur", desc: "Beternak ayam organik bebas kandang dengan metode alami" },
+    { icon: "🐟", name: "Ikan Lele", desc: "Budidaya ikan air tawar yang menguntungkan dan mudah dipelajari" },
   ];
 
   return (
     <div className="program-page">
-       <section
+
+      {/* ===== HERO ===== */}
+      <section
         className="program-hero peternakan-hero"
         style={{
           backgroundImage: `url(${heroImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center"
         }}
       >
+        {/* Overlay gelap */}
         <div className="hero-overlay" />
+
+        {/* Konten hero — di-tengah oleh flexbox dari CSS */}
         <div className="hero-content">
-          <span className="badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <Leaf size={16} />
+          <span className="badge">
+            <Leaf size={15} />
             Program Kami
           </span>
           <h1>Peternakan</h1>
@@ -36,6 +40,7 @@ export default function Peternakan() {
         </div>
       </section>
 
+      {/* ===== TENTANG ===== */}
       <section className="program-about">
         <div className="container">
           <div className="about-grid">
@@ -56,8 +61,8 @@ export default function Peternakan() {
             <div className="about-visual">
               <div className="visual-card">
                 <div className="visual-image">
-                  <img src={kambing} alt="Kambing" />
-              </div>
+                  <img src={kambing} alt="Peternakan Edupark" />
+                </div>
                 <p>Area peternakan seluas 2 hektar yang asri!</p>
               </div>
             </div>
@@ -65,6 +70,7 @@ export default function Peternakan() {
         </div>
       </section>
 
+      {/* ===== HEWAN ===== */}
       <section className="program-features" id="hewan">
         <div className="container">
           <h2 className="section-title">Hewan Ternak Kami</h2>
@@ -80,25 +86,26 @@ export default function Peternakan() {
         </div>
       </section>
 
+      {/* ===== CTA ===== */}
       <section className="program-cta" id="daftar">
         <div className="container">
           <h2>Tertarik Bergabung?</h2>
           <p>Hubungi kami untuk informasi jadwal program Peternakan Edupark</p>
           <div className="cta-btns">
-          <a 
-            href="https://wa.me/6281234567890" 
-            className="btn-primary" 
-            target="_blank" 
-            rel="noreferrer"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
-          >
-            <MessageCircle size={20} /> 
-            WhatsApp Kami
-          </a>
+            <a
+              href="https://wa.me/6281234567890"
+              className="btn-primary"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <MessageCircle size={20} />
+              WhatsApp Kami
+            </a>
             <Link to="/" className="btn-outline">← Kembali ke Beranda</Link>
           </div>
         </div>
       </section>
+
     </div>
   );
 }

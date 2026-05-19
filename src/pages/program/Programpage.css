@@ -1,510 +1,516 @@
-  /* ===== ProgramPage.css ===== */
+/* ===== ProgramPage.css ===== */
 
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-  .program-page {
-    overflow-x: hidden;
-  }
-  /* ===== HERO ===== */
- .program-page .program-hero {
+.program-page {
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   HERO — tinggi & layout seragam untuk SEMUA halaman program
+   ========================================================================== */
+
+.program-page .program-hero {
+  /* ✅ Tinggi FIXED — seragam di semua halaman program */
   width: 100%;
-  margin-top: 80px;
-  border-radius: 0;
+  height: 600px;
+
+  margin-top: 0;
+  position: relative;
   overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
   box-shadow: 0 20px 60px rgba(0,0,0,0.25);
 }
 
-  .program-page .program-hero::before {
-    content: "";
-    position: absolute;
-    width: 500px;
-    height: 500px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 50%;
-    top: -100px;
-    right: -100px;
-    z-index: 1;
-  }
-
-  .program-page .program-hero::after {
-    display: none;
-    content: "";
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 50%;
-    top: -150px;
-    left: -150px;
-  }
-
-  /* ===== BACKGROUND ===== */
-  .hydroponic-hero {
-    background: 
-      linear-gradient(
-        to bottom,
-      rgba(10, 61, 31, 0.4),
-        rgba(0, 0, 0, 0.7)
-      ),
-      url("https://www.istockphoto.com/id/foto/menanam-selada-ramah-lingkungan-dengan-sistem-hidroponik-gm2248859590-662680927");
-    background-size: cover;
-    background-position: center;
-    padding: 120px 20px;
-    text-align: center;
-    color: white;
-      position: relative;
-    overflow: hidden;
-  }
-
-  .workshop-hero {
-  background: 
-      linear-gradient(
-        to bottom,
-      rgba(10, 61, 31, 0.4),
-        rgba(0, 0, 0, 0.7)
-      ),
-      url("https://images.unsplash.com/photo-1501785888041-af3ef285b470");
-    background-size: cover;
-    background-position: center;
-    padding: 120px 20px;
-    text-align: center;
-    color: white;
-      position: relative;
-    overflow: hidden;
-  }
-
-  .peternakan-hero {
-    background: 
-      linear-gradient(
-        to bottom,
-      rgba(10, 61, 31, 0.4),
-        rgba(0, 0, 0, 0.7)
-      ),
-      url("https://images.unsplash.com/photo-1501785888041-af3ef285b470");
-    background-size: cover;
-    background-position: center;
-    padding: 120px 20px;
-    text-align: center;
-    color: white;
-      position: relative;
-    overflow: hidden;
-  }
-
-  .venuealam-hero {
-    background: linear-gradient(135deg, #1b5e20 0%, #00ff0d 50%, #388e3c 100%);
-    background-size: 200% 200%;
-    animation: gradientMove 8s ease infinite;
-  }
-
-  /* ===== ANIMATION ===== */
-  @keyframes gradientMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-
-  @keyframes scrollPlants {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-
-  /* ===== HERO CONTENT ===== */
-  .hero-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.35);
-  }
-
-  .program-page .hero-content {
-    position: relative;
-    z-index: 2;
-    max-width: 700px;
-    padding: 0 20px;
-      margin: 0 auto;
-    animation: fadeUp 0.8s ease both;
-  }
-
-  .badge {
-    display: inline-block;
-    background: rgba(255,255,255,0.2);
-    backdrop-filter: blur(10px);
-    padding: 6px 18px;
-    border-radius: 50px;
-    font-size: 14px;
-    margin-bottom: 20px;
-    border: 1px solid rgba(255,255,255,0.3);
-  }
-
-  .program-page .hero-content h1 {
-    font-size: clamp(2.5rem, 6vw, 5rem);
-    font-weight: 800;
-    margin: 0 0 16px;
-    line-height: 1.1;
-  letter-spacing: -1px;
-  }
-
-  .program-page .hero-content p {
-    font-size: 1.1rem;
-    opacity: 0.9;
-    margin-bottom: 32px;
-    line-height: 1.6;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-  animation: fadeUp 0.8s ease both;
-  }
-
-  .program-page .hero-btns {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  /* ===== BUTTONS ===== */
-  .btn-primary {
-    background: #16c35b;
-    color: white;
-    padding: 14px 28px;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 15px;
-    transition: all 0.3s;
-    display: inline-block;
-  }
-
-  .btn-primary:hover {
-    background: #0fa64b;
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 12px 30px rgba(22,195,91,0.4);
-  }
-
-  .btn-outline {
-    background: transparent;
-    color: white;
-    padding: 14px 28px;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 15px;
-    border: 2px solid rgba(255,255,255,0.6);
-    transition: all 0.3s;
-    display: inline-block;
-  }
-
-  .btn-outline:hover {
-    background: rgba(255,255,255,0.15);
-    border-color: white;
-  }
-
-  /* ===== CONTAINER ===== */
-  .container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 24px;
-  }
-
-  /* ===== ABOUT ===== */
-  .program-page .program-about {
-    padding: 90px 0;
-    background: #fff;
-  }
-
-  .program-page .about-grid {
-    display: grid;
-    grid-template-columns: 1.2fr 0.8fr; /* 🔥 text lebih lebar, gambar lebih kecil */
-    gap: 40px;
-    align-items: center;
-  }
-
-  .tag {
-    display: inline-block;
-    color: #16c35b;
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 2px;
-    margin-bottom: 12px;
-  }
-
-  .program-page .about-text {
-    min-width: 0;
-    /* font-size: 2.2rem; */
-    font-weight: 800;
-    color: #1a1a1a;
-    margin-bottom: 20px;
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-  }
-
-  .program-page .about-visual {
-  display: block;
-  }
-
-  .program-page .about-text h2 .green {
-    color: #16c35b;
-  }
-
-  .program-page .about-text p {
-    color: #555;
-    line-height: 1.8;
-    margin-bottom: 16px;
-  }
-
-  .stats-row {
-    display: flex;
-    gap: 30px;
-    margin-top: 30px;
-  }
-
-  .stat strong {
-    font-size: 2rem;
-    color: #16c35b;
-  }
-
-  .stat span {
-    font-size: 13px;
-    color: #888;
-  }
-
-  .program-page .visual-card {
-      width: 100%;
-    background: none;
-    padding: 0;
-    box-shadow: none;
-    border-radius: 24px;
-    text-align: center;
-    max-width: 100%;
-    box-shadow: 0 20px 50px rgba(22,195,91,0.12);
-  transform: none;
-    transition: all 0.3s ease;
-    box-shadow: none;
-  }
-
-  .program-page .visual-card:hover {
-    transform: rotate(0deg) scale(1.05);
-  }
-
-  /* .visual-icon {
-    font-size: 5rem;
-    margin-bottom: 20px;
-    animation: float 3s ease-in-out infinite;
-  } */
-
-  .program-page .visual-image {
-    width: 100%;
-    height: 320px; /* 🔥 BESARIN */
-    border-radius: 20px;
-    overflow: hidden;
-    margin: 0;
-    transition: 0.4s;
-  }
-
-  .program-page .visual-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .program-page .visual-image:hover img {
-    transform: scale(1.05);
-  }
-
-
-  /* ===== FEATURES ===== */
-  .program-page .program-features {
-    padding: 90px 0;
-    background: #f9fafb;
-  }
-
-  .section-title {
-    text-align: center;
-    font-size: 2rem;
-    font-weight: 800;
-    margin-bottom: 50px;
-  }
-
-  .program-page .features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 24px;
-  }
-
-  .program-page .feature-card{
-    background: white;
-    border-radius: 20px;
-    padding: 36px 28px;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    border: 1px solid #f0f0f0;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(8px);
-  }
-
-  .program-page .feature-card:hover{
-    transform: translateY(-10px) scale(1.03);
-    box-shadow: 0 20px 40px rgba(22,195,91,0.2);
-    border-color: #16c35b;
-    transform: translateY(-10px) scale(1.04);
-  }
-
-  .program-page .feature-card::before {
-    content: "";
-    display: block;
-    height: 4px;
-    width: 50px;
-    background: linear-gradient(90deg, #16c35b, transparent);
-    margin-bottom: 15px;
-  }
-
-  /* ===== PLANTS ===== */
-  /* ===== PLANTS (NEW CLEAN UI) ===== */
-  .program-page .program-plants {
-    padding: 80px 0;
-    background: white;
-    text-align: center;
-    overflow: hidden;
-  }
-
-  .program-page .plants-wrapper {
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-  }
-
-
-  .program-page .plants-slider {
-    overflow: hidden;
-    margin-top: 40px;
-    padding: 10px 0;
-  }
-
-  .program-page .plants-track {
-    display: flex;
-    gap: 20px;
-    width: max-content;
-    animation: scrollPlants 18s linear infinite;
-    padding-left: 20px; /* biar ga nempel banget kiri */
-  }
-
-
-  /* CHIP */
-  .program-page .plant-chip {
-    background: #e6f7ee;
-    color: #16c35b;
-    padding: 10px 20px;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 14px;
-    border: 1px solid #b2e5c7;
-    transition: 0.3s;
-    white-space: nowrap;
-
-    /* 🔥 INI PENTING: NO MIRING */
-    transform: none;
-  }
-
-  /* HOVER */
-  .program-page .plant-chip:hover {
-    background: #16c35b;
-    color: white;
-    transform: translateY(-4px);
-  }
-
-  @keyframes scrollPlants {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(-50%);
-    }
-  }
-
-  /* ===== CTA ===== */
-  .program-page .program-cta{
-    background: linear-gradient(135deg, #0a3d1f, #16c35b);
-    padding: 140px 20px; /* 🔥 lebih lega + ada samping */
-    text-align: center;
-    color: white;
-  }
-
-  .program-cta .container {
-    max-width: 700px; /* 🔥 biar ga kepanjangan */
-    margin: 0 auto;
-  }
-
-
-
-  /* ===== RESPONSIVE ===== */
-  @media (max-width: 768px) {
-    .program-page .about-grid {
-    grid-template-columns: 1fr 1fr; /* 🔥 seimbang */
-    gap: 60px;
-    }
-  }
-
-    .program-cta h2 {
-    font-size: 2.8rem; /* 🔥 lebih gede */
-    font-weight: 800;
-    margin-bottom: 16px;
-    line-height: 1.2;
-    }
-
-
-  .program-page .program-cta p {
-    font-size: 1.15rem;
-    opacity: 0.9;
-    margin-bottom: 40px;
-  }
-
-  .program-cta::before {
-    content: "";
-    position: absolute;
-    width: 400px;
-    height: 400px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 50%;
-    top: -100px;
-    left: -100px;
-  }
-
-  .program-page .cta-btns {
-    display: flex;
-    gap: 20px; /* 🔥 tambah jarak */
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 10px;
-  }
-
-  /* biar tombol ga dempet & enak diklik */
-  .program-page .cta-btns a {
-    min-width: 200px;
-    text-align: center;
-  }
-
-.program-page section {
-  padding: 60px 0;
+/* Dekorasi lingkaran di sudut (opsional) */
+.program-page .program-hero::before {
+  content: "";
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 50%;
+  top: -100px;
+  right: -100px;
+  z-index: 1;
+  pointer-events: none;
 }
 
+/* ==========================================================================
+   HERO — background per halaman
+   Gambar di-set dari inline style JSX; kelas ini hanya mengatur overlay warna
+   ========================================================================== */
 
-  /* ================= RESPONSIVE MOBILE ================= */
+/* Hydroponic */
+.hydroponic-hero {
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  color: white;
+}
+
+/* Venue Workshop */
+.workshop-hero {
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  color: white;
+}
+
+/* Peternakan */
+.peternakan-hero {
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  color: white;
+}
+
+/* Venue Alam */
+.venuealam-hero {
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  color: white;
+}
+
+/* ==========================================================================
+   HERO OVERLAY — gelap merata di atas gambar
+   ========================================================================== */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  /* gradient: transparan di atas → gelap di bawah */
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.30) 0%,
+    rgba(0, 0, 0, 0.55) 60%,
+    rgba(0, 0, 0, 0.72) 100%
+  );
+  z-index: 1;
+}
+
+/* ==========================================================================
+   HERO CONTENT
+   ========================================================================== */
+.program-page .hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
+  width: 100%;
+  padding: 0 24px;
+  margin: 0 auto;
+  animation: fadeUp 0.8s ease both;
+  color: white;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(10px);
+  padding: 7px 20px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 22px;
+  border: 1px solid rgba(255,255,255,0.30);
+  color: white;
+  letter-spacing: 0.3px;
+}
+
+.program-page .hero-content h1 {
+  font-size: clamp(2.8rem, 6vw, 5.2rem);
+  font-weight: 800;
+  margin: 0 0 18px;
+  line-height: 1.05;
+  letter-spacing: -1.5px;
+  color: white;
+}
+
+.program-page .hero-content p {
+  font-size: 1.1rem;
+  opacity: 0.92;
+  margin: 0 auto 36px;
+  line-height: 1.65;
+  max-width: 520px;
+  color: rgba(255,255,255,0.92);
+}
+
+.program-page .hero-btns {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+.btn-primary {
+  background: #16c35b;
+  color: white;
+  padding: 14px 30px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  background: #0fa64b;
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 12px 30px rgba(22,195,91,0.45);
+}
+
+.btn-outline {
+  background: transparent;
+  color: white;
+  padding: 14px 30px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  border: 2px solid rgba(255,255,255,0.60);
+  transition: all 0.3s;
+  display: inline-block;
+}
+
+.btn-outline:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: white;
+}
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes scrollPlants {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ==========================================================================
+   CONTAINER
+   ========================================================================== */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ==========================================================================
+   ABOUT
+   ========================================================================== */
+.program-page .program-about {
+  padding: 90px 0;
+  background: #fff;
+}
+
+.program-page .about-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.tag {
+  display: inline-block;
+  color: #16c35b;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.program-page .about-text {
+  min-width: 0;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 20px;
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.program-page .about-visual {
+  display: block;
+}
+
+.program-page .about-text h2 .green {
+  color: #16c35b;
+}
+
+.program-page .about-text p {
+  color: #555;
+  line-height: 1.8;
+  margin-bottom: 16px;
+  font-weight: 400;
+}
+
+.stats-row {
+  display: flex;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat strong {
+  font-size: 2rem;
+  color: #16c35b;
+}
+
+.stat span {
+  font-size: 13px;
+  color: #888;
+}
+
+.program-page .visual-card {
+  width: 100%;
+  background: none;
+  padding: 0;
+  border-radius: 24px;
+  text-align: center;
+  max-width: 100%;
+  transition: all 0.3s ease;
+}
+
+.program-page .visual-card:hover {
+  transform: scale(1.03);
+}
+
+.program-page .visual-image {
+  width: 100%;
+  height: 320px;
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 0;
+  transition: 0.4s;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+}
+
+.program-page .visual-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.program-page .visual-image:hover img {
+  transform: scale(1.05);
+}
+
+.program-page .visual-card p {
+  margin-top: 14px;
+  font-size: 13px;
+  color: #888;
+}
+
+/* ==========================================================================
+   FEATURES
+   ========================================================================== */
+.program-page .program-features {
+  padding: 90px 0;
+  background: #f9fafb;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 50px;
+  color: #1a1a1a;
+}
+
+.program-page .features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 24px;
+}
+
+.program-page .feature-card {
+  background: white;
+  border-radius: 20px;
+  padding: 36px 28px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.program-page .feature-card:hover {
+  transform: translateY(-10px) scale(1.04);
+  box-shadow: 0 20px 40px rgba(22,195,91,0.20);
+  border-color: #16c35b;
+}
+
+.program-page .feature-card::before {
+  content: "";
+  display: block;
+  height: 4px;
+  width: 50px;
+  background: linear-gradient(90deg, #16c35b, transparent);
+  margin: 0 auto 18px;
+  border-radius: 4px;
+}
+
+.program-page .feature-icon {
+  font-size: 2.6rem;
+  margin-bottom: 14px;
+}
+
+.program-page .feature-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+.program-page .feature-card p {
+  font-size: 13.5px;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   PLANTS (Hydroponic)
+   ========================================================================== */
+.program-page .program-plants {
+  padding: 80px 0;
+  background: white;
+  text-align: center;
+  overflow: hidden;
+}
+
+.program-page .plants-wrapper {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  margin-top: 10px;
+}
+
+.program-page .plants-track {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  animation: scrollPlants 18s linear infinite;
+  padding: 12px 20px;
+}
+
+.program-page .plant-chip {
+  background: #e6f7ee;
+  color: #16c35b;
+  padding: 10px 22px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid #b2e5c7;
+  transition: 0.3s;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.program-page .plant-chip:hover {
+  background: #16c35b;
+  color: white;
+  transform: translateY(-4px);
+}
+
+/* ==========================================================================
+   CTA
+   ========================================================================== */
+.program-page .program-cta {
+  background: linear-gradient(135deg, #0a3d1f, #16c35b);
+  padding: 120px 20px;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.program-page .program-cta::before {
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+  top: -100px;
+  left: -100px;
+  pointer-events: none;
+}
+
+.program-cta .container {
+  max-width: 700px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.program-cta h2 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  line-height: 1.2;
+  color: white;
+}
+
+.program-page .program-cta p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-bottom: 40px;
+  color: rgba(255,255,255,0.9);
+}
+
+.program-page .cta-btns {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.program-page .cta-btns a {
+  min-width: 200px;
+  text-align: center;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   RESPONSIVE — Tablet (≤ 992px)
+   ========================================================================== */
 @media (max-width: 992px) {
+
+  .program-page .program-hero {
+    height: 520px;
+  }
 
   .program-page .about-grid {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 36px;
   }
 
   .program-page .about-text {
@@ -516,8 +522,8 @@
   }
 
   .stats-row {
-    justify-content: space-between;
-    gap: 20px;
+    justify-content: flex-start;
+    gap: 24px;
     flex-wrap: wrap;
   }
 
@@ -530,23 +536,20 @@
   }
 }
 
+/* ==========================================================================
+   RESPONSIVE — Mobile (≤ 768px)
+   ========================================================================== */
 @media (max-width: 768px) {
 
   .program-page .program-hero {
-    margin-top: 70px;
+    height: 460px;
     border-bottom-left-radius: 24px;
     border-bottom-right-radius: 24px;
   }
 
-  .hydroponic-hero,
-  .workshop-hero,
-  .peternakan-hero {
-    padding: 100px 20px;
-  }
-
   .program-page .hero-content h1 {
-    font-size: 2.7rem;
-    line-height: 1.1;
+    font-size: 2.5rem;
+    letter-spacing: -0.5px;
   }
 
   .program-page .hero-content p {
@@ -564,18 +567,14 @@
     max-width: 280px;
   }
 
-  .program-page section {
-    padding: 80px 0;
-  }
-
   .section-title {
     font-size: 1.8rem;
     margin-bottom: 36px;
   }
 
   .program-page .about-text h2 {
-    font-size: 2rem;
-    line-height: 1.3;
+    font-size: 1.9rem;
+    line-height: 1.25;
   }
 
   .program-page .features-grid {
@@ -583,7 +582,7 @@
   }
 
   .program-page .feature-card {
-    padding: 30px 22px;
+    padding: 28px 22px;
   }
 
   .program-page .visual-image {
@@ -592,7 +591,7 @@
 
   .stats-row {
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
   }
 
   .stat {
@@ -628,10 +627,17 @@
   }
 }
 
+/* ==========================================================================
+   RESPONSIVE — Small Mobile (≤ 480px)
+   ========================================================================== */
 @media (max-width: 480px) {
 
+  .program-page .program-hero {
+    height: 420px;
+  }
+
   .program-page .hero-content h1 {
-    font-size: 2.2rem;
+    font-size: 2rem;
   }
 
   .program-page .hero-content p {
@@ -644,7 +650,7 @@
   }
 
   .program-page .about-text h2 {
-    font-size: 1.7rem;
+    font-size: 1.65rem;
   }
 
   .program-page .visual-image {
@@ -656,11 +662,11 @@
   }
 
   .program-page .feature-icon {
-    font-size: 2rem;
+    font-size: 2.2rem;
   }
 
   .program-cta h2 {
-    font-size: 1.8rem;
+    font-size: 1.75rem;
   }
 
   .container {

@@ -9,45 +9,44 @@
 /* ================= HERO ================= */
 .venue-hero {
   position: relative;
-  padding: 160px 20px 120px;
+  width: 100%;
+  height: 600px;          /* ✅ sama persis dengan program-hero di ProgramPage.css */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   color: white;
-  background: linear-gradient(135deg, #0a3d1f, #16c35b);
   overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+
+  /* fallback kalau foto tidak load */
+  background: linear-gradient(135deg, #0a3d1f, #16c35b);
+
+  /* foto background di-set via inline style di JSX */
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
 }
 
-/* glow effect */
-.venue-hero::before {
-  content: "";
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(255,255,255,0.12), transparent);
-  top: -150px;
-  right: -150px;
-}
-
-.venue-hero::after {
-  content: "";
-  position: absolute;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(255,255,255,0.08), transparent);
-  bottom: -150px;
-  left: -150px;
-}
-
-/* overlay */
+/* overlay gelap di atas foto */
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.2);
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.30) 0%,
+    rgba(0, 0, 0, 0.55) 60%,
+    rgba(0, 0, 0, 0.72) 100%
+  );
+  z-index: 1;
 }
 
 .venue-hero-content {
   position: relative;
   z-index: 2;
   max-width: 700px;
+  width: 100%;
+  padding: 0 24px;
   margin: auto;
   animation: fadeUp 0.8s ease;
 }
@@ -281,13 +280,6 @@
 }
 
 /* ================= RESPONSIVE ================= */
-@media (max-width: 768px) {
-  .venue-hero {
-    padding: 120px 20px 80px;
-  }
-}
-
-/* ================= RESPONSIVE ================= */
 
 @media (max-width: 992px) {
 
@@ -297,7 +289,7 @@
   }
 
   .venue-hero {
-    padding: 140px 20px 100px;
+    height: 520px;
   }
 
   .venue-hero h1 {
@@ -308,7 +300,9 @@
 @media (max-width: 768px) {
 
   .venue-hero {
-    padding: 120px 20px 80px;
+    height: 460px;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
   }
 
   .venue-hero h1 {
@@ -357,6 +351,10 @@
 }
 
 @media (max-width: 480px) {
+
+  .venue-hero {
+    height: 420px;
+  }
 
   .venue-hero h1 {
     font-size: 2rem;

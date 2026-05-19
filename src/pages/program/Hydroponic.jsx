@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import "./ProgramPage.css";
 import heroImage from "/src/assets/images/hydroponicc.jpeg";
 import kambing from "/src/assets/images/hidroponik.jpg";
-import { MessageCircle, Leaf,} from 'lucide-react';
+import { MessageCircle, Leaf } from 'lucide-react';
 
 export default function Hydroponic() {
   const features = [
@@ -13,31 +13,33 @@ export default function Hydroponic() {
   ];
 
   const plants = [
-  { name: "Selada", icon: "🥬" },
-  { name: "Kangkung", icon: "🌿" },
-  { name: "Bayam", icon: "🍃" },
-  { name: "Kacang Panjang", icon: "🫘" },
-  { name: "Pakcoy", icon: "🥗" },
-  { name: "Cabe Rawit", icon: "🌶️" },
-  { name: "Terong", icon: "🍆" },
-  { name: "Toge", icon: "🌱" }
-];
+    { name: "Selada", icon: "🥬" },
+    { name: "Kangkung", icon: "🌿" },
+    { name: "Bayam", icon: "🍃" },
+    { name: "Kacang Panjang", icon: "🫘" },
+    { name: "Pakcoy", icon: "🥗" },
+    { name: "Cabe Rawit", icon: "🌶️" },
+    { name: "Terong", icon: "🍆" },
+    { name: "Toge", icon: "🌱" },
+  ];
 
   return (
     <div className="program-page">
-      {/* HERO */}
-   <section
-  className="program-hero hydroponic-hero"
-  style={{
-    backgroundImage: `url(${heroImage})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center"
-  }}
->
+
+      {/* ===== HERO ===== */}
+      <section
+        className="program-hero hydroponic-hero"
+        style={{
+          backgroundImage: `url(${heroImage})`,
+        }}
+      >
+        {/* Overlay gelap */}
         <div className="hero-overlay" />
+
+        {/* Konten hero — di-tengah oleh flexbox dari CSS */}
         <div className="hero-content">
-          <span className="badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <Leaf size={16} />
+          <span className="badge">
+            <Leaf size={15} />
             Program Kami
           </span>
           <h1>Hydroponic</h1>
@@ -49,7 +51,7 @@ export default function Hydroponic() {
         </div>
       </section>
 
-      {/* TENTANG */}
+      {/* ===== TENTANG ===== */}
       <section className="program-about" id="tentang">
         <div className="container">
           <div className="about-grid">
@@ -57,15 +59,13 @@ export default function Hydroponic() {
               <span className="tag">Apa itu Hydroponic?</span>
               <h2>Pertanian Modern <br /><span className="green">Tanpa Batas Lahan</span></h2>
               <p>
-                Hydroponics adalah metode pertanian modern tanpa
-                menggunakan tanah sebagai media tanam. Sebaliknya, tanaman
-                tumbuh dalam larutan air yang kaya akan nutrisi penting yang
-                langsung diserap oleh akar.
+                Hydroponics adalah metode pertanian modern tanpa menggunakan tanah sebagai media tanam.
+                Sebaliknya, tanaman tumbuh dalam larutan air yang kaya akan nutrisi penting yang langsung
+                diserap oleh akar.
               </p>
               <p>
-                Di Edupark, kami menerapkan berbagai sistem hidroponik
-                canggih untuk menghasilkan tanaman yang lebih sehat, bersih,
-                dan bebas pestisida, sekaligus memberikan pengalaman belajar
+                Di Edupark, kami menerapkan berbagai sistem hidroponik canggih untuk menghasilkan tanaman
+                yang lebih sehat, bersih, dan bebas pestisida, sekaligus memberikan pengalaman belajar
                 yang interaktif bagi pengunjung.
               </p>
               <div className="stats-row">
@@ -76,9 +76,9 @@ export default function Hydroponic() {
             </div>
             <div className="about-visual">
               <div className="visual-card">
-               <div className="visual-image">
-              <img src={kambing} alt="Kambing" />
-             </div>
+                <div className="visual-image">
+                  <img src={kambing} alt="Hidroponik Edupark" />
+                </div>
                 <p>Skillage Edupark siap menyambutmu loh!!</p>
               </div>
             </div>
@@ -86,7 +86,7 @@ export default function Hydroponic() {
         </div>
       </section>
 
-      {/* FITUR */}
+      {/* ===== FITUR ===== */}
       <section className="program-features">
         <div className="container">
           <h2 className="section-title">Sistem yang Kami Ajarkan</h2>
@@ -102,41 +102,42 @@ export default function Hydroponic() {
         </div>
       </section>
 
-      {/* TANAMAN */}
-   <section className="program-plants">
-  <h2 className="section-title">Tanaman yang Ditanam</h2>
-
-  <div className="plants-wrapper">
-    <div className="plants-track">
-      {[...plants, ...plants].map((plant, i) => (
-        <div className="plant-chip" key={i}>
-          {plant.icon} {plant.name}
+      {/* ===== TANAMAN ===== */}
+      <section className="program-plants">
+        <div className="container">
+          <h2 className="section-title">Tanaman yang Ditanam</h2>
         </div>
-      ))}
-    </div>
-  </div>
-</section>
+        <div className="plants-wrapper">
+          <div className="plants-track">
+            {[...plants, ...plants].map((plant, i) => (
+              <div className="plant-chip" key={i}>
+                {plant.icon} {plant.name}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      {/* DAFTAR */}
+      {/* ===== CTA ===== */}
       <section className="program-cta" id="daftar">
         <div className="container">
           <h2>Tertarik Bergabung?</h2>
           <p>Hubungi kami untuk informasi jadwal dan harga program Hydroponic</p>
           <div className="cta-btns">
-            <a 
-              href="https://wa.me/6281234567890" 
-              className="btn-primary" 
-              target="_blank" 
+            <a
+              href="https://wa.me/6281234567890"
+              className="btn-primary"
+              target="_blank"
               rel="noreferrer"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
             >
-              <MessageCircle size={20} /> 
+              <MessageCircle size={20} />
               WhatsApp Kami
             </a>
             <Link to="/" className="btn-outline">← Kembali ke Beranda</Link>
           </div>
         </div>
       </section>
+
     </div>
   );
 }

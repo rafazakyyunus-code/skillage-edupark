@@ -67,7 +67,7 @@ export default function VenueAlam() {
 
   return (
     <div className="venue-page">
-      <section className="venue-hero">
+      <section className="venue-hero" style={{ backgroundImage: `url('/images/Sawah.jpeg')` }}>
   <div className="hero-overlay"></div>
 
   <div className="venue-hero-content">
