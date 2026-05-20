@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
 import Navbar from "./components/Navbar";
@@ -36,6 +36,11 @@ import Attractions from "./pages/Etiket/Attractions";
 import CreateArticle from "./pages/dashboard/CreateArticle";
 import Editor from "./pages/dashboard/Editor";
 import ContactPage from "./pages/contact/ContactPage";
+
+/* ───────── LOGIN & AUTH ───────── */
+import Login from "./pages/auth/Login";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 /* ───────── FIREBASE ───────── */
 import { db } from "./firebase";
@@ -81,9 +86,8 @@ function useArticles() {
   }, []);
 
   const addArticle = async (newArticle) => {
-    // Selalu buat ID baru dari timestamp agar tidak konflik
     const articleId = `art_${Date.now()}`;
-    const { id: _ignore, ...cleanArticle } = newArticle; // buang id lama kalau ada
+    const { id: _ignore, ...cleanArticle } = newArticle;
 
     await set(ref(db, `articles/${articleId}`), {
       ...cleanArticle,
@@ -91,20 +95,13 @@ function useArticles() {
     });
   };
 
-  const updateStatus = async (
-    articleId,
-    newStatus,
-    feedback = ""
-  ) => {
+  const updateStatus = async (articleId, newStatus, feedback = "") => {
     await update(ref(db, `articles/${articleId}`), {
       status: newStatus,
       feedback,
     });
 
-    console.log(
-      `Firebase Update: ${newStatus}`,
-      articleId
-    );
+    console.log(`Firebase Update: ${newStatus}`, articleId);
   };
 
   return {
@@ -114,29 +111,25 @@ function useArticles() {
   };
 }
 
-/* ───────── APP ───────── */
-function App() {
+/* ───────── APP INNER (pakai useAuth) ───────── */
+function AppInner() {
   const location = useLocation();
+  const { user } = useAuth();
 
-  const {
-    articles,
-    addArticle,
-    updateStatus,
-  } = useArticles();
+  const { articles, addArticle, updateStatus } = useArticles();
 
-  /* Hide navbar/footer dashboard */
+  /* Hide navbar/footer di halaman login & dashboard */
   const hideLayout =
-    location.pathname.startsWith("/dashboard");
+    location.pathname.startsWith("/dashboard") ||
+    location.pathname === "/login";
 
   return (
     <>
       {!hideLayout && <Navbar />}
 
       <AnimatePresence mode="wait">
-        <Routes
-          location={location}
-          key={location.pathname}
-        >
+        <Routes location={location} key={location.pathname}>
+
           {/* HOME */}
           <Route
             path="/"
@@ -153,6 +146,20 @@ function App() {
             }
           />
 
+          {/* ───────── LOGIN ───────── */}
+          <Route
+            path="/login"
+            element={
+              user
+                ? (
+                    user.role === 'writer'
+                      ? <Navigate to="/dashboard/create-article" replace />
+                      : <Navigate to="/dashboard/editor" replace />
+                  )
+                : <Login />
+            }
+          />
+
           <Route
             path="/tentang-kami"
             element={
@@ -162,14 +169,14 @@ function App() {
             }
           />
 
-            <Route
-              path="/contact"
-              element={
-                <AnimatedPage>
-                  <ContactPage />
-                </AnimatedPage>
-              }
-            />
+          <Route
+            path="/contact"
+            element={
+              <AnimatedPage>
+                <ContactPage />
+              </AnimatedPage>
+            }
+          />
 
           {/* E-TIKET */}
           <Route
@@ -237,15 +244,14 @@ function App() {
             }
           />
 
-          {/* VENUE */}
-            <Route
-              path="/program/venue-alam"
-              element={
-                <AnimatedPage>  
-                  <VenueAlam />
-                </AnimatedPage>
-              }
-            />
+          <Route
+            path="/program/venue-alam"
+            element={
+              <AnimatedPage>
+                <VenueAlam />
+              </AnimatedPage>
+            }
+          />
 
           <Route
             path="/venue/:id"
@@ -256,9 +262,7 @@ function App() {
             }
           />
 
-          {/* ✅ PRODUK — urutan penting: spesifik dulu, baru dinamis */}
-
-          {/* /produk → Semua Produk */}
+          {/* PRODUK */}
           <Route
             path="/produk"
             element={
@@ -268,13 +272,6 @@ function App() {
             }
           />
 
-          {/* /produk/kategori/:kategori → Produk per kategori */}
-          {/* 
-            Contoh URL yang ditangani route ini:
-            /produk/kategori/hewan-peternakan  → Hewan Peternakan
-            /produk/kategori/sayuran           → Sayuran
-            /produk/kategori/saprodi           → Saprodi
-          */}
           <Route
             path="/produk/kategori/:kategori"
             element={
@@ -284,7 +281,6 @@ function App() {
             }
           />
 
-          {/* /produk/:id → Detail produk — HARUS setelah route kategori */}
           <Route
             path="/produk/:id"
             element={
@@ -308,38 +304,50 @@ function App() {
             path="/article/:id"
             element={
               <AnimatedPage>
-                <ArticleDetail
-                  articles={articles}
-                />
+                <ArticleDetail articles={articles} />
               </AnimatedPage>
             }
           />
 
-          {/* DASHBOARD ROUTES */}
+          {/* ───────── DASHBOARD (Protected) ───────── */}
           <Route
             path="/dashboard/create-article"
             element={
-              <CreateArticle onExternalSubmit={addArticle} />
+              <ProtectedRoute allowedRoles={["admin", "writer"]}>
+                <CreateArticle onExternalSubmit={addArticle} />
+              </ProtectedRoute>
             }
           />
 
           <Route
             path="/dashboard/editor"
             element={
-              <Editor
-                externalArticles={articles}
-                onUpdateStatus={updateStatus}
-              />
+              <ProtectedRoute allowedRoles={["admin", "editor"]}>
+                <Editor
+                  externalArticles={articles}
+                  onUpdateStatus={updateStatus}
+                />
+              </ProtectedRoute>
             }
           />
 
           {/* FALLBACK */}
           <Route path="*" element={<h1>404 Not Found</h1>} />
+
         </Routes>
       </AnimatePresence>
 
       {!hideLayout && <Footer />}
     </>
+  );
+}
+
+/* ───────── APP ROOT (wrap AuthProvider) ───────── */
+function App() {
+  return (
+    <AuthProvider>
+      <AppInner />
+    </AuthProvider>
   );
 }
 
