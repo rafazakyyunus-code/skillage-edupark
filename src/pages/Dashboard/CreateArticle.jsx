@@ -65,61 +65,99 @@ const NAV_ITEMS = [
 ];
 
 /* ──────────────────────────────────────────
-   SIDEBAR
+   SIDEBAR — identik dengan Editor.jsx
    ────────────────────────────────────────── */
-function Sidebar({ activeNav, setActiveNav, currentUser }) {
+function Sidebar({ activeNav, setActiveNav, currentUser, myArticles }) {
   const initials = currentUser?.displayName
     ? currentUser.displayName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
     : "AT";
 
+  const navBtnStyle = (active) => ({
+    display: "flex", alignItems: "center", gap: 9, width: "100%",
+    padding: "9px 10px", borderRadius: 8, marginBottom: 2,
+    background: active ? "rgba(22,195,91,0.15)" : "transparent",
+    border: active ? "1px solid rgba(22,195,91,0.2)" : "1px solid transparent",
+    cursor: "pointer",
+    color: active ? "#fff" : "rgba(255,255,255,0.5)",
+    textAlign: "left", fontSize: 13, fontFamily: "inherit",
+    fontWeight: active ? 600 : 400,
+    transition: "all 0.15s", boxSizing: "border-box",
+    position: "relative",
+  });
+
+  const pending = myArticles ? myArticles.filter(a => a.status === "pending").length : 0;
+
   return (
-    <aside className="ca-sidebar">
-      <div className="ca-sidebar__brand">
-        <div className="ca-brand-icon">
-          {/* Graduation cap icon */}
+    <aside style={{
+      width: 220, background: "linear-gradient(180deg, #1a3828 0%, #0f2318 100%)",
+      height: "100vh", position: "fixed", left: 0, top: 0,
+      display: "flex", flexDirection: "column", zIndex: 100,
+      boxShadow: "4px 0 24px rgba(0,0,0,0.18)",
+    }}>
+
+      {/* Brand */}
+      <div style={{ padding: "20px 18px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ background: "linear-gradient(135deg, #2d6a4f, #16c35b)", width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 2px 10px rgba(22,195,91,0.3)" }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
             <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/>
           </svg>
         </div>
         <div>
-          <div className="ca-brand-name">Edupark</div>
-          <div className="ca-brand-sub">Writer Portal</div>
+          <div style={{ fontWeight: 800, color: "#fff", fontSize: 15, fontFamily: "Georgia, serif", lineHeight: 1.2, letterSpacing: "-0.01em" }}>Edupark</div>
+          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 1 }}>Writer Portal</div>
         </div>
       </div>
 
-      <nav className="ca-nav">
+      {/* Section label */}
+      <div style={{ padding: "14px 18px 6px", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.12em" }}>Menu</div>
+
+      {/* Nav */}
+      <nav style={{ flex: 1, padding: "4px 10px", overflowY: "auto" }}>
         {NAV_ITEMS.map(({ id, label, Icon }) => {
           const active = activeNav === id;
+          const badge = id === "my-articles" ? myArticles?.length || 0
+                      : id === "create" && pending > 0 ? pending
+                      : null;
           return (
-            <button
-              key={id}
+            <button key={id}
               onClick={() => setActiveNav(id)}
-              className={`ca-nav-btn${active ? " ca-nav-btn--active" : ""}`}
-            >
-              <Icon size={16} color={active ? "#fff" : "rgba(255,255,255,0.55)"} />
-              {label}
+              style={navBtnStyle(active)}
+              onMouseEnter={e => { if (!active) { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "rgba(255,255,255,0.75)"; }}}
+              onMouseLeave={e => { if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.5)"; }}}>
+              {active && <div style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", width: 3, height: 18, borderRadius: 2, background: "#16c35b" }} />}
+              <Icon size={16} color={active ? "#fff" : "rgba(255,255,255,0.5)"} />
+              <span style={{ flex: 1 }}>{label}</span>
+              {badge > 0 && (
+                <span style={{ fontSize: 10, fontWeight: 700, background: "rgba(22,195,91,0.3)", color: "#16c35b", borderRadius: 10, padding: "1px 6px", minWidth: 18, textAlign: "center" }}>{badge}</span>
+              )}
             </button>
           );
         })}
       </nav>
 
-      <div className="ca-nav-settings">
+      {/* Settings */}
+      <div style={{ padding: "6px 10px 4px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
         <button
           onClick={() => setActiveNav("settings")}
-          className={`ca-nav-btn${activeNav === "settings" ? " ca-nav-btn--active" : ""}`}
-        >
-          <Settings size={16} color={activeNav === "settings" ? "#fff" : "rgba(255,255,255,0.55)"} />
-          Settings
+          style={navBtnStyle(activeNav === "settings")}
+          onMouseEnter={e => { if (activeNav !== "settings") { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "rgba(255,255,255,0.75)"; }}}
+          onMouseLeave={e => { if (activeNav !== "settings") { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.5)"; }}}>
+          {activeNav === "settings" && <div style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", width: 3, height: 18, borderRadius: 2, background: "#16c35b" }} />}
+          <Settings size={16} color={activeNav === "settings" ? "#fff" : "rgba(255,255,255,0.5)"} />
+          <span style={{ flex: 1 }}>Settings</span>
         </button>
       </div>
 
-      <div className="ca-sidebar__user">
-        <div className="ca-user-btn">
-          <div className="ca-avatar">{initials}</div>
-          <div>
-            <div className="ca-user-name">{currentUser?.displayName || "Alex Thompson"}</div>
-            <div className="ca-user-role">{currentUser?.role || "Senior Writer"}</div>
+      {/* User */}
+      <div style={{ padding: "12px 16px 14px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg, #2d6a4f, #16c35b)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0, boxShadow: "0 2px 8px rgba(22,195,91,0.3)" }}>
+            {initials}
+          </div>
+          <div style={{ overflow: "hidden" }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "#fff", lineHeight: 1.3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{currentUser?.displayName || "Alex Thompson"}</div>
+            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{currentUser?.role || "Senior Writer"}</div>
           </div>
         </div>
       </div>
@@ -128,88 +166,160 @@ function Sidebar({ activeNav, setActiveNav, currentUser }) {
 }
 
 /* ──────────────────────────────────────────
-   TOPBAR — tombol duplikat dihapus
+   TOPBAR — identik dengan Editor.jsx
    ────────────────────────────────────────── */
 function Topbar({ activeNav }) {
   const breadcrumb = {
-    dashboard:    "Dashboard",
-    create:       "Create Article",
+    dashboard:     "Dashboard",
+    create:        "Create Article",
     "my-articles": "My Articles",
-    analytics:    "Analytics",
-    settings:     "Settings",
+    analytics:     "Analytics",
+    settings:      "Settings",
   }[activeNav] || activeNav;
 
   return (
-    <div className="ca-topbar">
-      <div className="ca-breadcrumb">
+    <div style={{
+      display: "flex", alignItems: "center", justifyContent: "space-between",
+      padding: "0 40px", height: 56,
+      background: "#fff", borderBottom: "1px solid #E5E7EB",
+      position: "sticky", top: 0, zIndex: 50,
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#6B7280" }}>
         <span>Dashboard</span>
         {activeNav !== "dashboard" && (
           <>
-            <span className="ca-breadcrumb__sep">›</span>
-            <span className="ca-breadcrumb__current">{breadcrumb}</span>
+            <span style={{ color: "#D1D5DB" }}>›</span>
+            <span style={{ color: "#111827", fontWeight: 600 }}>{breadcrumb}</span>
           </>
         )}
       </div>
-      {/* Tombol Save Draft & Submit for Review dihapus dari sini karena sudah ada di dalam form */}
     </div>
   );
 }
 
 /* ──────────────────────────────────────────
-   DASHBOARD VIEW
+   DASHBOARD VIEW — Editor-style with section previews
    ────────────────────────────────────────── */
 function DashboardView({ myArticles, setActiveNav }) {
-  const published  = myArticles.filter(a => a.status === "published").length;
-  const pending    = myArticles.filter(a => a.status === "pending").length;
-  const totalViews = myArticles.reduce((sum, a) => sum + (a.views || 0), 0);
+  const published    = myArticles.filter(a => a.status === "published").length;
+  const pending      = myArticles.filter(a => a.status === "pending").length;
+  const revision     = myArticles.filter(a => a.status === "revision").length;
+  const totalViews   = myArticles.reduce((sum, a) => sum + (a.views || 0), 0);
+  const totalWords   = myArticles.reduce((sum, a) => sum + (a.wordCount || 0), 0);
+  const avgReadTime  = totalWords > 0 ? (totalWords / 200).toFixed(1) : "0";
+
+  const monthLabels = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const viewsByMonth = Array(12).fill(0);
+  myArticles.forEach(a => {
+    if (!a.date) return;
+    const d = new Date(a.date);
+    if (!isNaN(d)) viewsByMonth[d.getMonth()] += (a.views || 0);
+  });
+  const maxVal = Math.max(...viewsByMonth, 1);
+
+  const now = new Date();
+  const hour = now.getHours();
+  const greeting = hour < 11 ? "Selamat Pagi" : hour < 15 ? "Selamat Siang" : hour < 18 ? "Selamat Sore" : "Selamat Malam";
 
   return (
     <div>
-      <div className="ca-dash__greeting">
-        <h1>Selamat datang, Penulis! 👋</h1>
-        <p>Berikut ringkasan aktivitas penulisan Anda.</p>
+      {/* ── Header ── */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+        <div>
+          <div style={{ fontSize: 12, color: "#16a34a", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: 4 }}>{greeting}, Penulis</div>
+          <h1 style={{ fontSize: 26, fontWeight: 800, color: "#111827", margin: 0, letterSpacing: "-0.02em" }}>Dashboard Overview</h1>
+          <p style={{ color: "#9CA3AF", fontSize: 13, margin: "4px 0 0" }}>
+            {now.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} · Data realtime dari Firebase
+          </p>
+        </div>
+        <button
+          onClick={() => setActiveNav("create")}
+          style={{ padding: "10px 20px", background: "#1b3a2a", color: "#fff", border: "none", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 7 }}
+        >
+          <PenSquare size={15} color="#fff" /> + Tulis Artikel Baru
+        </button>
       </div>
 
-      <div className="ca-stats">
+      {/* ── ROW 1: 4 stat cards ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 18 }}>
         {[
-          { label: "Total Artikel",  value: myArticles.length,          color: "#1b3a2a" },
-          { label: "Published",      value: published,                   color: "#16a34a" },
-          { label: "Pending Review", value: pending,                     color: "#f57f17" },
-          { label: "Total Views",    value: totalViews.toLocaleString(), color: "#1565c0" },
+          { label: "Total Artikel",  val: myArticles.length,          bg: "#F0FDF4", border: "#BBF7D0", valColor: "#1b3a2a", sub: "total artikel ditulis",  icon: <FileText size={18} color="#1b3a2a" /> },
+          { label: "Published",      val: published,                   bg: "#F0FDF4", border: "#BBF7D0", valColor: "#16a34a", sub: "artikel tayang",         icon: <CheckCircle size={18} color="#16a34a" /> },
+          { label: "Pending Review", val: pending,                     bg: "#FFFBEB", border: "#FDE68A", valColor: "#D97706", sub: "menunggu review",         icon: <BookOpen size={18} color="#D97706" /> },
+          { label: "Total Views",    val: totalViews.toLocaleString(), bg: "#EFF6FF", border: "#BFDBFE", valColor: "#2563EB", sub: "total pembaca",           icon: <Eye size={18} color="#2563EB" /> },
         ].map(s => (
-          <div key={s.label} className="ca-stat">
-            <div className="ca-stat__label">{s.label}</div>
-            <div className="ca-stat__value" style={{ color: s.color }}>{s.value}</div>
+          <div key={s.label} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 12, padding: "16px 18px 14px", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", right: 14, top: 14, opacity: 0.5 }}>{s.icon}</div>
+            <div style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>{s.label}</div>
+            <div style={{ fontSize: 30, fontWeight: 700, color: s.valColor, lineHeight: 1, marginBottom: 4 }}>{s.val}</div>
+            <div style={{ fontSize: 11, color: "#9CA3AF" }}>{s.sub}</div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16 }}>
-        <div className="ca-recent">
-          <div className="ca-recent__head">
-            <h2>Artikel Terbaru</h2>
-            <button className="ca-link-btn" onClick={() => setActiveNav("my-articles")}>Lihat semua →</button>
+      {/* ── ROW 2: 3 section shortcut cards ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 18 }}>
+        {[
+          { id: "create",       label: "Create Article", val: revision > 0 ? revision : "Baru", sub: revision > 0 ? `${revision} artikel perlu direvisi` : "Tulis artikel baru sekarang", valColor: "#7C3AED", bg: "#FAF5FF", border: "#DDD6FE", icon: <PenSquare size={20} color="#7C3AED" />, cta: "Mulai Menulis →" },
+          { id: "my-articles",  label: "My Articles",    val: myArticles.length,                  sub: `${published} published · ${pending} pending`,                                       valColor: "#0E7490", bg: "#ECFEFF", border: "#A5F3FC", icon: <FileText size={20} color="#0E7490" />, cta: "Lihat Semua →" },
+          { id: "analytics",    label: "Analytics",      val: `${avgReadTime}m`,                  sub: `Est. avg. read time · ${totalViews.toLocaleString()} views`,                        valColor: "#BE185D", bg: "#FDF2F8", border: "#FBCFE8", icon: <BarChart3 size={20} color="#BE185D" />, cta: "Lihat Analytics →" },
+        ].map(s => (
+          <div key={s.id} onClick={() => setActiveNav(s.id)}
+            style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 12, padding: "16px 18px 14px", cursor: "pointer", position: "relative", overflow: "hidden", transition: "box-shadow 0.15s" }}
+            onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.07)"; }}
+            onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}>
+            <div style={{ position: "absolute", right: 14, top: 14, opacity: 0.45 }}>{s.icon}</div>
+            <div style={{ fontSize: 11, color: "#6B7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>{s.label}</div>
+            <div style={{ fontSize: 30, fontWeight: 700, color: s.valColor, lineHeight: 1, marginBottom: 4 }}>{s.val}</div>
+            <div style={{ fontSize: 11, color: "#9CA3AF" }}>{s.sub}</div>
+            <div style={{ position: "absolute", bottom: 12, right: 14, fontSize: 11, color: s.valColor, fontWeight: 600, opacity: 0.7 }}>{s.cta}</div>
           </div>
-          {myArticles.slice(0, 4).map(a => {
-            const s = STATUS_MAP[a.status] || STATUS_MAP.draft;
-            return (
-              <div key={a.id} className="ca-article-row">
-                <div className="ca-article-row__initials" style={{ overflow: "hidden", borderRadius: 6 }}>
-                  {a.image
-                    ? <img src={a.image} alt={a.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    : (a.title ? a.title.charAt(0) : "A")}
+        ))}
+      </div>
+
+      {/* ── ROW 3: Artikel terbaru + Tips Menulis ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 16, marginBottom: 16 }}>
+
+        {/* My Articles preview */}
+        <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 14, padding: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+            <div>
+              <h2 style={{ fontSize: 15, fontWeight: 700, color: "#111827", margin: 0 }}>Artikel Terbaru</h2>
+              <p style={{ fontSize: 12, color: "#9CA3AF", margin: "2px 0 0" }}>Artikel yang baru saja kamu tulis</p>
+            </div>
+            <button onClick={() => setActiveNav("my-articles")} style={{ fontSize: 12, color: "#1B3A2A", background: "#E8F4EE", border: "none", borderRadius: 7, padding: "6px 12px", cursor: "pointer", fontWeight: 600 }}>Lihat semua →</button>
+          </div>
+          {myArticles.length === 0 ? (
+            <div style={{ padding: "28px 0", textAlign: "center" }}>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}><FileText size={32} color="#D1D5DB" /></div>
+              <p style={{ color: "#9CA3AF", fontSize: 13, margin: "0 0 14px" }}>Belum ada artikel. Mulai tulis sekarang!</p>
+              <button onClick={() => setActiveNav("create")} style={{ padding: "8px 18px", background: "#1b3a2a", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>+ Tulis Artikel</button>
+            </div>
+          ) : (
+            myArticles.slice(0, 5).map((a, i) => {
+              const s = STATUS_MAP[a.status] || STATUS_MAP.draft;
+              return (
+                <div key={a.id}
+                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: i < Math.min(myArticles.length, 5) - 1 ? "1px solid #F9FAFB" : "none", cursor: "pointer" }}
+                  onClick={() => setActiveNav("my-articles")}
+                  onMouseEnter={e => e.currentTarget.style.background = "#FAFAFA"}
+                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                  <div style={{ width: 42, height: 42, borderRadius: 9, overflow: "hidden", flexShrink: 0, background: "#E8F4EE", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    {a.image ? <img src={a.image} alt={a.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <FileText size={18} color="#9CA3AF" />}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, color: "#111827", fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{a.title}</div>
+                    <div style={{ fontSize: 11, color: "#9CA3AF", marginTop: 2 }}>{a.category} · {a.date}</div>
+                  </div>
+                  <span style={{ fontSize: 11, background: s.bg, color: s.text, borderRadius: 20, padding: "3px 10px", fontWeight: 600, flexShrink: 0 }}>{s.label}</span>
                 </div>
-                <div className="ca-article-row__info">
-                  <div className="ca-article-row__title">{a.title}</div>
-                  <div className="ca-article-row__meta">{a.category} · {a.date}</div>
-                </div>
-                <span className="ca-badge" style={{ background: s.bg, color: s.text }}>{s.label}</span>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
 
-        <div style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, padding: 20 }}>
+        {/* Tips Menulis */}
+        <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 14, padding: 20 }}>
           <h2 style={{ fontSize: 15, fontWeight: 700, color: "#111827", margin: "0 0 14px" }}>Tips Menulis</h2>
           {[
             "Gunakan judul yang menarik dan informatif",
@@ -219,13 +329,59 @@ function DashboardView({ myArticles, setActiveNav }) {
             "Artikel 800–1500 kata lebih sering dibaca",
           ].map((tip, i) => (
             <div key={i} style={{ display: "flex", gap: 8, marginBottom: 10, fontSize: 13, color: "#374151", alignItems: "flex-start" }}>
-              <span style={{ color: "#22c55e", fontWeight: 700, flexShrink: 0 }}>✓</span>
+              <span style={{ color: "#22c55e", fontWeight: 700, flexShrink: 0, marginTop: 1 }}>✓</span>
               {tip}
             </div>
           ))}
-          <button className="ca-btn-submit" style={{ width: "100%", marginTop: 12 }} onClick={() => setActiveNav("create")}>
+          <button onClick={() => setActiveNav("create")}
+            style={{ width: "100%", marginTop: 14, padding: "10px", background: "#22c55e", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
             + Tulis Artikel Baru
           </button>
+        </div>
+      </div>
+
+      {/* ── ROW 4: Analytics preview ── */}
+      <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 14, padding: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <div>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: "#111827", margin: 0 }}>Performa Artikel</h2>
+            <p style={{ fontSize: 12, color: "#9CA3AF", margin: "2px 0 0" }}>Views per bulan dari semua artikel kamu</p>
+          </div>
+          <button onClick={() => setActiveNav("analytics")} style={{ fontSize: 12, color: "#1B3A2A", background: "#E8F4EE", border: "none", borderRadius: 7, padding: "6px 12px", cursor: "pointer", fontWeight: 600 }}>Lihat Analytics →</button>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+          {/* Mini bar chart */}
+          <div>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 100, marginBottom: 6 }}>
+              {viewsByMonth.map((val, i) => (
+                <div key={monthLabels[i]} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%", justifyContent: "flex-end" }}>
+                  <div
+                    style={{ width: "100%", borderRadius: "4px 4px 0 0", background: val > 0 ? "#1b3a2a" : "#e5e7eb", height: `${(val / maxVal) * 88}%`, minHeight: val > 0 ? 4 : 0, transition: "background 0.2s", cursor: "pointer" }}
+                    title={`${monthLabels[i]}: ${val} views`}
+                    onMouseEnter={e => { e.currentTarget.style.background = val > 0 ? "#16c35b" : "#d1d5db"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = val > 0 ? "#1b3a2a" : "#e5e7eb"; }}
+                  />
+                </div>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              {monthLabels.map(m => <div key={m} style={{ flex: 1, textAlign: "center", fontSize: 9, color: "#9CA3AF" }}>{m}</div>)}
+            </div>
+          </div>
+          {/* Mini stat cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {[
+              { label: "Total Views",   value: totalViews.toLocaleString(), color: "#2563EB", bg: "#EFF6FF" },
+              { label: "Published",     value: published,                   color: "#16a34a", bg: "#F0FDF4" },
+              { label: "Avg Read Time", value: `${avgReadTime}m`,           color: "#D97706", bg: "#FFFBEB" },
+              { label: "In Revision",   value: revision,                    color: "#EA580C", bg: "#FFF7ED" },
+            ].map(s => (
+              <div key={s.label} style={{ background: s.bg, borderRadius: 10, padding: "12px 14px" }}>
+                <div style={{ fontSize: 10, color: "#6B7280", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>{s.label}</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: s.color }}>{s.value}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -893,13 +1049,13 @@ export default function CreateArticle({ onExternalSubmit, currentUser }) {
   };
 
   return (
-    <div className="ca-root">
-      <Sidebar activeNav={activeNav} setActiveNav={handleSetActiveNav} currentUser={currentUser} />
+    <div style={{ display: "flex", minHeight: "100vh", background: "#f5f7f5", fontFamily: "sans-serif" }}>
+      <Sidebar activeNav={activeNav} setActiveNav={handleSetActiveNav} currentUser={currentUser} myArticles={myArticles} />
 
-      <div className="ca-main">
+      <div style={{ flex: 1, marginLeft: 220, display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <Topbar activeNav={activeNav} />
 
-        <div className="ca-body">
+        <div style={{ flex: 1, padding: "32px 40px" }}>
           {activeNav === "dashboard" && (
             <DashboardView myArticles={myArticles} setActiveNav={handleSetActiveNav} />
           )}
