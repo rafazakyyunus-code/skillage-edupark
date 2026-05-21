@@ -2084,35 +2084,12 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState([]);
   const [gallery,  setGallery]  = useState([]);
 
-  /* ── Auto-create/update user entry in /users ── */
-  useEffect(() => {
-    if (!user) return;
-    const userRef = ref(db, `users/${user.uid}`);
-    onValue(userRef, snap => {
-      const existing = snap.val();
-      if (!existing) {
-        set(userRef, {
-          displayName: user.displayName || "User",
-          email: user.email || "",
-          role: "writer",
-          createdAt: Date.now(),
-        });
-        return;
-      }
-      const updates = {};
-      // Jika displayName berubah, simpan nama lama sebagai alias
-      if (user.displayName && existing.displayName !== user.displayName) {
-        updates.displayName = user.displayName;
-        const aliases = existing.authorAliases || [];
-        if (existing.displayName && !aliases.includes(existing.displayName))
-          updates.authorAliases = [...aliases, existing.displayName];
-      }
-      if (user.email && existing.email !== user.email)
-        updates.email = user.email;
-      if (Object.keys(updates).length > 0)
-        update(userRef, updates);
-    }, { onlyOnce: true });
-  }, [user]);
+  /* ── Auto-create/update user entry in /users ──
+     CATATAN: Pembuatan user baru & sinkronisasi role kini ditangani sepenuhnya
+     oleh AuthContext.jsx (onValue realtime listener). useEffect ini sengaja
+     dihapus untuk mencegah race condition yang bisa overwrite role user
+     (misalnya role "writer" menimpa role yang baru saja di-approve admin).
+  ── */
 
   /* ── Realtime listeners ── */
   useEffect(() => {
