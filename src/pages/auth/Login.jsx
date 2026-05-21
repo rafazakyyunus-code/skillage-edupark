@@ -90,9 +90,10 @@ function Login() {
   };
 
   const redirectByRole = (role) => {
-    if (role === 'admin')       navigate('/dashboard/admin');
-    else if (role === 'editor') navigate('/dashboard/editor');
-    else if (role === 'writer') navigate('/dashboard/create-article');
+    if (role === 'admin')        navigate('/dashboard/admin');
+    else if (role === 'editor')  navigate('/dashboard/editor');
+    else if (role === 'writer')  navigate('/dashboard/create-article');
+    else if (role === 'pending') navigate('/waiting-approval');
     else navigate('/');
   };
 
@@ -102,11 +103,17 @@ function Login() {
     try {
       const { user: fu } = await signInWithEmailAndPassword(auth, email, password);
       const snap = await get(ref(db, `users/${fu.uid}`));
-      if (!snap.exists()) { await auth.signOut(); setErrorMsg('Akun tidak ditemukan. Hubungi admin.'); return; }
-      const { role } = snap.val();
-      if (!ALLOWED_ROLES.includes(role)) { await auth.signOut(); setErrorMsg('Akses ditolak: role tidak diizinkan.'); return; }
-      localStorage.setItem('role', role);
-      localStorage.setItem('user', JSON.stringify({ uid: fu.uid, email: fu.email, role }));
+      let role;
+      if (!snap.exists()) {
+        // Auto-create user baru dengan role pending
+        await set(ref(db, `users/${fu.uid}`), {
+          uid: fu.uid, displayName: fu.email.split('@')[0],
+          email: fu.email, role: 'pending', status: 'active', createdAt: Date.now(),
+        });
+        role = 'pending';
+      } else {
+        role = snap.val().role;
+      }
       redirectByRole(role);
     } catch (err) {
       const map = {
@@ -130,10 +137,11 @@ function Login() {
       const { user: fu } = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(fu, { displayName: name });
       await set(ref(db, `users/${fu.uid}`), {
-        displayName: name, email: fu.email, role: 'writer', createdAt: Date.now(),
+        uid: fu.uid, displayName: name, email: fu.email,
+        role: 'pending', status: 'active', createdAt: Date.now(),
       });
       await auth.signOut();
-      setSuccessMsg('Akun berhasil dibuat! Mengarahkan ke login...');
+      setSuccessMsg('Akun berhasil dibuat! Silakan login. Admin akan mengaktifkan akun Anda.');
       setTimeout(() => switchMode('login'), 2000);
     } catch (err) {
       const map = {
@@ -150,17 +158,17 @@ function Login() {
     try {
       const { user: fu } = await signInWithPopup(auth, googleProvider);
       const snap = await get(ref(db, `users/${fu.uid}`));
-      let role = 'writer';
+      let role;
       if (!snap.exists()) {
+        // User baru via Google → auto-create dengan role pending
+        role = 'pending';
         await set(ref(db, `users/${fu.uid}`), {
-          displayName: fu.displayName || fu.email, email: fu.email, role, createdAt: Date.now(),
+          uid: fu.uid, displayName: fu.displayName || fu.email, email: fu.email,
+          role, status: 'active', createdAt: Date.now(),
         });
       } else {
         role = snap.val().role;
-        if (!ALLOWED_ROLES.includes(role)) { await auth.signOut(); setErrorMsg('Akses ditolak: role tidak diizinkan.'); return; }
       }
-      localStorage.setItem('role', role);
-      localStorage.setItem('user', JSON.stringify({ uid: fu.uid, email: fu.email, role }));
       redirectByRole(role);
     } catch (err) {
       if (err.code !== 'auth/popup-closed-by-user') setErrorMsg('Login Google gagal. Coba lagi.');

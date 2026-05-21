@@ -1613,44 +1613,74 @@ function ManageUsersView({ users }) {
 }
 
 /* ─────────────────────────────────────────────
-   ADD / EDIT ROLE VIEW
+   ADD / EDIT ROLE VIEW  — fully automatic
 ───────────────────────────────────────────── */
 function AddRoleView({ users }) {
-  const [form, setForm]             = useState({ uid:"", displayName:"", role:"writer" });
-  const [selectedUser, setSelectedUser] = useState("");
-  const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [toast, showToast]          = useToast();
+  const [search, setSearch]           = useState("");
+  const [savingUid, setSavingUid]     = useState(null);
+  const [pendingRoles, setPendingRoles] = useState({});   // { uid: newRole }
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [toast, showToast]            = useToast();
 
-  const selectedUserObj = users.find(u => u.uid === selectedUser);
+  /* Split users into two lists */
+  const pendingUsers  = users.filter(u => u.role === "pending");
+  const activeUsers   = users.filter(u => u.role !== "pending");
 
-  const handleSaveRole = async () => {
-    const uid = selectedUser || form.uid.trim();
-    if (!uid) return alert("UID tidak boleh kosong.");
-    try {
-      await update(ref(db, `users/${uid}`), { displayName:form.displayName.trim()||undefined, role:form.role });
-      showToast("✓ Role berhasil disimpan!");
-      setForm({ uid:"", displayName:"", role:"writer" }); setSelectedUser("");
-    } catch (err) { alert("Gagal simpan: "+err.message); }
+  /* Filter active users by search */
+  const filteredActive = activeUsers.filter(u =>
+    [u.displayName, u.email, u.role].some(v => v?.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  /* Get the in-flight role value for a user (or fall back to saved role) */
+  const getRoleFor = (u) => pendingRoles[u.uid] ?? u.role ?? "writer";
+
+  /* Change role inline (optimistic UI) */
+  const handleRoleChange = (uid, newRole) => {
+    setPendingRoles(p => ({ ...p, [uid]: newRole }));
   };
 
-  const handleDeleteRole = async () => {
-    if (!selectedUser) return;
+  /* Save role to Firebase */
+  const handleSaveRole = async (u) => {
+    const newRole = getRoleFor(u);
+    setSavingUid(u.uid);
     try {
-      await remove(ref(db, `users/${selectedUser}`));
+      await update(ref(db, `users/${u.uid}`), { role: newRole });
+      setPendingRoles(p => { const c = {...p}; delete c[u.uid]; return c; });
+      showToast(`✓ Role ${u.displayName || u.uid} → ${newRole}`);
+    } catch (err) {
+      showToast(`✗ Gagal simpan: ${err.message}`);
+    } finally {
+      setSavingUid(null);
+    }
+  };
+
+  /* Approve pending user: set role to writer */
+  const handleApprove = async (u, role = "writer") => {
+    setSavingUid(u.uid);
+    try {
+      await update(ref(db, `users/${u.uid}`), { role });
+      showToast(`✓ ${u.displayName || u.email} disetujui sebagai ${role}`);
+    } catch (err) {
+      showToast(`✗ Gagal: ${err.message}`);
+    } finally {
+      setSavingUid(null);
+    }
+  };
+
+  /* Delete user from DB */
+  const handleDeleteUser = async () => {
+    if (!deleteConfirm) return;
+    try {
+      await remove(ref(db, `users/${deleteConfirm.uid}`));
       showToast("✓ User berhasil dihapus.");
-      setSelectedUser(""); setForm({ uid:"", displayName:"", role:"writer" }); setDeleteConfirm(false);
-    } catch (err) { showToast("✗ Gagal hapus: "+err.message); setDeleteConfirm(false); }
+      setDeleteConfirm(null);
+    } catch (err) {
+      showToast(`✗ Gagal hapus: ${err.message}`);
+      setDeleteConfirm(null);
+    }
   };
 
-  const handleCreateUser = async () => {
-    if (!form.uid.trim()) return alert("UID tidak boleh kosong.");
-    if (!form.displayName.trim()) return alert("Nama tidak boleh kosong.");
-    try {
-      await set(ref(db, `users/${form.uid.trim()}`), { displayName:form.displayName.trim(), role:form.role });
-      showToast("✓ User baru berhasil ditambahkan!");
-      setForm({ uid:"", displayName:"", role:"writer" });
-    } catch (err) { alert("Gagal tambah user: "+err.message); }
-  };
+  const isDirty = (u) => pendingRoles[u.uid] !== undefined && pendingRoles[u.uid] !== u.role;
 
   return (
     <div>
@@ -1664,93 +1694,249 @@ function AddRoleView({ users }) {
               <Trash2 size={24} color="#DC2626" />
             </div>
             <h3 style={{ margin:"0 0 8px", color:"#111827", fontSize:17, fontWeight:700 }}>Hapus User?</h3>
-            <p style={{ color:"#6B7280", fontSize:13, marginBottom:6 }}>
-              User <strong>"{selectedUserObj?.displayName || selectedUser}"</strong> dengan role <strong>{selectedUserObj?.role?.toUpperCase()}</strong> akan dihapus dari database.
+            <p style={{ color:"#6B7280", fontSize:13, marginBottom:10 }}>
+              <strong>"{deleteConfirm?.displayName || deleteConfirm?.uid}"</strong> akan dihapus dari database.
             </p>
             <p style={{ color:"#DC2626", fontSize:12, marginBottom:22, background:"#FEF2F2", padding:"8px 12px", borderRadius:8 }}>
               ⚠ Ini hanya menghapus data di Realtime Database, bukan akun Firebase Auth.
             </p>
             <div style={{ display:"flex", gap:10, justifyContent:"center" }}>
-              <button onClick={() => setDeleteConfirm(false)} style={{ padding:"9px 22px", borderRadius:8, border:"1px solid #E5E7EB", background:"#fff", color:"#374151", fontSize:14, cursor:"pointer", fontWeight:600 }}>Batal</button>
-              <button onClick={handleDeleteRole} style={{ padding:"9px 22px", borderRadius:8, border:"none", background:"#DC2626", color:"#fff", fontSize:14, cursor:"pointer", fontWeight:700 }}>Ya, Hapus</button>
+              <button onClick={() => setDeleteConfirm(null)} style={{ padding:"9px 22px", borderRadius:8, border:"1px solid #E5E7EB", background:"#fff", color:"#374151", fontSize:14, cursor:"pointer", fontWeight:600 }}>Batal</button>
+              <button onClick={handleDeleteUser} style={{ padding:"9px 22px", borderRadius:8, border:"none", background:"#DC2626", color:"#fff", fontSize:14, cursor:"pointer", fontWeight:700 }}>Ya, Hapus</button>
             </div>
           </div>
         </div>
       )}
 
       <div className="ad-page-header">
-        <h1 className="ad-page-title">Add / Edit Role</h1>
-        <p className="ad-page-sub">Tambahkan role baru atau ubah role pengguna yang sudah ada</p>
+        <h1 className="ad-page-title">Manajemen Role</h1>
+        <p className="ad-page-sub">Setujui pengguna baru dan ubah role secara langsung</p>
       </div>
-      <div className="ad-two-col" style={{ alignItems:"flex-start" }}>
-        <div className="ad-card">
-          <h3 className="ad-card__section-title"><UserCheck size={16} /> Edit Role Pengguna Terdaftar</h3>
-          <p className="ad-card__hint">Pilih pengguna yang sudah ada lalu ubah rolenya.</p>
-          <div className="ad-form-row">
-            <label className="ad-form-label">Pilih Pengguna</label>
-            <select className="ad-form-input" value={selectedUser} onChange={e=>{ setSelectedUser(e.target.value); const u=users.find(x=>x.uid===e.target.value); if(u) setForm(p=>({...p,role:u.role||"writer",displayName:u.displayName||""})); }}>
-              <option value="">-- Pilih pengguna --</option>
-              {users.map(u=><option key={u.uid} value={u.uid}>{u.displayName||u.uid} ({u.role})</option>)}
-            </select>
+
+      {/* ── PENDING APPROVAL SECTION ── */}
+      {pendingUsers.length > 0 && (
+        <div style={{ marginBottom:28 }}>
+          <div style={{
+            display:"flex", alignItems:"center", gap:10, marginBottom:14,
+          }}>
+            <div style={{ width:8, height:8, borderRadius:"50%", background:"#F59E0B", flexShrink:0 }} />
+            <h2 style={{ margin:0, fontSize:15, fontWeight:700, color:"#111827" }}>
+              Menunggu Persetujuan
+            </h2>
+            <span style={{ background:"#FEF3C7", color:"#92400E", fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:99 }}>
+              {pendingUsers.length}
+            </span>
           </div>
-          {selectedUser && (
-            <>
-              <div className="ad-form-row">
-                <label className="ad-form-label">Display Name</label>
-                <input className="ad-form-input" value={form.displayName} onChange={e=>setForm(p=>({...p,displayName:e.target.value}))} placeholder="Nama tampilan" />
-              </div>
-              <div className="ad-form-row">
-                <label className="ad-form-label">Role Baru</label>
-                <select className="ad-form-input" value={form.role} onChange={e=>setForm(p=>({...p,role:e.target.value}))}>
-                  {ROLES.map(r=><option key={r} value={r}>{r}</option>)}
+          <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+            {pendingUsers.map(u => (
+              <div key={u.uid} style={{
+                background:"#fff", border:"1px solid #FCD34D", borderRadius:12,
+                padding:"14px 18px", display:"flex", alignItems:"center", gap:14,
+                flexWrap:"wrap",
+              }}>
+                {/* Avatar */}
+                <div style={{
+                  width:42, height:42, borderRadius:"50%", background:"#FEF3C7",
+                  color:"#92400E", fontWeight:700, fontSize:15,
+                  display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0,
+                }}>
+                  {(u.displayName||u.email||"?").slice(0,2).toUpperCase()}
+                </div>
+                {/* Info */}
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ fontWeight:700, fontSize:14, color:"#111827" }}>{u.displayName || "—"}</div>
+                  <div style={{ fontSize:12, color:"#6B7280", marginTop:1 }}>{u.email || u.uid}</div>
+                </div>
+                {/* Status badge */}
+                <span style={{ background:"#FEF3C7", color:"#92400E", fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:99, border:"1px solid #FCD34D", flexShrink:0 }}>
+                  PENDING
+                </span>
+                {/* Role picker for approve */}
+                <select
+                  className="ad-role-select"
+                  value={getRoleFor(u)}
+                  onChange={e => handleRoleChange(u.uid, e.target.value)}
+                  style={{ flexShrink:0 }}
+                >
+                  {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
                 </select>
-              </div>
-              <div style={{ display:"flex", gap:10, marginTop:4 }}>
-                <button className="ad-btn ad-btn--primary" style={{ flex:1 }} onClick={handleSaveRole}>
-                  <Save size={14} /> Simpan Perubahan
-                </button>
+                {/* Approve btn */}
                 <button
-                  onClick={() => setDeleteConfirm(true)}
-                  style={{ display:"flex", alignItems:"center", gap:7, padding:"9px 16px", background:"#FEF2F2", color:"#DC2626", border:"1px solid #FECACA", borderRadius:8, fontSize:13, fontWeight:600, cursor:"pointer" }}
+                  disabled={savingUid === u.uid}
+                  onClick={() => handleApprove(u, getRoleFor(u))}
+                  style={{
+                    display:"flex", alignItems:"center", gap:6,
+                    padding:"8px 16px", background:"#1B3A2A", color:"#fff",
+                    border:"none", borderRadius:8, fontSize:13, fontWeight:700,
+                    cursor: savingUid === u.uid ? "not-allowed" : "pointer",
+                    opacity: savingUid === u.uid ? 0.7 : 1, flexShrink:0,
+                  }}
+                >
+                  {savingUid === u.uid ? <Loader size={13} style={{ animation:"spin 1s linear infinite" }} /> : <CheckCircle size={14} />}
+                  Setujui
+                </button>
+                {/* Reject / delete */}
+                <button
+                  onClick={() => setDeleteConfirm(u)}
+                  style={{
+                    display:"flex", alignItems:"center", gap:6,
+                    padding:"8px 14px", background:"#FEF2F2", color:"#DC2626",
+                    border:"1px solid #FECACA", borderRadius:8, fontSize:13, fontWeight:600,
+                    cursor:"pointer", flexShrink:0,
+                  }}
                   onMouseEnter={e => { e.currentTarget.style.background="#DC2626"; e.currentTarget.style.color="#fff"; }}
                   onMouseLeave={e => { e.currentTarget.style.background="#FEF2F2"; e.currentTarget.style.color="#DC2626"; }}
                 >
-                  <Trash2 size={14} /> Hapus User
+                  <XCircle size={14} /> Tolak
                 </button>
-              </div>
-            </>
-          )}
-        </div>
-        <div className="ad-card">
-          <h3 className="ad-card__section-title"><UserPlus size={16} /> Tambah User Entry Manual</h3>
-          <p className="ad-card__hint">Gunakan UID dari Firebase Authentication.</p>
-          <div className="ad-form-row">
-            <label className="ad-form-label">UID Firebase</label>
-            <input className="ad-form-input" value={form.uid} onChange={e=>setForm(p=>({...p,uid:e.target.value}))} placeholder="UID dari Firebase Auth" />
-          </div>
-          <div className="ad-form-row">
-            <label className="ad-form-label">Display Name</label>
-            <input className="ad-form-input" value={form.displayName} onChange={e=>setForm(p=>({...p,displayName:e.target.value}))} placeholder="Nama pengguna" />
-          </div>
-          <div className="ad-form-row">
-            <label className="ad-form-label">Role</label>
-            <select className="ad-form-input" value={form.role} onChange={e=>setForm(p=>({...p,role:e.target.value}))}>
-              {ROLES.map(r=><option key={r} value={r}>{r}</option>)}
-            </select>
-          </div>
-          <div className="ad-role-info-grid">
-            {ROLES.map(r => (
-              <div key={r} className="ad-role-info-card" style={{ borderColor:ROLE_COLORS[r]?.border }}>
-                <span className="ad-role-badge" style={{ background:ROLE_COLORS[r]?.bg, color:ROLE_COLORS[r]?.text, border:`1px solid ${ROLE_COLORS[r]?.border}` }}>{r.toUpperCase()}</span>
-                <p className="ad-role-info-desc">
-                  {r==="admin"&&"Akses penuh ke semua fitur."}
-                  {r==="editor"&&"Review dan approve/reject artikel."}
-                  {r==="writer"&&"Membuat dan mengirim artikel."}
-                </p>
               </div>
             ))}
           </div>
-          <button className="ad-btn ad-btn--primary" onClick={handleCreateUser}><UserPlus size={14} /> Tambah User</button>
+        </div>
+      )}
+
+      {pendingUsers.length === 0 && (
+        <div style={{
+          background:"#F0FDF4", border:"1px solid #BBF7D0", borderRadius:12,
+          padding:"14px 20px", marginBottom:24, display:"flex", alignItems:"center", gap:10,
+        }}>
+          <CheckCircle size={16} color="#16A34A" />
+          <span style={{ fontSize:13, color:"#15803D", fontWeight:600 }}>
+            Tidak ada pengguna yang menunggu persetujuan.
+          </span>
+        </div>
+      )}
+
+      {/* ── ACTIVE USERS ROLE MANAGEMENT ── */}
+      <div>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14, flexWrap:"wrap", gap:10 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            <div style={{ width:8, height:8, borderRadius:"50%", background:"#2FA084", flexShrink:0 }} />
+            <h2 style={{ margin:0, fontSize:15, fontWeight:700, color:"#111827" }}>
+              Pengguna Aktif
+            </h2>
+            <span style={{ background:"#D1FAE5", color:"#065F46", fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:99 }}>
+              {activeUsers.length}
+            </span>
+          </div>
+          <div className="ad-search-wrap" style={{ maxWidth:280 }}>
+            <Search size={14} />
+            <input
+              className="ad-search-input"
+              placeholder="Cari nama, email, role..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="ad-card" style={{ padding:0, overflow:"hidden" }}>
+          <table className="ad-table">
+            <thead>
+              <tr>
+                <th>Pengguna</th>
+                <th>Email</th>
+                <th>Role Saat Ini</th>
+                <th>Ubah Role</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredActive.length === 0
+                ? <tr><td colSpan={5} className="ad-table__empty">Tidak ada pengguna ditemukan.</td></tr>
+                : filteredActive.map(u => {
+                    const dirty = isDirty(u);
+                    const saving = savingUid === u.uid;
+                    return (
+                      <tr key={u.uid}>
+                        <td>
+                          <div className="ad-table__user">
+                            <div className="ad-table__avatar">
+                              {(u.displayName||"U").split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase()}
+                            </div>
+                            <span className="ad-table__name">{u.displayName||"—"}</span>
+                          </div>
+                        </td>
+                        <td className="ad-table__email">{u.email||"—"}</td>
+                        <td>
+                          <span className="ad-role-badge" style={{
+                            background: ROLE_COLORS[u.role]?.bg,
+                            color: ROLE_COLORS[u.role]?.text,
+                            border: `1px solid ${ROLE_COLORS[u.role]?.border}`,
+                          }}>
+                            {u.role?.toUpperCase()||"—"}
+                          </span>
+                        </td>
+                        <td>
+                          <select
+                            className="ad-role-select"
+                            value={getRoleFor(u)}
+                            onChange={e => handleRoleChange(u.uid, e.target.value)}
+                          >
+                            {[...ROLES, "pending"].map(r => <option key={r} value={r}>{r}</option>)}
+                          </select>
+                        </td>
+                        <td>
+                          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                            {/* Save btn — hanya muncul jika ada perubahan */}
+                            {dirty && (
+                              <button
+                                disabled={saving}
+                                onClick={() => handleSaveRole(u)}
+                                title="Simpan role"
+                                style={{
+                                  display:"flex", alignItems:"center", gap:5,
+                                  padding:"6px 12px", background:"#1B3A2A", color:"#fff",
+                                  border:"none", borderRadius:7, fontSize:12, fontWeight:700,
+                                  cursor: saving ? "not-allowed" : "pointer",
+                                  opacity: saving ? 0.7 : 1,
+                                }}
+                              >
+                                {saving ? <Loader size={12} /> : <Save size={12} />}
+                                Simpan
+                              </button>
+                            )}
+                            <button
+                              onClick={() => setDeleteConfirm(u)}
+                              title="Hapus user"
+                              style={{
+                                display:"flex", alignItems:"center", justifyContent:"center",
+                                padding:"6px 8px", background:"#FEF2F2", color:"#DC2626",
+                                border:"1px solid #FECACA", borderRadius:7, cursor:"pointer",
+                              }}
+                              onMouseEnter={e => { e.currentTarget.style.background="#DC2626"; e.currentTarget.style.color="#fff"; }}
+                              onMouseLeave={e => { e.currentTarget.style.background="#FEF2F2"; e.currentTarget.style.color="#DC2626"; }}
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+              }
+            </tbody>
+          </table>
+        </div>
+
+        {/* Role legend */}
+        <div style={{ display:"flex", gap:10, marginTop:16, flexWrap:"wrap" }}>
+          {ROLES.map(r => (
+            <div key={r} style={{
+              display:"flex", alignItems:"center", gap:8,
+              background:"#fff", border:`1px solid ${ROLE_COLORS[r]?.border}`,
+              borderRadius:10, padding:"8px 14px",
+            }}>
+              <span className="ad-role-badge" style={{ background:ROLE_COLORS[r]?.bg, color:ROLE_COLORS[r]?.text, border:`1px solid ${ROLE_COLORS[r]?.border}` }}>
+                {r.toUpperCase()}
+              </span>
+              <span style={{ fontSize:12, color:"#6B7280" }}>
+                {r==="admin"&&"Akses penuh ke semua fitur"}
+                {r==="editor"&&"Review dan approve/reject artikel"}
+                {r==="writer"&&"Membuat dan mengirim artikel"}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

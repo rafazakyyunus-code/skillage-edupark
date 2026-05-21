@@ -41,7 +41,7 @@ import ContactPage from "./pages/contact/ContactPage";
 /* ───────── LOGIN & AUTH ───────── */
 import Login from "./pages/auth/Login";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute, { WaitingApprovalPage } from "./components/ProtectedRoute";
 
 /* ───────── FIREBASE ───────── */
 import { db } from "./firebase";
@@ -122,7 +122,8 @@ function AppInner() {
   /* Hide navbar/footer di halaman login & dashboard */
   const hideLayout =
     location.pathname.startsWith("/dashboard") ||
-    location.pathname === "/login";
+    location.pathname === "/login" ||
+    location.pathname === "/waiting-approval";
 
   return (
     <>
@@ -157,7 +158,9 @@ function AppInner() {
                       ? <Navigate to="/dashboard/admin" replace />
                       : user.role === 'writer'
                         ? <Navigate to="/dashboard/create-article" replace />
-                        : <Navigate to="/dashboard/editor" replace />
+                        : user.role === 'editor'
+                          ? <Navigate to="/dashboard/editor" replace />
+                          : <Navigate to="/waiting-approval" replace />  // pending
                   )
                 : <Login />
             }
@@ -339,6 +342,16 @@ function AppInner() {
                   externalArticles={articles}
                   onUpdateStatus={updateStatus}
                 />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ───────── WAITING APPROVAL (role: pending) ───────── */}
+          <Route
+            path="/waiting-approval"
+            element={
+              <ProtectedRoute allowedRoles={["pending"]}>
+                <WaitingApprovalPage />
               </ProtectedRoute>
             }
           />
