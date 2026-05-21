@@ -4,11 +4,16 @@
    ============================================= */
 
 /* ── Root ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 .ca-root {
   display: flex;
   min-height: 100vh;
   background: #f5f7f5;
   font-family: "Inter", sans-serif;
+  overflow-x: hidden;
 }
 
 /* =============================================
@@ -153,9 +158,11 @@
 .ca-main {
   margin-left: 220px;
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* ── Top Header ── */
@@ -170,6 +177,9 @@
   position: sticky;
   top: 0;
   z-index: 50;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
 }
 
 .ca-breadcrumb {
@@ -240,6 +250,9 @@
 .ca-body {
   flex: 1;
   padding: 28px 32px;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 /* =============================================
@@ -247,7 +260,7 @@
    ============================================= */
 .ca-editor-layout {
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
   gap: 20px;
   align-items: start;
 }

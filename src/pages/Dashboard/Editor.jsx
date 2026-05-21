@@ -168,18 +168,22 @@ const BLANK = {
 /* ─────────────────────────────────────────────
    PRODUK MANAGEMENT VIEW
 ───────────────────────────────────────────── */
+const IMGBB_API_KEY = "6604bf748a40b7eaf83a5d4792bff01e";
+
 function ProdukView() {
   const db = getDatabase();
 
-  const [products, setProducts]     = useState([]);
-  const [loading, setLoading]       = useState(true);
-  const [view, setView]             = useState("list"); // "list" | "form" | "detail"
-  const [form, setForm]             = useState(BLANK);
-  const [editId, setEditId]         = useState(null);
-  const [saving, setSaving]         = useState(false);
+  const [products, setProducts]         = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [view, setView]                 = useState("list"); // "list" | "form" | "detail"
+  const [form, setForm]                 = useState(BLANK);
+  const [editId, setEditId]             = useState(null);
+  const [saving, setSaving]             = useState(false);
+  const [uploading, setUploading]       = useState(false);
+  const [imagePreview, setImagePreview] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [filterCat, setFilterCat]   = useState("Semua");
-  const [toast, setToast]           = useState("");
+  const [filterCat, setFilterCat]       = useState("Semua");
+  const [toast, setToast]               = useState("");
 
   /* ── realtime listener ── */
   useEffect(() => {
@@ -202,12 +206,38 @@ function ProdukView() {
     setTimeout(() => setToast(""), 3000);
   };
 
+  /* ── upload foto produk ke ImgBB ── */
+  const uploadProdukImage = async (file) => {
+    const fd = new FormData();
+    fd.append("image", file);
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: fd });
+    const json = await res.json();
+    if (!json.success) throw new Error("Upload gagal");
+    return json.data.url;
+  };
+
+  const handleProdukFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImagePreview(URL.createObjectURL(file));
+    setUploading(true);
+    try {
+      const url = await uploadProdukImage(file);
+      setForm(f => ({ ...f, image: url }));
+      showToast("✓ Foto berhasil diupload!");
+    } catch (err) {
+      showToast("✗ Upload foto gagal: " + err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   /* ── save (add / edit) ── */
   const handleSave = async () => {
-    if (!form.name.trim()) return alert("Nama produk wajib diisi.");
-    if (!form.price || isNaN(Number(form.price))) return alert("Harga harus angka.");
-    if (!form.desc.trim()) return alert("Deskripsi wajib diisi.");
-    if (!form.image.trim()) return alert("URL foto produk wajib diisi.");
+    if (!form.name.trim()) return showToast("✗ Nama produk wajib diisi.");
+    if (!form.price || isNaN(Number(form.price))) return showToast("✗ Harga harus angka.");
+    if (!form.desc.trim()) return showToast("✗ Deskripsi wajib diisi.");
+    if (!form.image.trim()) return showToast("✗ Foto produk wajib diisi — upload atau masukkan URL.");
 
     setSaving(true);
     try {
@@ -246,6 +276,7 @@ function ProdukView() {
   const resetForm = () => {
     setForm(BLANK);
     setEditId(null);
+    setImagePreview("");
   };
 
   const handleEdit = (p) => {
@@ -262,6 +293,7 @@ function ProdukView() {
       feature3:  p.feature3 || "Mendapatkan dukungan penuh dari tim ahli kami.",
     });
     setEditId(p.firebaseId);
+    setImagePreview(p.image || "");
     setView("form");
   };
 
@@ -312,27 +344,67 @@ function ProdukView() {
           {/* Foto Produk */}
           <div style={card}>
             <label style={sectionLabel}><span style={{ display:"flex", alignItems:"center", gap:6 }}><IcoImage size={15} color="#374151"/>Foto Produk</span></label>
-            <div style={{ marginBottom: 10 }}>
-              <label style={fieldLabel}>URL Gambar Produk *</label>
+
+            {/* Upload area — klik untuk pilih file */}
+            <div
+              onClick={() => document.getElementById("produk-file-input").click()}
+              style={{
+                border: "2px dashed #D1D5DB", borderRadius: 12, cursor: "pointer",
+                overflow: "hidden", transition: "border-color 0.2s",
+                minHeight: imagePreview ? "auto" : 160,
+                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+              }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = "#16c35b"}
+              onMouseLeave={e => e.currentTarget.style.borderColor = "#D1D5DB"}
+            >
+              {imagePreview ? (
+                <div style={{ position: "relative", width: "100%" }}>
+                  <img src={imagePreview} alt="preview"
+                    style={{ width: "100%", height: 220, objectFit: "cover", display: "block" }} />
+                  <div style={{
+                    position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    opacity: 0, transition: "0.3s",
+                  }}
+                    onMouseEnter={e => e.currentTarget.style.opacity = 1}
+                    onMouseLeave={e => e.currentTarget.style.opacity = 0}>
+                    <span style={{ color: "#fff", fontWeight: 600, fontSize: 14 }}>Klik untuk ganti foto</span>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ padding: "40px 20px", textAlign: "center" }}>
+                  <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>
+                    <IcoImage size={36} color="#D1D5DB" />
+                  </div>
+                  <p style={{ fontSize: 15, fontWeight: 600, color: "#374151", margin: "0 0 6px" }}>
+                    {uploading ? "Mengupload..." : "Klik untuk pilih foto"}
+                  </p>
+                  <span style={{ fontSize: 12, color: "#9CA3AF" }}>JPG, PNG, WEBP • Maks 10MB</span>
+                </div>
+              )}
+            </div>
+            <input id="produk-file-input" type="file" accept="image/*"
+              onChange={handleProdukFileChange} style={{ display: "none" }} />
+
+            {/* Indikator uploading */}
+            {uploading && (
+              <p style={{ fontSize: 12, color: "#16c35b", marginTop: 8, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
+                <IcoLoader size={13} color="#16c35b" /> Sedang mengupload foto...
+              </p>
+            )}
+
+            {/* URL fallback */}
+            <div style={{ marginTop: 10 }}>
+              <label style={fieldLabel}>Atau masukkan URL foto langsung</label>
               <input
                 value={form.image}
-                onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
-                placeholder="https://i.ibb.co/... atau https://images.unsplash.com/..."
+                onChange={e => { setForm(f => ({ ...f, image: e.target.value })); setImagePreview(e.target.value); }}
+                placeholder="https://i.ibb.co/... atau URL gambar lain"
                 style={input}
               />
-              <p style={{ fontSize: 11, color: "#9CA3AF", margin: "6px 0 0" }}>
-                Upload foto ke <a href="https://imgbb.com" target="_blank" rel="noreferrer" style={{ color: "#1B3A2A" }}>imgbb.com</a> (gratis) lalu paste URL-nya di sini.
-              </p>
             </div>
-            {/* Preview */}
-            {form.image && (
-              <div style={{ border: "1px solid #E5E7EB", borderRadius: 8, overflow: "hidden", marginTop: 8 }}>
-                <img src={form.image} alt="preview"
-                  style={{ width: "100%", maxHeight: 220, objectFit: "cover" }}
-                  onError={e => { e.target.style.display = "none"; }} />
-              </div>
-            )}
           </div>
+
 
           {/* Info Utama */}
           <div style={card}>
@@ -457,11 +529,12 @@ function ProdukView() {
           </div>
 
           {/* Simpan */}
-          <button onClick={handleSave} disabled={saving}
-            style={{ width: "100%", padding: "14px", background: saving ? "#9CA3AF" : "#1B3A2A",
+          {/* Simpan */}
+          <button onClick={handleSave} disabled={saving || uploading}
+            style={{ width: "100%", padding: "14px", background: (saving || uploading) ? "#9CA3AF" : "#1B3A2A",
               color: "#fff", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700,
-              cursor: saving ? "not-allowed" : "pointer" }}>
-            {saving ? "Menyimpan..." : editId
+              cursor: (saving || uploading) ? "not-allowed" : "pointer" }}>
+            {saving ? "Menyimpan..." : uploading ? "Menunggu upload..." : editId
               ? <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}><IcoSave size={16} color="#fff"/>Perbarui Produk</span>
               : <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}><IcoPlus size={16} color="#fff"/>Simpan Produk</span>
             }
@@ -1043,6 +1116,97 @@ const input = {
 };
 
 /* ─────────────────────────────────────────────
+   WRITER DIRECTORY VIEW — data dari /users (role=writer) + /articles
+───────────────────────────────────────────── */
+function WriterDirectoryView({ articles }) {
+  const [writers, setWriters] = useState([]);
+
+  useEffect(() => {
+    const db = getDatabase();
+    const unsub = onValue(ref(db, "users"), snap => {
+      const data = snap.val();
+      if (data) {
+        const list = Object.entries(data)
+          .map(([uid, v]) => ({ uid, ...v }))
+          .filter(u => u.role === "writer");
+        setWriters(list);
+      } else {
+        setWriters([]);
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  const getStats = (w) => {
+    const aliases = [w.displayName, ...(w.authorAliases || [])].filter(Boolean);
+    const mine = articles.filter(a =>
+      (w.uid && a.authorUid === w.uid) ||
+      (!a.authorUid && aliases.includes(a.author))
+    );
+    return {
+      count:      mine.length,
+      published:  mine.filter(a => a.status === "published").length,
+      pending:    mine.filter(a => a.status === "pending").length,
+      revision:   mine.filter(a => a.status === "revision").length,
+      totalViews: mine.reduce((s, a) => s + (a.views || 0), 0),
+    };
+  };
+
+  // Fallback: jika belum ada user di /users, tampilkan dari data artikel
+  const articleWriters = writers.length === 0
+    ? [...new Map(articles.map(a => [a.authorUid || a.author, {
+        uid: a.authorUid || null,
+        displayName: a.author,
+        email: null,
+        role: "writer",
+      }])).values()]
+    : [];
+
+  const allWriters = writers.length > 0 ? writers : articleWriters;
+
+  return (
+    <div>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: "#111827", margin: "0 0 4px" }}>Writer Directory</h1>
+      <p style={{ color: "#6B7280", fontSize: 14, margin: "0 0 24px" }}>
+        {allWriters.length} penulis terdaftar · data realtime dari Firebase
+      </p>
+      {allWriters.length === 0 ? (
+        <p style={{ color: "#6B7280", fontSize: 14 }}>Belum ada data penulis.</p>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+          {allWriters.map(w => {
+            const stats = getStats(w);
+            const initials = w.displayName
+              ? w.displayName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
+              : "W";
+            return (
+              <div key={w.uid || w.displayName} style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, padding: "20px 18px", textAlign: "center" }}>
+                <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#E8F4EE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 700, color: "#1B3A2A", margin: "0 auto 12px" }}>
+                  {initials}
+                </div>
+                <div style={{ fontWeight: 700, fontSize: 14, color: "#111827" }}>{w.displayName || "—"}</div>
+                <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 10 }}>{w.email || "Writer"}</div>
+                <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+                  <div style={{ fontSize: 12, background: "#E8F4EE", color: "#1B3A2A", borderRadius: 20, padding: "3px 12px", fontWeight: 600 }}>{stats.count} artikel</div>
+                  <div style={{ fontSize: 12, background: "#E8F5E9", color: "#1B5E20", borderRadius: 20, padding: "3px 12px", fontWeight: 600 }}>{stats.published} published</div>
+                </div>
+                {(stats.pending > 0 || stats.revision > 0 || stats.totalViews > 0) && (
+                  <div style={{ marginTop: 8, display: "flex", gap: 6, justifyContent: "center", flexWrap: "wrap" }}>
+                    {stats.pending > 0 && <span style={{ fontSize: 10, background: "#FFF8E1", color: "#F57F17", borderRadius: 20, padding: "2px 8px", fontWeight: 700 }}>{stats.pending} pending</span>}
+                    {stats.revision > 0 && <span style={{ fontSize: 10, background: "#FBE9E7", color: "#BF360C", borderRadius: 20, padding: "2px 8px", fontWeight: 700 }}>{stats.revision} revisi</span>}
+                    {stats.totalViews > 0 && <span style={{ fontSize: 10, background: "#EFF6FF", color: "#1565C0", borderRadius: 20, padding: "2px 8px", fontWeight: 700 }}>{stats.totalViews.toLocaleString()} views</span>}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
    MAIN EDITOR PORTAL
 ───────────────────────────────────────────── */
 export default function EditorPortal({ externalArticles = [], onUpdateStatus, currentUser }) {
@@ -1502,33 +1666,7 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
 
         {/* WRITERS */}
         {activeNav === "writers" && !selectedArticle && (
-          <div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: "#111827", margin: "0 0 4px" }}>Writer Directory</h1>
-            <p style={{ color: "#6B7280", fontSize: 14, margin: "0 0 24px" }}>Daftar semua penulis yang terdaftar di platform Edupark</p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
-              {articles.length === 0 ? (
-                <p style={{ color: "#6B7280", fontSize: 14 }}>Belum ada data penulis.</p>
-              ) : (
-                [...new Map(articles.map(a => [a.author, {
-                  name: a.author, role: a.role || "Writer",
-                  count: articles.filter(x => x.author === a.author).length,
-                  published: articles.filter(x => x.author === a.author && x.status === "published").length,
-                }])).values()].map(w => (
-                  <div key={w.name} style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, padding: "20px 18px", textAlign: "center" }}>
-                    <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#E8F4EE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 700, color: "#1B3A2A", margin: "0 auto 12px" }}>
-                      {w.name ? w.name.split(" ").map(n => n[0]).join("") : "W"}
-                    </div>
-                    <div style={{ fontWeight: 700, fontSize: 14, color: "#111827" }}>{w.name}</div>
-                    <div style={{ fontSize: 12, color: "#6B7280", marginBottom: 10 }}>{w.role}</div>
-                    <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-                      <div style={{ fontSize: 12, background: "#E8F4EE", color: "#1B3A2A", borderRadius: 20, padding: "3px 12px", fontWeight: 600 }}>{w.count} artikel</div>
-                      <div style={{ fontSize: 12, background: "#E8F5E9", color: "#1B5E20", borderRadius: 20, padding: "3px 12px", fontWeight: 600 }}>{w.published} published</div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
+          <WriterDirectoryView articles={articles} />
         )}
 
         {/* PRODUK */}

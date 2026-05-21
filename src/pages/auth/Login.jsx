@@ -328,7 +328,7 @@ function Login() {
       localStorage.setItem('user', JSON.stringify({ uid: firebaseUser.uid, email: firebaseUser.email, role: userRole }));
 
       // 5. Redirect berdasarkan role
-      if (userRole === 'admin') navigate('/dashboard/editor');
+      if (userRole === 'admin') navigate('/dashboard/admin');
       else if (userRole === 'editor') navigate('/dashboard/editor');
       else if (userRole === 'writer') navigate('/dashboard/create-article');
       else navigate('/');

@@ -35,6 +35,7 @@ import Attractions from "./pages/Etiket/Attractions";
 /* ───────── DASHBOARD ───────── */
 import CreateArticle from "./pages/dashboard/CreateArticle";
 import Editor from "./pages/dashboard/Editor";
+import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import ContactPage from "./pages/contact/ContactPage";
 
 /* ───────── LOGIN & AUTH ───────── */
@@ -152,9 +153,11 @@ function AppInner() {
             element={
               user
                 ? (
-                    user.role === 'writer'
-                      ? <Navigate to="/dashboard/create-article" replace />
-                      : <Navigate to="/dashboard/editor" replace />
+                    user.role === 'admin'
+                      ? <Navigate to="/dashboard/admin" replace />
+                      : user.role === 'writer'
+                        ? <Navigate to="/dashboard/create-article" replace />
+                        : <Navigate to="/dashboard/editor" replace />
                   )
                 : <Login />
             }
@@ -310,6 +313,15 @@ function AppInner() {
           />
 
           {/* ───────── DASHBOARD (Protected) ───────── */}
+          <Route
+            path="/dashboard/admin"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/dashboard/create-article"
             element={
