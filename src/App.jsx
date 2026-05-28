@@ -27,10 +27,12 @@ import VenueAlam from "./pages/venue/VenueAlam";
 import VenueDetail from "./pages/venue/VenueDetail";
 import Article from "./pages/article/Article";
 import ArticleDetail from "./pages/articleDetail/ArticleDetail";
+import AttractionDetail from "./pages/Etiket/AttractionDetail";
 
 /* ───────── E-TIKET ───────── */
 import ETicket from "./pages/Etiket/ETicket";
 import Attractions from "./pages/Etiket/Attractions";
+
 
 /* ───────── DASHBOARD ───────── */
 import CreateArticle from "./pages/dashboard/CreateArticle";
@@ -199,6 +201,15 @@ function AppInner() {
             element={
               <AnimatedPage>
                 <Attractions />
+              </AnimatedPage>
+            }
+          />
+
+            <Route
+            path="/attractions/:id"
+            element={
+              <AnimatedPage>
+                <AttractionDetail />
               </AnimatedPage>
             }
           />
