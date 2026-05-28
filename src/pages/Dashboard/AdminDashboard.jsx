@@ -1655,17 +1655,19 @@ function AddRoleView({ users }) {
   };
 
   /* Approve pending user: set role to writer */
-  const handleApprove = async (u, role = "writer") => {
-    setSavingUid(u.uid);
-    try {
-      await update(ref(db, `users/${u.uid}`), { role });
-      showToast(`✓ ${u.displayName || u.email} disetujui sebagai ${role}`);
-    } catch (err) {
-      showToast(`✗ Gagal: ${err.message}`);
-    } finally {
-      setSavingUid(null);
-    }
-  };
+  const handleApprove = async (u) => {
+  const role = pendingRoles[u.uid] ?? "writer";   // ← fix utama
+  setSavingUid(u.uid);
+  try {
+    await update(ref(db, `users/${u.uid}`), { role });
+    setPendingRoles(p => { const c = {...p}; delete c[u.uid]; return c; }); // cleanup
+    showToast(`✓ ${u.displayName || u.email} disetujui sebagai ${role}`);
+  } catch (err) {
+    showToast(`✗ Gagal: ${err.message}`);
+  } finally {
+    setSavingUid(null);
+  }
+};
 
   /* Delete user from DB */
   const handleDeleteUser = async () => {
@@ -1763,7 +1765,7 @@ function AddRoleView({ users }) {
                 {/* Approve btn */}
                 <button
                   disabled={savingUid === u.uid}
-                  onClick={() => handleApprove(u, getRoleFor(u))}
+                  onClick={() => handleApprove(u)}
                   style={{
                     display:"flex", alignItems:"center", gap:6,
                     padding:"8px 16px", background:"#1B3A2A", color:"#fff",
