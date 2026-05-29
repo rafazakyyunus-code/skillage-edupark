@@ -235,9 +235,6 @@ function Topbar({ activeNav, onLogout, pendingCount }) {
         <span className="ad-breadcrumb__current">{LABELS[activeNav] || activeNav}</span>
       </div>
       <div className="ad-topbar__actions">
-        {pendingCount > 0 && (
-          <div className="ad-notif-wrap"><Bell size={18} /><span className="ad-notif-dot">{pendingCount}</span></div>
-        )}
         <div style={{ fontSize:11, background:"#FEE2E2", color:"#991B1B", borderRadius:20, padding:"3px 10px", fontWeight:700, letterSpacing:"0.04em" }}>ADMIN</div>
         <button className="ad-logout-btn" onClick={onLogout}><LogOut size={14} /> Logout</button>
       </div>

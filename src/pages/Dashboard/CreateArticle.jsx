@@ -9,7 +9,7 @@ import ImageExtension from "@tiptap/extension-image";
 
 import { db } from "../../firebase";
 import { ref, onValue, remove, set, update, push } from "firebase/database";
-import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
+import { getAuth, signOut, onAuthStateChanged, updateProfile, updateEmail } from "firebase/auth";
 
 import {
   LayoutDashboard,
@@ -67,9 +67,10 @@ const NAV_ITEMS = [
 /* ──────────────────────────────────────────
    SIDEBAR — identik dengan Editor.jsx
    ────────────────────────────────────────── */
-function Sidebar({ activeNav, setActiveNav, currentUser, myArticles }) {
-  const initials = currentUser?.displayName
-    ? currentUser.displayName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
+function Sidebar({ activeNav, setActiveNav, currentUser, myArticles, displayName }) {
+  const resolvedName = displayName || currentUser?.displayName || "";
+  const initials = resolvedName
+    ? resolvedName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
     : "AT";
 
   const navBtnStyle = (active) => ({
@@ -163,8 +164,8 @@ function Sidebar({ activeNav, setActiveNav, currentUser, myArticles }) {
             {initials}
           </div>
           <div style={{ overflow: "hidden" }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: "#fff", lineHeight: 1.3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{currentUser?.displayName || "Alex Thompson"}</div>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{currentUser?.role || "Senior Writer"}</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "#fff", lineHeight: 1.3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{resolvedName || "Writer"}</div>
+            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>Writer Portal</div>
           </div>
         </div>
       </div>
@@ -1006,25 +1007,73 @@ function AnalyticsView({ myArticles }) {
 /* ──────────────────────────────────────────
    SETTINGS VIEW — dengan Login/Logout
    ────────────────────────────────────────── */
-function SettingsView({ currentUser }) {
-  const [name, setName]   = useState(currentUser?.displayName || "Alex Thompson");
-  const [email, setEmail] = useState(currentUser?.email || "alex.thompson@edupark.id");
-  const [bio, setBio]     = useState("Senior writer and education enthusiast.");
-  const [saved, setSaved] = useState(false);
+function SettingsView({ currentUser, onNameChange }) {
+  const auth = getAuth();
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+  const [name,   setName]   = useState(currentUser?.displayName || "");
+  const [email,  setEmail]  = useState(currentUser?.email || "");
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState(null);
+  const [errMsg, setErrMsg] = useState("");
+
+  // Sync jika currentUser prop berubah
+  useEffect(() => {
+    setName(currentUser?.displayName || "");
+    setEmail(currentUser?.email || "");
+  }, [currentUser?.uid]);
+
+  const handleSave = async () => {
+    if (!name.trim()) { setErrMsg("Nama tidak boleh kosong."); setStatus("error"); return; }
+    if (!email.trim()) { setErrMsg("Email tidak boleh kosong."); setStatus("error"); return; }
+    setSaving(true);
+    setStatus(null);
+    setErrMsg("");
+    try {
+      const firebaseUser = auth.currentUser;
+      if (!firebaseUser) throw new Error("Sesi tidak ditemukan, silakan login ulang.");
+
+      if (firebaseUser.displayName !== name.trim()) {
+        await updateProfile(firebaseUser, { displayName: name.trim() });
+      }
+      if (firebaseUser.email !== email.trim()) {
+        await updateEmail(firebaseUser, email.trim());
+      }
+      if (firebaseUser.uid) {
+        const userUpdates = {};
+        if (name.trim())  userUpdates.displayName = name.trim();
+        if (email.trim()) userUpdates.email = email.trim();
+        await update(ref(db, `users/${firebaseUser.uid}`), userUpdates);
+      }
+      // Update sidebar langsung
+      if (onNameChange) onNameChange(name.trim());
+      setStatus("success");
+      setTimeout(() => setStatus(null), 3000);
+    } catch (err) {
+      console.error("Settings save error:", err);
+      if (err.code === "auth/requires-recent-login") {
+        setErrMsg("Untuk mengubah email, silakan logout lalu login kembali.");
+      } else if (err.code === "auth/email-already-in-use") {
+        setErrMsg("Email sudah digunakan akun lain.");
+      } else if (err.code === "auth/invalid-email") {
+        setErrMsg("Format email tidak valid.");
+      } else {
+        setErrMsg(err.message || "Gagal menyimpan perubahan.");
+      }
+      setStatus("error");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleLogout = async () => {
-    try {
-      const auth = getAuth();
-      await signOut(auth);
-    } catch (err) {
-      console.error("Logout error:", err);
-      alert("Gagal logout: " + err.message);
-    }
+    try { await signOut(auth); }
+    catch (err) { console.error("Logout error:", err); alert("Gagal logout: " + err.message); }
+  };
+
+  const inputStyle = {
+    width: "100%", padding: "9px 12px", borderRadius: 8,
+    border: "1px solid #D1D5DB", fontSize: 14, boxSizing: "border-box",
+    fontFamily: "inherit", outline: "none",
   };
 
   return (
@@ -1038,21 +1087,48 @@ function SettingsView({ currentUser }) {
         <h3>Informasi Profil</h3>
         <div className="ca-form-row">
           <label className="ca-form-label">Nama Lengkap</label>
-          <input className="ca-form-input" value={name} onChange={e => setName(e.target.value)} />
+          <input
+            className="ca-form-input"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            placeholder="Nama lengkap Anda"
+            style={inputStyle}
+            onFocus={e => e.target.style.borderColor = "#1B3A2A"}
+            onBlur={e => e.target.style.borderColor = "#D1D5DB"}
+          />
         </div>
         <div className="ca-form-row">
           <label className="ca-form-label">Email</label>
-          <input className="ca-form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} />
-        </div>
-        <div className="ca-form-row">
-          <label className="ca-form-label">Bio</label>
-          <textarea className="ca-form-input" value={bio} onChange={e => setBio(e.target.value)} rows={3} style={{ resize: "vertical" }} />
+          <input
+            className="ca-form-input"
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="email@contoh.com"
+            style={inputStyle}
+            onFocus={e => e.target.style.borderColor = "#1B3A2A"}
+            onBlur={e => e.target.style.borderColor = "#D1D5DB"}
+          />
+          <p style={{ fontSize: 11, color: "#9CA3AF", marginTop: 4 }}>Mengubah email memerlukan login ulang jika sudah lama tidak login.</p>
         </div>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-        <button className="ca-settings-save-btn" onClick={handleSave}>Simpan Perubahan</button>
-        {saved && <span style={{ fontSize: 13, color: "#16a34a", display: "flex", alignItems: "center", gap: 5 }}><CheckCircle size={14} /> Tersimpan!</span>}
+        <button
+          className="ca-settings-save-btn"
+          onClick={handleSave}
+          disabled={saving}
+          style={{ opacity: saving ? 0.7 : 1, cursor: saving ? "not-allowed" : "pointer" }}>
+          {saving ? "Menyimpan..." : "Simpan Perubahan"}
+        </button>
+        {status === "success" && (
+          <span style={{ fontSize: 13, color: "#16a34a", display: "flex", alignItems: "center", gap: 5 }}>
+            <CheckCircle size={14} /> Perubahan berhasil disimpan!
+          </span>
+        )}
+        {status === "error" && (
+          <span style={{ fontSize: 13, color: "#dc2626" }}>✗ {errMsg}</span>
+        )}
       </div>
 
       {/* Logout Section */}
@@ -1098,6 +1174,12 @@ export default function CreateArticle({ onExternalSubmit, currentUser: currentUs
 
   // currentUser yang dipakai di seluruh komponen
   const currentUser = authUser;
+
+  // profileName — reactive, diupdate langsung dari SettingsView agar sidebar langsung berubah
+  const [profileName, setProfileName] = useState("");
+  useEffect(() => {
+    if (currentUser?.displayName) setProfileName(currentUser.displayName);
+  }, [currentUser?.displayName]);
 
   // Auto-create / sync user entry di /users agar muncul di Writer Directory
   useEffect(() => {
@@ -1184,12 +1266,12 @@ export default function CreateArticle({ onExternalSubmit, currentUser: currentUs
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#f5f7f5", fontFamily: "sans-serif" }}>
-      <Sidebar activeNav={activeNav} setActiveNav={handleSetActiveNav} currentUser={currentUser} myArticles={myArticles} />
+      <Sidebar activeNav={activeNav} setActiveNav={handleSetActiveNav} currentUser={currentUser} myArticles={myArticles} displayName={profileName} />
 
-      <div style={{ flex: 1, marginLeft: 220, display: "flex", flexDirection: "column", minHeight: "100vh", minWidth: 0, overflowX: "hidden" }}>
+      <div style={{ flex: 1, marginLeft: 220, display: "flex", flexDirection: "column", height: "100vh", minWidth: 0, overflowX: "hidden" }}>
         <Topbar activeNav={activeNav} />
 
-        <div style={{ flex: 1, padding: "32px 40px", boxSizing: "border-box", width: "100%", overflowX: "hidden" }}>
+        <div style={{ flex: 1, padding: "32px 40px", boxSizing: "border-box", width: "100%", overflowX: "hidden", overflowY: "auto" }}>
           {activeNav === "dashboard" && (
             <DashboardView myArticles={myArticles} setActiveNav={handleSetActiveNav} />
           )}
@@ -1218,7 +1300,7 @@ export default function CreateArticle({ onExternalSubmit, currentUser: currentUs
           )}
 
           {activeNav === "settings" && (
-            <SettingsView currentUser={currentUser} />
+            <SettingsView currentUser={currentUser} onNameChange={setProfileName} />
           )}
         </div>
       </div>

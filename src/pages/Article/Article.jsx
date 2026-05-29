@@ -39,7 +39,6 @@ export default function ArticlePage({ articles = [] }) {
     <div className="article-page">
       {/* HERO SECTION */}
       <section className="article-hero">
-        <p className="breadcrumb">Home › Articles</p>
         <h1>Latest Articles</h1>
         <p className="article-hero-sub">
           Stay ahead with expert insights on pedagogical shifts, educational technology,

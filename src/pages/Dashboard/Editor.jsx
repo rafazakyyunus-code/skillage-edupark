@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getAuth, signOut } from "firebase/auth";
+import { getAuth, signOut, updateProfile, updateEmail } from "firebase/auth";
 import { getDatabase, ref, push, onValue, remove, update } from "firebase/database";
 
 /* ─────────────────────────────────────────────
@@ -108,10 +108,64 @@ const NAV_ITEMS = [
 /* ─────────────────────────────────────────────
    SETTINGS VIEW
 ───────────────────────────────────────────── */
-function EditorSettingsView({ onLogout }) {
-  const [name, setName]   = useState("Editor Edupark");
-  const [email, setEmail] = useState("editor@edupark.id");
-  const [saved, setSaved] = useState(false);
+function EditorSettingsView({ onLogout, onNameChange }) {
+  const auth = getAuth();
+  const db   = getDatabase();
+  const currentUser = auth.currentUser;
+
+  const [name,    setName]    = useState(currentUser?.displayName || "");
+  const [email,   setEmail]   = useState(currentUser?.email || "");
+  const [saving,  setSaving]  = useState(false);
+  const [status,  setStatus]  = useState(null);
+  const [errMsg,  setErrMsg]  = useState("");
+
+  useEffect(() => {
+    if (currentUser) {
+      setName(currentUser.displayName || "");
+      setEmail(currentUser.email || "");
+    }
+  }, [currentUser?.uid]);
+
+  const inputStyle = {
+    width: "100%", padding: "9px 12px", borderRadius: 8,
+    border: "1px solid #D1D5DB", fontSize: 14, boxSizing: "border-box",
+    fontFamily: "inherit", outline: "none",
+  };
+
+  const handleSave = async () => {
+    if (!name.trim()) { setErrMsg("Nama tidak boleh kosong."); setStatus("error"); return; }
+    if (!email.trim()) { setErrMsg("Email tidak boleh kosong."); setStatus("error"); return; }
+    setSaving(true); setStatus(null); setErrMsg("");
+    try {
+      if (currentUser.displayName !== name.trim())
+        await updateProfile(currentUser, { displayName: name.trim() });
+      if (currentUser.email !== email.trim())
+        await updateEmail(currentUser, email.trim());
+      if (currentUser?.uid) {
+        const userUpdates = {};
+        if (name.trim())  userUpdates.displayName = name.trim();
+        if (email.trim()) userUpdates.email = email.trim();
+        await update(ref(db, `users/${currentUser.uid}`), userUpdates);
+      }
+      // Update sidebar langsung
+      if (onNameChange) onNameChange(name.trim());
+      setStatus("success");
+      setTimeout(() => setStatus(null), 3000);
+    } catch (err) {
+      console.error("Settings save error:", err);
+      if (err.code === "auth/requires-recent-login")
+        setErrMsg("Untuk mengubah email, silakan logout lalu login kembali.");
+      else if (err.code === "auth/email-already-in-use")
+        setErrMsg("Email sudah digunakan akun lain.");
+      else if (err.code === "auth/invalid-email")
+        setErrMsg("Format email tidak valid.");
+      else
+        setErrMsg(err.message || "Gagal menyimpan perubahan.");
+      setStatus("error");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div>
@@ -119,24 +173,45 @@ function EditorSettingsView({ onLogout }) {
         <h1 style={{ fontSize: 22, fontWeight: 700, color: "#111827", margin: 0 }}>Settings</h1>
         <p style={{ color: "#6B7280", fontSize: 14, marginTop: 4 }}>Kelola profil dan preferensi akun editor Anda</p>
       </div>
+
       <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, padding: 24, marginBottom: 16 }}>
         <h3 style={{ fontSize: 15, fontWeight: 700, color: "#111827", margin: "0 0 16px" }}>Informasi Profil</h3>
         <div style={{ marginBottom: 12 }}>
           <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Nama Lengkap</label>
-          <input value={name} onChange={e => setName(e.target.value)} style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid #D1D5DB", fontSize: 14, boxSizing: "border-box" }} />
+          <input
+            value={name}
+            onChange={e => setName(e.target.value)}
+            placeholder="Nama lengkap Anda"
+            style={inputStyle}
+            onFocus={e => e.target.style.borderColor = "#1B3A2A"}
+            onBlur={e => e.target.style.borderColor = "#D1D5DB"}
+          />
         </div>
-        <div style={{ marginBottom: 16 }}>
+        <div style={{ marginBottom: 20 }}>
           <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 6 }}>Email</label>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid #D1D5DB", fontSize: 14, boxSizing: "border-box" }} />
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="email@contoh.com"
+            style={inputStyle}
+            onFocus={e => e.target.style.borderColor = "#1B3A2A"}
+            onBlur={e => e.target.style.borderColor = "#D1D5DB"}
+          />
+          <p style={{ fontSize: 11, color: "#9CA3AF", marginTop: 4 }}>Mengubah email memerlukan login ulang jika sudah lama tidak login.</p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <button onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 2500); }}
-            style={{ padding: "9px 20px", background: "#1B3A2A", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
-            Simpan Perubahan
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            style={{ padding: "9px 20px", background: saving ? "#6B7280" : "#1B3A2A", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: saving ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 7 }}>
+            {saving ? "Menyimpan..." : "Simpan Perubahan"}
           </button>
-          {saved && <span style={{ fontSize: 13, color: "#16a34a" }}>✓ Tersimpan!</span>}
+          {status === "success" && <span style={{ fontSize: 13, color: "#16a34a" }}>✓ Perubahan berhasil disimpan!</span>}
+          {status === "error"   && <span style={{ fontSize: 13, color: "#dc2626" }}>✗ {errMsg}</span>}
         </div>
       </div>
+
       <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, padding: 24 }}>
         <h3 style={{ fontSize: 15, fontWeight: 700, color: "#111827", margin: "0 0 8px" }}>Akun</h3>
         <p style={{ fontSize: 13, color: "#6B7280", marginBottom: 16 }}>Keluar dari sesi editor portal Anda.</p>
@@ -1223,6 +1298,12 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
   const [showConfirm, setShowConfirm]     = useState(null);
   const [statusFilter, setStatusFilter]   = useState("pending");
 
+  // profileName — reactive display name untuk sidebar, diupdate dari EditorSettingsView
+  const [profileName, setProfileName] = useState(currentUser?.displayName || "");
+  useEffect(() => {
+    if (currentUser?.displayName) setProfileName(currentUser.displayName);
+  }, [currentUser?.displayName]);
+
   // ── realtime data for dashboard ──
   const [produkList, setProdukList]   = useState([]);
   const [galleryList, setGalleryList] = useState([]);
@@ -1340,10 +1421,10 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
         <div style={{ padding: "12px 16px 14px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg,#2d6a4f,#16c35b)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0, boxShadow:"0 2px 8px rgba(22,195,91,0.3)" }}>
-              {currentUser?.displayName ? currentUser.displayName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() : "ED"}
+              {(profileName || currentUser?.displayName || "").split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() || "ED"}
             </div>
             <div style={{ overflow:"hidden" }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#fff", lineHeight: 1.3, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{currentUser?.displayName || "Editor"}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "#fff", lineHeight: 1.3, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{profileName || currentUser?.displayName || "Editor"}</div>
               <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>Editor Portal</div>
             </div>
           </div>
@@ -1683,7 +1764,7 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
         {activeNav === "gallery" && <GalleryView />}
 
         {/* SETTINGS */}
-        {activeNav === "settings" && <EditorSettingsView onLogout={handleLogout} />}
+        {activeNav === "settings" && <EditorSettingsView onLogout={handleLogout} onNameChange={setProfileName} />}
 
         {/* MODAL */}
         {showConfirm && (
