@@ -507,6 +507,38 @@ function Login() {
       <div className="lp">
         <div className="lp-card">
 
+          {/* ── BACK BUTTON ── */}
+          <button
+            onClick={() => navigate("/")}
+            style={{
+              position: "absolute",
+              top: "16px",
+              left: "16px",
+              zIndex: 30,
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "7px 14px",
+              background: "rgba(255,255,255,0.92)",
+              border: "1px solid #e2e8f0",
+              borderRadius: "999px",
+              fontSize: "13px",
+              fontWeight: "600",
+              color: "#2FA084",
+              cursor: "pointer",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              backdropFilter: "blur(4px)",
+              fontFamily: "inherit",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#2FA084"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#2FA084"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.92)"; e.currentTarget.style.color = "#2FA084"; e.currentTarget.style.borderColor = "#e2e8f0"; }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+            Kembali ke Website
+          </button>
+
           {/* ── SLIDING GREEN PANEL ── */}
           <div className={`lp-panel ${isLogin ? 'is-login' : 'is-signup'}`}>
             <div className="lp-panel-deco1" />
@@ -566,7 +598,16 @@ function Login() {
                 <rect x="20" y="20" width="14" height="14" rx="3" fill="#2FA084" opacity="0.6"/>
               </svg>
               <h1 className="lp-title">LOGIN</h1>
-              <p className="lp-sub">Selamat datang kembali 👋</p>
+              <p className="lp-sub" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                Selamat datang kembali
+                {/* Ikon Tangan Melambai (Wave) */}
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#f59e0b' }}>
+                  <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v5" />
+                  <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6" />
+                  <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v4.5" />
+                  <path d="M6 10V8a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v5c0 4.42 3.58 8 8 8h3a6 6 0 0 0 6-6V11" />
+                </svg>
+              </p>
 
               <div className="lp-field">
                 <span className="lp-field-icon"><EmailIcon /></span>
@@ -628,7 +669,15 @@ function Login() {
                 <rect x="20" y="20" width="14" height="14" rx="3" fill="#2FA084" opacity="0.6"/>
               </svg>
               <h1 className="lp-title">SIGN UP</h1>
-              <p className="lp-sub">Buat akun baru ✨</p>
+              <p className="lp-sub" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                Buat akun baru
+                {/* Ikon Sparkles / Kilauan */}
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#eab308' }}>
+                  <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/>
+                  <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5Z"/>
+                  <path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1Z"/>
+                </svg>
+              </p>
 
               <div className="lp-field">
                 <span className="lp-field-icon"><UserIcon /></span>

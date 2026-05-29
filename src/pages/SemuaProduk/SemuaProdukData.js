@@ -69,7 +69,7 @@ export const SORT_OPTIONS = [
   { value: "harga-desc",label: "Harga Tertinggi" },
 ];
 
-export const ITEMS_PER_PAGE = 6;
+export const ITEMS_PER_PAGE = 8;
 
 export function formatRp(num) {
   return "Rp " + Number(num).toLocaleString("id-ID");

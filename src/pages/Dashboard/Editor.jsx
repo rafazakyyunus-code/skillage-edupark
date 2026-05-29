@@ -879,7 +879,14 @@ function GalleryView() {
             <input id="gal-file-input" type="file" accept="image/*"
               onChange={handleFileChange} style={{ display:"none" }} />
             {uploading && (
-              <p style={{ fontSize:12, color:"#16c35b", marginTop:8, fontWeight:600 }}>⏳ Sedang mengupload foto...</p>
+              <p style={{ fontSize: 12, color: "#16c35b", marginTop: 8, fontWeight: 600, display: "flex", alignItems: "center", gap: "6px" }}>
+              {/* Ikon Spinner Berputar */}
+              <svg style={{ animation: "spin 1s linear infinite", width: "14px", height: "14px" }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                <circle style={{ opacity: 0.25 }} cx="12" cy="12" r="10" stroke="currentColor"></circle>
+                <path style={{ opacity: 0.85 }} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>Sedang mengupload foto...</span>
+            </p>
             )}
             {form.image && !uploading && (
               <div style={{ marginTop:10 }}>

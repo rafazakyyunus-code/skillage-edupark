@@ -1616,11 +1616,11 @@ function ManageUsersView({ users }) {
    ADD / EDIT ROLE VIEW  — fully automatic
 ───────────────────────────────────────────── */
 function AddRoleView({ users }) {
-  const [search, setSearch]           = useState("");
-  const [savingUid, setSavingUid]     = useState(null);
-  const [pendingRoles, setPendingRoles] = useState({});   // { uid: newRole }
+  const [search, setSearch]             = useState("");
+  const [savingUid, setSavingUid]       = useState(null);
+  const [pendingRoles, setPendingRoles] = useState({});   // { uid: selectedRole }
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [toast, showToast]            = useToast();
+  const [toast, showToast]              = useToast();
 
   /* Split users into two lists */
   const pendingUsers  = users.filter(u => u.role === "pending");
@@ -1631,6 +1631,26 @@ function AddRoleView({ users }) {
     [u.displayName, u.email, u.role].some(v => v?.toLowerCase().includes(search.toLowerCase()))
   );
 
+  /*
+   * FIX: Inisialisasi pendingRoles untuk setiap pending user dengan default "writer".
+   * Ini penting agar dropdown selalu punya nilai yang valid sejak render pertama,
+   * sehingga klik "Setujui" tanpa menyentuh dropdown tetap memakai "writer"
+   * dan bukan fallback ke u.role ("pending").
+   */
+  useEffect(() => {
+    setPendingRoles(prev => {
+      const updated = { ...prev };
+      users
+        .filter(u => u.role === "pending")
+        .forEach(u => {
+          if (updated[u.uid] === undefined) {
+            updated[u.uid] = "writer";
+          }
+        });
+      return updated;
+    });
+  }, [users]);
+
   /* Get the in-flight role value for a user (or fall back to saved role) */
   const getRoleFor = (u) => pendingRoles[u.uid] ?? u.role ?? "writer";
 
@@ -1639,7 +1659,7 @@ function AddRoleView({ users }) {
     setPendingRoles(p => ({ ...p, [uid]: newRole }));
   };
 
-  /* Save role to Firebase */
+  /* Save role to Firebase (untuk active users) */
   const handleSaveRole = async (u) => {
     const newRole = getRoleFor(u);
     setSavingUid(u.uid);
@@ -1654,20 +1674,24 @@ function AddRoleView({ users }) {
     }
   };
 
-  /* Approve pending user: set role to writer */
+  /*
+   * FIX: Approve pending user — baca role dari pendingRoles[u.uid] yang sudah
+   * diinisialisasi di useEffect. Tidak lagi bergantung pada parameter role
+   * yang bisa berisi "pending" saat dropdown belum disentuh.
+   */
   const handleApprove = async (u) => {
-  const role = pendingRoles[u.uid] ?? "writer";   // ← fix utama
-  setSavingUid(u.uid);
-  try {
-    await update(ref(db, `users/${u.uid}`), { role });
-    setPendingRoles(p => { const c = {...p}; delete c[u.uid]; return c; }); // cleanup
-    showToast(`✓ ${u.displayName || u.email} disetujui sebagai ${role}`);
-  } catch (err) {
-    showToast(`✗ Gagal: ${err.message}`);
-  } finally {
-    setSavingUid(null);
-  }
-};
+    const role = pendingRoles[u.uid] ?? "writer";
+    setSavingUid(u.uid);
+    try {
+      await update(ref(db, `users/${u.uid}`), { role });
+      setPendingRoles(p => { const c = {...p}; delete c[u.uid]; return c; });
+      showToast(`✓ ${u.displayName || u.email} disetujui sebagai ${role}`);
+    } catch (err) {
+      showToast(`✗ Gagal: ${err.message}`);
+    } finally {
+      setSavingUid(null);
+    }
+  };
 
   /* Delete user from DB */
   const handleDeleteUser = async () => {

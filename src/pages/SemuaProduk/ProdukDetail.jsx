@@ -14,8 +14,21 @@ export default function ProdukDetail() {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
         <div style={{ textAlign: "center", color: "#64748b" }}>
-          <div style={{ fontSize: 36, marginBottom: 12 }}>⏳</div>
-          <p>Memuat detail produk...</p>
+          {/* Ikon Spinner Berputar */}
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+            <svg 
+              style={{ animation: "spin 1s linear infinite", width: "36px", height: "36px" }} 
+              xmlns="http://www.w3.org/2000/svg" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor" 
+              strokeWidth="2.5"
+            >
+              <circle style={{ opacity: 0.25 }} cx="12" cy="12" r="10" stroke="currentColor"></circle>
+              <path style={{ opacity: 0.75 }} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </div>
+          <p style={{ fontSize: 15, margin: 0 }}>Memuat detail produk...</p>
         </div>
       </div>
     );
@@ -117,9 +130,25 @@ export default function ProdukDetail() {
           </ul>
 
           <div className="pd-actions">
-            <button className="pd-buy">
-              <span className="cart-icon">🛒</span> Beli Sekarang
-            </button>
+            <button className="pd-buy" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+            {/* Ikon Keranjang Belanja (Shopping Cart) */}
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="18" 
+              height="18" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+              <circle cx="8" cy="21" r="1" />
+              <circle cx="19" cy="21" r="1" />
+              <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+            </svg>
+            <span>Beli Sekarang</span>
+          </button>
             <button className="pd-back" onClick={() => navigate("/produk")}>
               ← Kembali ke Katalog
             </button>
