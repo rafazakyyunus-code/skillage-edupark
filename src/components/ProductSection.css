@@ -19,9 +19,8 @@
 }
 
 .ps-header h2 {
-  font-size: 30px;
-  color: #0d2c54;
-  font-weight: 700;
+  font-size: 36px;
+  font-weight: 800;
   margin-bottom: 8px;
 }
 
@@ -31,14 +30,6 @@
   color: #666;
   font-size: 15px;
   line-height: 1.65;
-}
-
-.ps-underline {
-  width: 56px;
-  height: 4px;
-  background: #1cc88a;
-  margin: 10px auto 14px;
-  border-radius: 10px;
 }
 
 /* ============================================

@@ -22,7 +22,6 @@ export default function ProductSection() {
           viewport={{ once: true }}
         >
           <h2>Produk Edupark</h2>
-          <div className="ps-underline" />
           <p>
             Temukan beragam program interaktif kami yang dirancang untuk
             menginspirasi kepemimpinan lingkungan.
