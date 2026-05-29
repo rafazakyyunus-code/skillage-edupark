@@ -61,7 +61,7 @@ export default function WhyChoose({ articles = [] }) {
           className="slider-track"
           animate={{ x: ["0%", "-50%"] }}
           transition={{
-            duration: 20,
+            duration: 25,
             repeat: Infinity,
             ease: "linear",
           }}
