@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import "./ProgramPage.css";
-import heroImage from "/src/assets/images/hydroponicc.jpeg";
+import programData from "./Programdata";   // ← sesuaikan path jika perlu
 import kambing from "/src/assets/images/hidroponik.jpg";
 import { MessageCircle, Leaf } from 'lucide-react';
+
+// Ambil heroImage dari sumber terpusat
+const { heroImage } = programData.find(p => p.key === "hydroponic");
 
 export default function Hydroponic() {
   const features = [
@@ -29,14 +32,9 @@ export default function Hydroponic() {
       {/* ===== HERO ===== */}
       <section
         className="program-hero hydroponic-hero"
-        style={{
-          backgroundImage: `url(${heroImage})`,
-        }}
+        style={{ backgroundImage: `url(${heroImage})` }}
       >
-        {/* Overlay gelap */}
         <div className="hero-overlay" />
-
-        {/* Konten hero — di-tengah oleh flexbox dari CSS */}
         <div className="hero-content">
           <span className="badge">
             <Leaf size={15} />

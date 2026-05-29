@@ -141,7 +141,7 @@ function AppInner() {
               <AnimatedPage>
                 <Hero />
                 <About />
-                <WhyChoose />
+                <WhyChoose articles={articles} />
                 <ProductSection />
                 <ProgramSection />
                 <GallerySection />

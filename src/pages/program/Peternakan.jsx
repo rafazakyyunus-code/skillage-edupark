@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import "./ProgramPage.css";
-import heroImage from "/src/assets/images/pertenakan domba.jpeg";
+import programData from "./Programdata";   // ← sesuaikan path jika perlu
 import kambing from "/src/assets/images/kambing.jpg";
 import { MessageCircle, Leaf } from 'lucide-react';
+
+// Ambil heroImage dari sumber terpusat
+const { heroImage } = programData.find(p => p.key === "peternakan");
 
 export default function Peternakan() {
   const hewan = [
@@ -18,14 +21,9 @@ export default function Peternakan() {
       {/* ===== HERO ===== */}
       <section
         className="program-hero peternakan-hero"
-        style={{
-          backgroundImage: `url(${heroImage})`,
-        }}
+        style={{ backgroundImage: `url(${heroImage})` }}
       >
-        {/* Overlay gelap */}
         <div className="hero-overlay" />
-
-        {/* Konten hero — di-tengah oleh flexbox dari CSS */}
         <div className="hero-content">
           <span className="badge">
             <Leaf size={15} />
