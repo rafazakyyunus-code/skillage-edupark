@@ -7,24 +7,18 @@ const itemsPerPage = 6
 const CATEGORIES = ["Semua", "Peternakan", "Perkebunan", "Workshop", "Pengunjung"]
 
 export default function Gallery() {
-  const [galleryData, setGalleryData]       = useState([])
-  const [loading, setLoading]               = useState(true)
-  const [currentPage, setCurrentPage]       = useState(1)
+  const [galleryData, setGalleryData]           = useState([])
+  const [loading, setLoading]                   = useState(true)
+  const [currentPage, setCurrentPage]           = useState(1)
   const [selectedCategory, setSelectedCategory] = useState("Semua")
 
-  // ── Realtime listener dari Firebase ──────────────────────────────────
   useEffect(() => {
     const db  = getDatabase()
     const galleryRef = ref(db, "gallery")
-
     const unsub = onValue(galleryRef, (snapshot) => {
       const data = snapshot.val()
       if (data) {
-        const arr = Object.entries(data).map(([key, val]) => ({
-          id: key,   // Firebase key dipakai sebagai id (untuk link ke detail)
-          ...val,
-        }))
-        // Urutkan terbaru di atas
+        const arr = Object.entries(data).map(([key, val]) => ({ id: key, ...val }))
         arr.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
         setGalleryData(arr)
       } else {
@@ -32,11 +26,9 @@ export default function Gallery() {
       }
       setLoading(false)
     })
-
     return () => unsub()
   }, [])
 
-  // ── Filter & Pagination ───────────────────────────────────────────────
   const filteredData =
     selectedCategory === "Semua"
       ? galleryData
@@ -54,15 +46,18 @@ export default function Gallery() {
   return (
     <div className="gallery-page">
 
-      {/* HERO */}
+      {/* HERO — sama strukturnya dengan Tentang Kami */}
       <div className="gallery-hero">
-        <h1>Gallery Edupark</h1>
-        <p>Dokumentasi kegiatan, fasilitas, dan aktivitas Edupark</p>
+        <div className="gallery-hero-content">
+          <span className="gallery-hero-tag">Gallery Edupark</span>
+          <h1>Galeri Kami</h1>
+          <p>Dokumentasi kegiatan, fasilitas, dan aktivitas Edupark</p>
+        </div>
       </div>
 
       <div className="gallery-content">
 
-        {/* SIDEBAR – sticky */}
+        {/* SIDEBAR */}
         <aside className="gallery-sidebar">
           <h3>Kategori</h3>
           {CATEGORIES.map(cat => {
@@ -85,7 +80,6 @@ export default function Gallery() {
         {/* GRID */}
         <div className="gallery-grid">
 
-          {/* Loading state */}
           {loading && (
             <div className="gallery-feedback">
               <div className="gallery-spinner" />
@@ -93,7 +87,6 @@ export default function Gallery() {
             </div>
           )}
 
-          {/* Empty state */}
           {!loading && currentItems.length === 0 && (
             <div className="gallery-feedback">
               <span className="gallery-feedback-icon">🖼️</span>
@@ -101,7 +94,6 @@ export default function Gallery() {
             </div>
           )}
 
-          {/* Cards */}
           {!loading && currentItems.map((item, index) => (
             <Link
               to={`/gallery/${item.id}`}
@@ -117,7 +109,6 @@ export default function Gallery() {
             </Link>
           ))}
 
-          {/* PAGINATION */}
           {!loading && totalPages > 1 && (
             <div className="pagination">
               <button

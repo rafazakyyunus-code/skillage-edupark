@@ -6,24 +6,48 @@
 
 /* ── HERO ─────────────────────────────────────────── */
 .gallery-hero {
-  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(rgba(0,40,25,0.6), rgba(0,40,25,0.6)),
     url("https://images.unsplash.com/photo-1501785888041-af3ef285b470");
   background-size: cover;
   background-position: center;
-  padding: 120px 20px;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.gallery-hero-content {
+  position: relative;
   text-align: center;
   color: white;
+  max-width: 800px;
+}
+
+.gallery-hero-tag {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #7dffb3;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: inline-block;
+  text-transform: uppercase;
 }
 
 .gallery-hero h1 {
-  font-size: 42px;
-  margin: 0 0 10px;
+  font-size: clamp(28px, 5vw, 56px);
+  font-weight: 700;
+  margin: 0 0 20px;
 }
 
 .gallery-hero p {
+  font-size: clamp(14px, 2vw, 18px);
+  line-height: 1.7;
+  color: #eaeaea;
   margin: 0;
-  opacity: 0.85;
-  font-size: 16px;
 }
 
 /* ── LAYOUT ───────────────────────────────────────── */
@@ -31,20 +55,17 @@
   display: flex;
   padding: 60px;
   gap: 40px;
-  align-items: flex-start; /* wajib agar sticky bekerja */
+  align-items: flex-start;
 }
 
 /* ── SIDEBAR – STICKY ─────────────────────────────── */
 .gallery-sidebar {
   width: 240px;
   flex-shrink: 0;
-
-  /* sticky: ikut scroll ke bawah, kembali sendiri ke atas */
   position: sticky;
-  top: 80px;                      /* sesuaikan tinggi navbar kamu */
+  top: 80px;
   max-height: calc(100vh - 100px);
   overflow-y: auto;
-
   background: white;
   padding: 22px;
   border-radius: 16px;
@@ -90,7 +111,6 @@
   box-shadow: 0 5px 15px rgba(22,195,91,0.3);
 }
 
-/* jumlah item per kategori */
 .sidebar-badge {
   font-size: 11px;
   font-weight: 700;
@@ -127,14 +147,8 @@
   text-align: center;
 }
 
-.gallery-feedback p {
-  margin: 0;
-  font-size: 15px;
-}
-
-.gallery-feedback-icon {
-  font-size: 52px;
-}
+.gallery-feedback p { margin: 0; font-size: 15px; }
+.gallery-feedback-icon { font-size: 52px; }
 
 .gallery-spinner {
   width: 36px;
@@ -172,7 +186,6 @@
   display: block;
 }
 
-/* dark gradient overlay */
 .gallery-card::after {
   content: "";
   position: absolute;
@@ -182,7 +195,6 @@
   transition: 0.4s;
 }
 
-/* text overlay */
 .card-overlay {
   position: absolute;
   bottom: 0;
@@ -197,13 +209,9 @@
 .card-overlay h4 { margin: 0 0 4px; font-size: 15px; }
 .card-overlay span { font-size: 12px; opacity: 0.8; }
 
-/* hover */
-.gallery-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-}
-.gallery-card:hover img        { transform: scale(1.1); }
-.gallery-card:hover::after     { opacity: 1; }
+.gallery-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 12px 30px rgba(0,0,0,0.15); }
+.gallery-card:hover img { transform: scale(1.1); }
+.gallery-card:hover::after { opacity: 1; }
 .gallery-card:hover .card-overlay { transform: translateY(0); opacity: 1; }
 
 /* ── PAGINATION ───────────────────────────────────── */
@@ -230,12 +238,7 @@
 
 .pagination button:hover:not(:disabled) { background: #ddd; }
 .pagination button:disabled { opacity: 0.35; cursor: default; }
-
-.pagination .active {
-  background: #16c35b;
-  color: white;
-  box-shadow: 0 4px 10px rgba(22,195,91,0.4);
-}
+.pagination .active { background: #16c35b; color: white; box-shadow: 0 4px 10px rgba(22,195,91,0.4); }
 
 /* ── ANIMATION ────────────────────────────────────── */
 @keyframes fadeUp {
@@ -250,7 +253,6 @@
     padding: 30px 20px;
   }
 
-  /* Di mobile sidebar TIDAK sticky, tampil horizontal */
   .gallery-sidebar {
     width: 100%;
     position: static;
@@ -262,7 +264,7 @@
     padding: 16px;
   }
 
-  .gallery-sidebar h3   { display: none; }
+  .gallery-sidebar h3 { display: none; }
 
   .gallery-sidebar button {
     width: auto;
