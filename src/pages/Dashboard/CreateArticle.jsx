@@ -90,15 +90,10 @@ function Sidebar({ activeNav, setActiveNav, currentUser, myArticles, displayName
   const revision = myArticles ? myArticles.filter(a => a.status === "revision").length : 0;
 
   return (
-    <aside style={{
-      width: 220, background: "linear-gradient(180deg, #1a3828 0%, #0f2318 100%)",
-      height: "100vh", position: "fixed", left: 0, top: 0,
-      display: "flex", flexDirection: "column", zIndex: 100,
-      boxShadow: "4px 0 24px rgba(0,0,0,0.18)",
-    }}>
+    <aside className="ca-sidebar">
 
       {/* Brand */}
-      <div style={{ padding: "20px 18px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 10 }}>
+      <div className="ca-sidebar__brand">
         <div style={{ background: "linear-gradient(135deg, #2d6a4f, #16c35b)", width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 2px 10px rgba(22,195,91,0.3)" }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
@@ -106,16 +101,16 @@ function Sidebar({ activeNav, setActiveNav, currentUser, myArticles, displayName
           </svg>
         </div>
         <div>
-          <div style={{ fontWeight: 800, color: "#fff", fontSize: 15, fontFamily: "Georgia, serif", lineHeight: 1.2, letterSpacing: "-0.01em" }}>Edupark</div>
-          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 1 }}>Writer Portal</div>
+          <div className="ca-brand-name">Edupark</div>
+          <div className="ca-brand-sub">Writer Portal</div>
         </div>
       </div>
 
       {/* Section label */}
-      <div style={{ padding: "14px 18px 6px", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.12em" }}>Menu</div>
+      <div className="ca-sidebar-section-label" style={{ padding: "14px 18px 6px", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.12em" }}>Menu</div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: "4px 10px", overflowY: "auto" }}>
+      <nav className="ca-nav">
         {NAV_ITEMS.map(({ id, label, Icon }) => {
           const active = activeNav === id;
           const isRevisionBadge = id === "my-articles" && revision > 0;
@@ -125,12 +120,10 @@ function Sidebar({ activeNav, setActiveNav, currentUser, myArticles, displayName
           return (
             <button key={id}
               onClick={() => setActiveNav(id)}
-              style={navBtnStyle(active)}
-              onMouseEnter={e => { if (!active) { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "rgba(255,255,255,0.75)"; }}}
-              onMouseLeave={e => { if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.5)"; }}}>
-              {active && <div style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", width: 3, height: 18, borderRadius: 2, background: "#16c35b" }} />}
-              <Icon size={16} color={active ? "#fff" : "rgba(255,255,255,0.5)"} />
-              <span style={{ flex: 1 }}>{label}</span>
+              className={`ca-nav-btn${active ? " ca-nav-btn--active" : ""}`}
+              style={{ position: "relative", fontWeight: active ? 600 : 400 }}>
+              <Icon size={16} />
+              <span className="ca-nav-label">{label}</span>
               {badge > 0 && (
                 <span style={{
                   fontSize: 10, fontWeight: 700,
@@ -145,27 +138,23 @@ function Sidebar({ activeNav, setActiveNav, currentUser, myArticles, displayName
       </nav>
 
       {/* Settings */}
-      <div style={{ padding: "6px 10px 4px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+      <div className="ca-nav-settings">
         <button
           onClick={() => setActiveNav("settings")}
-          style={navBtnStyle(activeNav === "settings")}
-          onMouseEnter={e => { if (activeNav !== "settings") { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "rgba(255,255,255,0.75)"; }}}
-          onMouseLeave={e => { if (activeNav !== "settings") { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.5)"; }}}>
-          {activeNav === "settings" && <div style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", width: 3, height: 18, borderRadius: 2, background: "#16c35b" }} />}
-          <Settings size={16} color={activeNav === "settings" ? "#fff" : "rgba(255,255,255,0.5)"} />
-          <span style={{ flex: 1 }}>Settings</span>
+          className={`ca-nav-btn${activeNav === "settings" ? " ca-nav-btn--active" : ""}`}
+          style={{ position: "relative", fontWeight: activeNav === "settings" ? 600 : 400 }}>
+          <Settings size={16} />
+          <span className="ca-nav-label">Settings</span>
         </button>
       </div>
 
       {/* User */}
-      <div style={{ padding: "12px 16px 14px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+      <div className="ca-sidebar__user">
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg, #2d6a4f, #16c35b)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0, boxShadow: "0 2px 8px rgba(22,195,91,0.3)" }}>
-            {initials}
-          </div>
+          <div className="ca-avatar">{initials}</div>
           <div style={{ overflow: "hidden" }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: "#fff", lineHeight: 1.3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{resolvedName || "Writer"}</div>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>Writer Portal</div>
+            <div className="ca-user-name">{resolvedName || "Writer"}</div>
+            <div className="ca-user-role">Writer Portal</div>
           </div>
         </div>
       </div>
@@ -233,7 +222,7 @@ function DashboardView({ myArticles, setActiveNav }) {
   return (
     <div>
       {/* ── Header ── */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24, gap: 16, flexWrap: "wrap" }}>
+      <div className="ca-dash-header" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24, gap: 16, flexWrap: "wrap" }}>
         <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: 12, color: "#16a34a", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: 4 }}>{greeting}, Penulis</div>
           <h1 style={{ fontSize: 26, fontWeight: 800, color: "#111827", margin: 0, letterSpacing: "-0.02em" }}>Dashboard Overview</h1>
@@ -273,7 +262,7 @@ function DashboardView({ myArticles, setActiveNav }) {
       )}
 
       {/* ── ROW 1: 4 stat cards ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 14, marginBottom: 18 }}>
+      <div className="ca-dash-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 14, marginBottom: 18 }}>
         {[
           { label: "Total Artikel",  val: myArticles.length,          bg: "#F0FDF4", border: "#BBF7D0", valColor: "#1b3a2a", sub: "total artikel ditulis",  icon: <FileText size={18} color="#1b3a2a" /> },
           { label: "Published",      val: published,                   bg: "#F0FDF4", border: "#BBF7D0", valColor: "#16a34a", sub: "artikel tayang",         icon: <CheckCircle size={18} color="#16a34a" /> },
@@ -290,7 +279,7 @@ function DashboardView({ myArticles, setActiveNav }) {
       </div>
 
       {/* ── ROW 2: 3 section shortcut cards ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 14, marginBottom: 18 }}>
+      <div className="ca-dash-shortcut-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 14, marginBottom: 18 }}>
         {[
           { id: "create",       label: "Create Article", val: revision > 0 ? revision : "Baru", sub: revision > 0 ? `${revision} artikel perlu direvisi` : "Tulis artikel baru sekarang", valColor: "#7C3AED", bg: "#FAF5FF", border: "#DDD6FE", icon: <PenSquare size={20} color="#7C3AED" />, cta: "Mulai Menulis →" },
           { id: "my-articles",  label: "My Articles",    val: myArticles.length,                  sub: `${published} published · ${pending} pending`,                                       valColor: "#0E7490", bg: "#ECFEFF", border: "#A5F3FC", icon: <FileText size={20} color="#0E7490" />, cta: "Lihat Semua →" },
@@ -310,7 +299,7 @@ function DashboardView({ myArticles, setActiveNav }) {
       </div>
 
       {/* ── ROW 3: Artikel terbaru + Tips Menulis ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(220px, 280px)", gap: 16, marginBottom: 16 }}>
+      <div className="ca-dash-row3" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(220px, 280px)", gap: 16, marginBottom: 16 }}>
 
         {/* My Articles preview */}
         <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 14, padding: 20 }}>
@@ -381,7 +370,7 @@ function DashboardView({ myArticles, setActiveNav }) {
           </div>
           <button onClick={() => setActiveNav("analytics")} style={{ fontSize: 12, color: "#1B3A2A", background: "#E8F4EE", border: "none", borderRadius: 7, padding: "6px 12px", cursor: "pointer", fontWeight: 600 }}>Lihat Analytics →</button>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+        <div className="ca-dash-row4-inner" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
           {/* Mini bar chart */}
           <div>
             <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 100, marginBottom: 6 }}>
@@ -1265,13 +1254,13 @@ export default function CreateArticle({ onExternalSubmit, currentUser: currentUs
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f5f7f5", fontFamily: "sans-serif" }}>
+    <div className="ca-root" style={{ fontFamily: "sans-serif" }}>
       <Sidebar activeNav={activeNav} setActiveNav={handleSetActiveNav} currentUser={currentUser} myArticles={myArticles} displayName={profileName} />
 
-      <div style={{ flex: 1, marginLeft: 220, display: "flex", flexDirection: "column", height: "100vh", minWidth: 0, overflowX: "hidden" }}>
+      <div className="ca-main" style={{ display: "flex", flexDirection: "column", height: "100vh", minWidth: 0, overflowX: "hidden" }}>
         <Topbar activeNav={activeNav} />
 
-        <div style={{ flex: 1, padding: "32px 40px", boxSizing: "border-box", width: "100%", overflowX: "hidden", overflowY: "auto" }}>
+        <div className="ca-body" style={{ flex: 1, boxSizing: "border-box", width: "100%", overflowX: "hidden", overflowY: "auto" }}>
           {activeNav === "dashboard" && (
             <DashboardView myArticles={myArticles} setActiveNav={handleSetActiveNav} />
           )}
