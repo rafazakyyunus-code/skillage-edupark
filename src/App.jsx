@@ -340,7 +340,7 @@ function AppInner() {
             path="/dashboard/create-article"
             element={
               <ProtectedRoute allowedRoles={["admin", "writer"]}>
-                <CreateArticle onExternalSubmit={addArticle} />
+                <CreateArticle onExternalSubmit={addArticle} currentUser={user} />
               </ProtectedRoute>
             }
           />
@@ -352,6 +352,7 @@ function AppInner() {
                 <Editor
                   externalArticles={articles}
                   onUpdateStatus={updateStatus}
+                  currentUser={user}
                 />
               </ProtectedRoute>
             }

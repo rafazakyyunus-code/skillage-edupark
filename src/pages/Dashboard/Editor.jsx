@@ -113,17 +113,22 @@ function EditorSettingsView({ onLogout, onNameChange }) {
   const db   = getDatabase();
   const currentUser = auth.currentUser;
 
-  const [name,    setName]    = useState(currentUser?.displayName || "");
+  const [name,    setName]    = useState("");
   const [email,   setEmail]   = useState(currentUser?.email || "");
   const [saving,  setSaving]  = useState(false);
   const [status,  setStatus]  = useState(null);
   const [errMsg,  setErrMsg]  = useState("");
 
+  // DB adalah sumber kebenaran — Firebase Auth displayName tidak reliable setelah re-login
   useEffect(() => {
-    if (currentUser) {
-      setName(currentUser.displayName || "");
-      setEmail(currentUser.email || "");
-    }
+    if (!currentUser?.uid) return;
+    const userRef = ref(db, `users/${currentUser.uid}`);
+    const unsub = onValue(userRef, (snap) => {
+      const data = snap.val();
+      setName(data?.displayName || currentUser?.displayName || "");
+      setEmail(data?.email || currentUser?.email || "");
+    });
+    return () => unsub();
   }, [currentUser?.uid]);
 
   const inputStyle = {
@@ -1298,11 +1303,28 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
   const [showConfirm, setShowConfirm]     = useState(null);
   const [statusFilter, setStatusFilter]   = useState("pending");
 
-  // profileName — reactive display name untuk sidebar, diupdate dari EditorSettingsView
-  const [profileName, setProfileName] = useState(currentUser?.displayName || "");
+  // profileName — selalu baca dari Realtime DB (sumber kebenaran)
+  // Firebase Auth displayName TIDAK reliable setelah re-login
+  const [profileName, setProfileName] = useState("");
   useEffect(() => {
-    if (currentUser?.displayName) setProfileName(currentUser.displayName);
-  }, [currentUser?.displayName]);
+    if (!currentUser?.uid) return;
+    const db2 = getDatabase();
+    const userRef = ref(db2, `users/${currentUser.uid}`);
+    const unsub = onValue(userRef, (snap) => {
+      const data = snap.val();
+      if (data?.displayName) {
+        setProfileName(data.displayName);
+        // Sinkronkan balik ke Firebase Auth jika perlu
+        if (currentUser.displayName !== data.displayName)
+          updateProfile(currentUser, { displayName: data.displayName }).catch(() => {});
+      } else if (currentUser?.displayName) {
+        setProfileName(currentUser.displayName);
+        // Tulis ke DB agar sesi berikutnya sudah ada
+        update(ref(db2, `users/${currentUser.uid}`), { displayName: currentUser.displayName }).catch(() => {});
+      }
+    });
+    return () => unsub();
+  }, [currentUser?.uid]);
 
   // ── realtime data for dashboard ──
   const [produkList, setProdukList]   = useState([]);
@@ -1421,10 +1443,10 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
         <div style={{ padding: "12px 16px 14px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg,#2d6a4f,#16c35b)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0, boxShadow:"0 2px 8px rgba(22,195,91,0.3)" }}>
-              {(profileName || currentUser?.displayName || "").split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() || "ED"}
+              {profileName ? profileName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() : "ED"}
             </div>
             <div style={{ overflow:"hidden" }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#fff", lineHeight: 1.3, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{profileName || currentUser?.displayName || "Editor"}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "#fff", lineHeight: 1.3, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{profileName || "Editor"}</div>
               <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>Editor Portal</div>
             </div>
           </div>
