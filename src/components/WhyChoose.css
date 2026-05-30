@@ -26,6 +26,7 @@
   display: flex;
   gap: 30px;
   width: max-content;
+  padding: 50px;
 }
 
 /* Pause on hover */

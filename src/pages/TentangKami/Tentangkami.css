@@ -1,100 +1,192 @@
+/* ===================================================
+   ABOUT PAGE — SKILLAGE EDUPARK
+   Elegant • Clean • Premium • Modern
+=================================================== */
+
+/* ===================================================
+   HERO
+=================================================== */
+
 .tk-hero {
   position: relative;
   min-height: 100vh;
   width: 100%;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
-
-  /* ANTI NAVBAR NUTUP */
   padding-top: 80px;
+  overflow: hidden;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.tk-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(34, 197, 94, 0.15),
+      transparent 35%
+    );
 }
 
 .tk-hero-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 40, 25, 0.6);
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.55),
+      rgba(0, 30, 18, 0.78)
+    );
+
+  backdrop-filter: blur(2px);
 }
 
 .tk-hero-content {
   position: relative;
+  z-index: 2;
+
+  max-width: 850px;
+  padding: 0 24px;
+
   text-align: center;
   color: white;
-  max-width: 800px;
-  padding: 0 24px;
-  transform: scale(1);
+
+  animation: heroFade 1s ease;
+}
+
+@keyframes heroFade {
+  from {
+    opacity: 0;
+    transform: translateY(35px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .tk-hero-tag {
-  font-size: 12px;
-  letter-spacing: 2px;
-  color: #7dffb3;
-  font-weight: 600;
-  margin-bottom: 16px;
   display: inline-block;
+
+  margin-bottom: 20px;
+  padding: 10px 18px;
+
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.15);
+
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+
+  color: #7dffb3;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
 }
 
 .tk-hero-content h1 {
-  /*font-family: "Playfair Display", serifc:\codingan\skillage-edupark\skillage-edupark;*/
-  font-size: clamp(28px, 5vw, 56px);
-  font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 800;
+  line-height: 1.1;
+
+  text-shadow: 0 10px 30px rgba(0,0,0,0.35);
 }
 
 .tk-hero-content p {
-  font-family: "Inter", sans-serif;
-  font-size: clamp(14px, 2vw, 18px);
-  line-height: 1.7;
-  color: #eaeaea;
+  max-width: 700px;
+  margin: auto;
+
+  color: #f1f5f9;
+  font-size: clamp(16px, 2vw, 20px);
+  line-height: 1.9;
 }
 
-/* SECTION TAG */
-.section-tag {
-  color: #22c55e;
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+/* ===================================================
+   GLOBAL TAG
+=================================================== */
+
+.section-tag,
+.tk-section-tag {
   display: block;
-  margin-bottom: 8px;
-  font-family: 'Poppins', sans-serif;
+
+  margin-bottom: 12px;
+
+  color: #22c55e;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 .section-tag.center {
   text-align: center;
 }
 
-/* JOURNEY */
+/* ===================================================
+   JOURNEY
+=================================================== */
+
 .tk-journey {
-  padding: 80px 24px;
-  background: #fff;
+  padding: 110px 24px;
+
+  background:
+    linear-gradient(
+      to bottom,
+      #ffffff,
+      #f8faf9
+    );
 }
 
 .tk-journey-container {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: auto;
+
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 64px;
+  gap: 80px;
+
   align-items: center;
 }
 
+/* IMAGE */
+
 .tk-journey img {
-  width: 95%;
-  height: auto;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  width: 100%;
+  border-radius: 30px;
+
+  transition:
+    transform 0.6s ease,
+    box-shadow 0.6s ease,
+    filter 0.6s ease;
+
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.10),
+    0 8px 20px rgba(34,197,94,0.06);
 }
 
 .tk-journey img:hover {
-  transform: scale(1.02) translateY(-4px);
-  box-shadow: 0 25px 50px rgba(34, 197, 94, 0.18);
+  transform: scale(1.02);
+
+  filter: brightness(1.02);
+
+  box-shadow:
+    0 30px 60px rgba(0,0,0,0.14),
+    0 12px 24px rgba(34,197,94,0.10);
 }
+
+/* TEXT */
 
 .tk-journey-text {
   animation: fadeUp 1s ease forwards;
@@ -103,8 +195,9 @@
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(50px);
+    transform: translateY(45px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -112,226 +205,469 @@
 }
 
 .tk-journey-text h2 {
-  font-family: 'Poppins', sans-serif;
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
+
   color: #0f172a;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.2;
 }
 
 .tk-journey-text h4 {
-  font-family: 'Poppins regular', sans-serif;
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  margin-top: 18px;
-  color: #4b5563;
   position: relative;
-  padding-left: 14px;
+
+  margin-top: 30px;
+  margin-bottom: 12px;
+  padding-left: 18px;
+
+  color: #1e293b;
+  font-size: 22px;
+  font-weight: 700;
 }
 
 .tk-journey-text h4::before {
   content: "";
+
   position: absolute;
   left: 0;
   top: 6px;
-  width: 4px;
-  height: 16px;
-  background: #22c55e;
-  border-radius: 2px;
+
+  width: 5px;
+  height: 20px;
+
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      to bottom,
+      #22c55e,
+      #15803d
+    );
 }
 
 .tk-journey-text p {
-  font-family: 'Poppins regular', sans-serif;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
+
+  color: #475569;
+  font-size: 17px;
+  line-height: 2;
   text-align: justify;
-  line-height: 1.8;
-  font-size: clamp(18px, 1.5vw, 18px);
-  color: #4b5563;
 }
 
-.tk-journey-text h4 {
-  position: relative;
-  padding-left: 14px;
-}
+/* ===================================================
+   REASON
+=================================================== */
 
-/* REASON */
 .tk-reason {
-  padding: 80px 24px;
+  padding: 110px 24px;
+
   text-align: center;
-  background: #f8faf9;
+
+  background: #f8fafc;
 }
 
 .tk-reason h2 {
-/*  font-family: "Playfair Display", serif; */
-  font-size: clamp(2rem, 4vw, 3rem);
-  margin-bottom: 48px;
+  margin-bottom: 60px;
+
+  color: #0f172a;
+  font-size: clamp(2.3rem, 5vw, 4rem);
+  font-weight: 800;
 }
 
 .tk-reason-grid {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: auto;
+
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
 }
 
 .reason-card {
-  background: #fff;
-  padding: 32px 20px;
-  border-radius: 16px;
-  font-size: 15px;
+  position: relative;
+  overflow: hidden;
+
+  padding: 40px 28px;
+
+  border-radius: 28px;
+  border: 1px solid rgba(255,255,255,0.55);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.92),
+      rgba(255,255,255,0.78)
+    );
+
+  backdrop-filter: blur(20px);
+
   text-align: center;
-  transition: all 0.3s ease;
+
+  transition:
+    transform 0.45s ease,
+    box-shadow 0.45s ease,
+    border-color 0.45s ease;
+
+  box-shadow:
+    0 10px 30px rgba(15,23,42,0.06);
+}
+
+.reason-card::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(34,197,94,0.08),
+      transparent
+    );
+
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.reason-card:hover::after {
+  opacity: 1;
 }
 
 .reason-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(34, 197, 94, 0.12);
-  transition: all 0.3s ease;
+  transform: translateY(-8px);
+
+  border-color: rgba(34,197,94,0.15);
+
+  box-shadow:
+    0 25px 50px rgba(15,23,42,0.10),
+    0 12px 24px rgba(34,197,94,0.10);
 }
 
+/* ICON */
+
 .icon {
-  margin-bottom: 15px;
+  width: 85px;
+  height: 85px;
+
+  margin: auto;
+  margin-bottom: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(34,197,94,0.12),
+      rgba(34,197,94,0.04)
+    );
+
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+.reason-card:hover .icon {
+  transform: scale(1.08);
+
+  box-shadow:
+    0 10px 20px rgba(34,197,94,0.15);
 }
 
 .reason-card h4 {
-  font-family: 'Poppins', sans-serif;
-  font-size: 24px;
-  font-weight: 600;
-  margin: 16px 0 10px;
+  margin-bottom: 14px;
+
   color: #0f172a;
+  font-size: 24px;
+  font-weight: 700;
 }
 
 .reason-card p {
-  font-family: 'Poppins', sans-serif;
-  font-size: clamp(18px, 1.5vw, 18px);
-  line-height: 1.7;
   color: #64748b;
-  margin: 0;
+  font-size: 16px;
+  line-height: 1.9;
 }
 
-/* TESTIMONIAL */
+/* ===================================================
+   TESTIMONIAL
+=================================================== */
+
 .tk-testimonial {
-  background: linear-gradient(135deg, #0f3d24, #14532d, #166534);
-  padding: 80px 20px;
+  position: relative;
+  overflow: hidden;
+
+  padding: 110px 24px;
+
   text-align: center;
   color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #052e16,
+      #14532d,
+      #166534
+    );
+}
+
+.tk-testimonial::before {
+  content: "";
+
+  position: absolute;
+  top: -200px;
+  right: -150px;
+
+  width: 500px;
+  height: 500px;
+
+  border-radius: 50%;
+
+  background: rgba(34,197,94,0.08);
+
+  filter: blur(20px);
 }
 
 .tk-testimonial-header {
-  margin-bottom: 40px;
-  font-size: clamp(2rem, 4vw, 3rem);
-}
+  position: relative;
+  z-index: 2;
 
-.tk-section-tag {
-  color: #3ddc84;
-  font-size: 15px;
-  letter-spacing: 2px;
-  font-weight: 600;
+  margin-bottom: 60px;
 }
 
 .tk-testimonial-header h2 {
-  margin-top: 10px;
-  font-size: clamp(2rem, 4vw, 3rem);
+  margin-top: 16px;
+
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
 }
 
 .tk-testimonial-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 25px;
-  max-width: 1100px;
+  position: relative;
+  z-index: 2;
+
+  max-width: 1200px;
   margin: auto;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
 }
 
 .tk-testimonial-card {
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(12px);
-  padding: 28px;
-  border-radius: 18px;
+  position: relative;
+  overflow: hidden;
+
+  padding: 35px;
+
+  border-radius: 28px;
+  border: 1px solid rgba(255,255,255,0.08);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.10),
+      rgba(255,255,255,0.05)
+    );
+
+  backdrop-filter: blur(16px);
+
   text-align: left;
-  transition: all 0.3s ease;
+
+  transition:
+    transform 0.45s ease,
+    box-shadow 0.45s ease;
+}
+
+.tk-testimonial-card::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,0.10),
+      transparent
+    );
+
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.tk-testimonial-card:hover::before {
+  opacity: 1;
 }
 
 .tk-testimonial-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(34, 197, 94, 0.12);
+  transform: translateY(-8px);
+
+  box-shadow:
+    0 25px 50px rgba(0,0,0,0.25),
+    0 10px 20px rgba(34,197,94,0.10);
 }
 
 .tk-testimonial-card h4 {
-  margin-bottom: 17px;
-  font-size: 20px;
+  margin-bottom: 18px;
+
+  font-size: 22px;
+  font-weight: 700;
 }
 
 .tk-testimonial-card p {
-  font-size: clamp(18px, 1.5vw, 18px);
-  line-height: 1.6;
-  color: #dcdcdc;
+  color: #dbe4dd;
+  font-size: 16px;
+  line-height: 1.9;
 }
 
 .stars {
-  color: #3ddc84;
-  margin-top: 10px;
   display: block;
+
+  margin-top: 18px;
+
+  color: #7dffb3;
+  font-size: 18px;
+  letter-spacing: 3px;
 }
 
-/* RESPONSIVE */
-@media (max-width:900px){
-  .tk-testimonial-grid{
-    grid-template-columns:1fr;
-  }
-}
+/* ===================================================
+   CTA
+=================================================== */
 
-/* CTA */
 .tk-cta {
-  background: #f8faf9;
-  color: black;
+  padding: 120px 24px;
+
   text-align: center;
-  padding: 80px 24px;
+
+  background:
+    linear-gradient(
+      to bottom,
+      #ffffff,
+      #f8faf9
+    );
 }
 
 .tk-cta h2 {
-/*  font-family: "Playfair Display", serif; */
-  font-size: clamp(2rem, 4vw, 3rem);
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+
+  color: #0f172a;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
 }
 
 .tk-cta p {
-  font-size: clamp(18px, 1.5vw, 18px);
+  max-width: 700px;
+  margin: auto;
+
+  color: #64748b;
+  font-size: 18px;
+  line-height: 1.9;
 }
 
 .tk-cta button {
-  margin-top: 24px;
-  padding: 17px 30px;
+  position: relative;
+  overflow: hidden;
+
+  margin-top: 38px;
+  padding: 18px 38px;
+
   border: none;
   border-radius: 999px;
-  background: #22c55e;
+
+  background:
+    linear-gradient(
+      135deg,
+      #22c55e,
+      #15803d
+    );
+
   color: white;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 700;
+
   cursor: pointer;
-  font-size: 18px;
-  transition: all 0.3s ease;
+
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
+
+  box-shadow:
+    0 12px 24px rgba(34,197,94,0.20);
+}
+
+.tk-cta button::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent,
+      rgba(255,255,255,0.35),
+      transparent
+    );
+
+  transform: translateX(-100%);
+}
+
+.tk-cta button:hover::before {
+  transform: translateX(200%);
+  transition: 0.8s ease;
 }
 
 .tk-cta button:hover {
-  box-shadow: 0 15px 30px rgba(34, 197, 94, 0.12);
-  transform: translateY(-5px);
-  transition: 0.3s ease;
+  transform: translateY(-4px);
+
+  box-shadow:
+    0 20px 40px rgba(34,197,94,0.28);
 }
 
-/* RESPONSIVE */
+/* ===================================================
+   RESPONSIVE
+=================================================== */
+
 @media (max-width: 900px) {
   .tk-journey-container {
     grid-template-columns: 1fr;
+    gap: 50px;
   }
 
   .tk-reason-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .tk-testimonial-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tk-hero-content h1 {
+    line-height: 1.2;
+  }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
   .tk-reason-grid {
     grid-template-columns: 1fr;
+  }
+
+  .tk-hero {
+    min-height: 90vh;
+  }
+
+  .tk-journey,
+  .tk-reason,
+  .tk-testimonial,
+  .tk-cta {
+    padding: 80px 20px;
+  }
+
+  .reason-card,
+  .tk-testimonial-card {
+    border-radius: 22px;
   }
 }
