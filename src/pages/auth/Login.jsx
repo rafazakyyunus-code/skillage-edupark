@@ -79,14 +79,25 @@ function Login() {
     setErrorMsg(''); setSuccessMsg(''); setShowPass(false); setShowConf(false);
   };
 
+  const [backState, setBackState] = useState('idle'); // 'idle' | 'moving' | 'arriving'
+
   const switchMode = (next) => {
     if (animating || next === mode) return;
     setAnimating(true);
     resetForm();
+
+    // Phase 1: shrink + fade out
+    setBackState('moving');
+
+    // Phase 2: after slide completes, expand back in
     setTimeout(() => {
       setMode(next);
       setAnimating(false);
+      setBackState('arriving');
     }, 480);
+
+    // Phase 3: back to idle
+    setTimeout(() => setBackState('idle'), 750);
   };
 
   const redirectByRole = (role) => {
@@ -487,6 +498,52 @@ function Login() {
         }
         .lp-google:disabled { opacity: 0.55; cursor: not-allowed; }
 
+        /* back button (follows panel) */
+        .lp-back-btn {
+          display: flex; align-items: center; gap: 6px;
+          padding: 8px 16px;
+          background: rgba(255,255,255,0.18);
+          border: 1.5px solid rgba(255,255,255,0.45);
+          border-radius: 50px;
+          color: #fff;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-weight: 700; font-size: 12px;
+          letter-spacing: 1px;
+          cursor: pointer;
+          backdrop-filter: blur(4px);
+          white-space: nowrap;
+          transition:
+            left   0.7s cubic-bezier(0.4,0,0.2,1),
+            right  0.7s cubic-bezier(0.4,0,0.2,1),
+            opacity 0.35s ease,
+            transform 0.35s cubic-bezier(0.4,0,0.2,1),
+            background 0.25s,
+            border-color 0.25s,
+            box-shadow 0.25s;
+          will-change: left, right, transform, opacity;
+        }
+        .lp-back-btn:hover {
+          background: rgba(255,255,255,0.30);
+          border-color: rgba(255,255,255,0.75);
+          box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        .lp-back-btn:active { transform: scale(0.95) !important; opacity: 0.85 !important; }
+        .lp-back-btn.is-moving {
+          opacity: 0.5;
+          transform: scale(0.88);
+        }
+        .lp-back-btn.is-arriving {
+          opacity: 1;
+          transform: scale(1);
+        }
+        .lp-back-btn .lp-back-arrow {
+          display: flex; align-items: center;
+          transition: transform 0.6s cubic-bezier(0.4,0,0.2,1);
+        }
+        .lp-back-btn.flipped .lp-back-arrow {
+          transform: rotate(180deg);
+        }
+
         /* spinners */
         .sp { width:14px; height:14px; border-radius:50%; animation: spin .7s linear infinite; flex-shrink:0; }
         .sp-w { border: 2px solid rgba(255,255,255,0.3); border-top-color: white; }
@@ -507,35 +564,23 @@ function Login() {
       <div className="lp">
         <div className="lp-card">
 
-          {/* ── BACK BUTTON ── */}
+          {/* ── BACK BUTTON (follows the green panel) ── */}
           <button
             onClick={() => navigate("/")}
+            className={`lp-back-btn${backState === 'moving' ? ' is-moving' : backState === 'arriving' ? ' is-arriving' : ''}${!isLogin ? ' flipped' : ''}`}
             style={{
               position: "absolute",
               top: "16px",
-              left: "16px",
+              ...(isLogin ? { left: "16px", right: "auto" } : { right: "16px", left: "auto" }),
               zIndex: 30,
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              padding: "7px 14px",
-              background: "rgba(255,255,255,0.92)",
-              border: "1px solid #e2e8f0",
-              borderRadius: "999px",
-              fontSize: "13px",
-              fontWeight: "600",
-              color: "#2FA084",
-              cursor: "pointer",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-              backdropFilter: "blur(4px)",
-              fontFamily: "inherit",
+              transition: "left 0.7s cubic-bezier(0.77,0,0.175,1), right 0.7s cubic-bezier(0.77,0,0.175,1)",
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#2FA084"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#2FA084"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.92)"; e.currentTarget.style.color = "#2FA084"; e.currentTarget.style.borderColor = "#e2e8f0"; }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5M12 5l-7 7 7 7"/>
-            </svg>
+            <span className="lp-back-arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 5l-7 7 7 7"/>
+              </svg>
+            </span>
             Kembali ke Website
           </button>
 
