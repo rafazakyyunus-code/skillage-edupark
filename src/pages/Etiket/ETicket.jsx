@@ -39,12 +39,13 @@ export default function ETicket() {
 
           <div className="et-hero-buttons">
             <button
-              className="et-buy-btn"
-              onClick={() => navigate("/buy-tickets")}
-            >
-              <FaTicketAlt />
-              Buy Tickets Online
-            </button>
+  className="et-buy-btn"
+  onClick={() => navigate("/tickets-online")}
+>
+  <FaTicketAlt />
+  Buy Tickets Online
+</button>
+
 
             <button
               className="et-view-btn"

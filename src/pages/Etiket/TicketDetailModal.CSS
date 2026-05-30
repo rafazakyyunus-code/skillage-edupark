@@ -1,0 +1,382 @@
+/* =========================
+   OVERLAY
+========================= */
+
+.td-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+  z-index: 9999;
+
+  animation: fadeIn 0.3s ease;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.td-modal{
+  width: 900px;
+  max-width: 95%;
+  height: 85vh; /* BUKAN max-height */
+
+  background: red; /* test dulu */
+
+  border-radius: 28px;
+
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 24px;
+
+  overflow: hidden;
+}
+.td-scroll-content{
+  flex:1;
+
+  background:white;
+  border-radius:24px;
+
+  margin-top:60px;
+  margin-bottom:30px;
+  border:8px solid blue;
+
+  overflow-y:auto;
+}
+
+/* Scrollbar */
+
+.td-scroll-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.td-scroll-content::-webkit-scrollbar-thumb {
+  background: #cfd8cf;
+  border-radius: 999px;
+}
+
+.td-scroll-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.td-modal::-webkit-scrollbar-thumb {
+  background: #cfd8cf;
+  border-radius: 999px;
+}
+
+/* =========================
+   CLOSE BUTTON
+========================= */
+
+.td-close {
+  position: absolute;
+  top: 28px;
+  right: 28px;
+
+  width: 42px;
+  height: 42px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(255,255,255,.95);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  z-index: 100;
+  transition: all .3s ease;
+}
+
+.td-close:hover {
+  transform: rotate(90deg);
+  background: #f1f1f1;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.td-header {
+  position: relative;
+  padding: 20px 20px 10px;
+}
+
+.td-header img {
+  width: 100%;
+  height: 340px;
+
+  object-fit: cover;
+  border-radius: 24px;
+}
+
+.td-badge {
+  position: absolute;
+  top: 35px;
+  left: 35px;
+
+  background: #dff3df;
+  color: #2f6f3e;
+
+  padding: 8px 16px;
+  border-radius: 999px;
+
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* =========================
+   PRICE SECTION
+========================= */
+
+.td-prices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 16px;
+  padding: 10px 20px 0;
+}
+
+.td-price-card {
+  background: #f5f7f4;
+  border-radius: 18px;
+
+  padding: 18px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  transition: all 0.3s ease;
+}
+
+.td-price-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.td-price-card svg {
+  color: #4caf50;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.td-price-card small {
+  display: block;
+  color: #777;
+  margin-bottom: 4px;
+}
+
+.td-price-card strong {
+  font-size: 1.35rem;
+  color: #111;
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.td-content {
+  padding: 28px 24px;
+}
+
+.td-content h2 {
+  color: #21472c;
+  margin-bottom: 14px;
+}
+
+.td-content p {
+  color: #666;
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+
+/* =========================
+   FEATURES
+========================= */
+
+.td-features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 14px;
+}
+
+.td-features div {
+  background: #fafafa;
+  border-radius: 14px;
+
+  padding: 16px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  transition: all 0.3s ease;
+}
+
+.td-features div:hover {
+  background: #f1f8f0;
+  transform: translateX(5px);
+}
+
+.td-features svg {
+  color: #4caf50;
+  flex-shrink: 0;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.td-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+
+  padding: 24px;
+
+  border-top: 1px solid #edf1ed;
+  margin-top: 20px;
+}
+
+.td-cancel,
+.td-book {
+  min-width: 140px;
+  padding: 13px 24px;
+
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+}
+
+.td-cancel {
+  border: 2px solid #2f6f3e;
+  background: #fff;
+  color: #2f6f3e;
+}
+
+.td-cancel:hover {
+  background: #f4faf4;
+}
+
+.td-book {
+  border: none;
+  color: white;
+
+  background: linear-gradient(
+    135deg,
+    #2f6f3e,
+    #4caf50
+  );
+}
+
+.td-book:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(76, 175, 80, 0.35);
+}
+
+/* =========================
+   RESPONSIVE TABLET
+========================= */
+
+@media (max-width: 768px) {
+
+  .td-modal {
+    max-height: 92vh;
+    padding: 12px;
+  }
+
+  .td-scroll-content {
+    max-height: calc(92vh - 24px);
+  }
+
+  .td-header img {
+    height: 240px;
+  }
+
+  .td-prices,
+  .td-features {
+    grid-template-columns: 1fr;
+  }
+
+  .td-footer {
+    flex-direction: column;
+  }
+
+  .td-cancel,
+  .td-book {
+    width: 100%;
+  }
+}
+
+/* =========================
+   RESPONSIVE MOBILE
+========================= */
+
+@media (max-width: 480px) {
+
+  .td-header {
+    padding: 12px;
+  }
+
+  .td-header img {
+    height: 200px;
+    border-radius: 16px;
+  }
+
+  .td-content {
+    padding: 20px;
+  }
+
+  .td-badge {
+    top: 24px;
+    left: 24px;
+    font-size: 12px;
+  }
+
+  .td-close {
+    top: 20px;
+    right: 20px;
+  }
+}
+
+/* =========================
+   ANIMATION
+========================= */
+
+@keyframes popup {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

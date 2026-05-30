@@ -32,6 +32,8 @@ import AttractionDetail from "./pages/Etiket/AttractionDetail";
 /* ───────── E-TIKET ───────── */
 import ETicket from "./pages/Etiket/ETicket";
 import Attractions from "./pages/Etiket/Attractions";
+import TicketsOnline from "./pages/Etiket/TicketsOnline";
+
 
 
 /* ───────── DASHBOARD ───────── */
@@ -195,6 +197,16 @@ function AppInner() {
               </AnimatedPage>
             }
           />
+
+          <Route
+  path="/tickets-online"
+  element={
+    <AnimatedPage>
+      <TicketsOnline />
+    </AnimatedPage>
+  }
+/>
+
 
           <Route
             path="/attractions"
