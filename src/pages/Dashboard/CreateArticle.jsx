@@ -1010,16 +1010,25 @@ function AnalyticsView({ myArticles }) {
 function SettingsView({ currentUser, onNameChange }) {
   const auth = getAuth();
 
-  const [name,   setName]   = useState(currentUser?.displayName || "");
+  const [name,   setName]   = useState("");
   const [email,  setEmail]  = useState(currentUser?.email || "");
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState(null);
   const [errMsg, setErrMsg] = useState("");
 
-  // Sync jika currentUser prop berubah
+  // Baca nama dari Realtime DB — sumber kebenaran utama
+  // Firebase Auth displayName tidak reliable setelah re-login
   useEffect(() => {
-    setName(currentUser?.displayName || "");
-    setEmail(currentUser?.email || "");
+    if (!currentUser?.uid) return;
+    const userRef = ref(db, `users/${currentUser.uid}`);
+    const unsub = onValue(userRef, (snap) => {
+      const data = snap.val();
+      if (data?.displayName) setName(data.displayName);
+      else if (currentUser?.displayName) setName(currentUser.displayName);
+      if (data?.email) setEmail(data.email);
+      else if (currentUser?.email) setEmail(currentUser.email);
+    });
+    return () => unsub();
   }, [currentUser?.uid]);
 
   const handleSave = async () => {
@@ -1175,11 +1184,21 @@ export default function CreateArticle({ onExternalSubmit, currentUser: currentUs
   // currentUser yang dipakai di seluruh komponen
   const currentUser = authUser;
 
-  // profileName — reactive, diupdate langsung dari SettingsView agar sidebar langsung berubah
+  // profileName — baca dari Realtime DB (sumber kebenaran), bukan dari Auth displayName
   const [profileName, setProfileName] = useState("");
   useEffect(() => {
-    if (currentUser?.displayName) setProfileName(currentUser.displayName);
-  }, [currentUser?.displayName]);
+    if (!currentUser?.uid) return;
+    const userRef = ref(db, `users/${currentUser.uid}`);
+    const unsub = onValue(userRef, (snap) => {
+      const data = snap.val();
+      if (data?.displayName) {
+        setProfileName(data.displayName);
+      } else if (currentUser?.displayName) {
+        setProfileName(currentUser.displayName);
+      }
+    });
+    return () => unsub();
+  }, [currentUser?.uid]);
 
   // Auto-create / sync user entry di /users agar muncul di Writer Directory
   useEffect(() => {
@@ -1189,7 +1208,7 @@ export default function CreateArticle({ onExternalSubmit, currentUser: currentUs
       const existing = snap.val();
       const updates = {};
       if (!existing) {
-        // Buat entry baru
+        // Buat entry baru — gunakan Auth displayName hanya jika DB belum ada
         set(userRef, {
           displayName: currentUser.displayName || "Writer",
           email: currentUser.email || "",
@@ -1198,21 +1217,16 @@ export default function CreateArticle({ onExternalSubmit, currentUser: currentUs
         });
         return;
       }
-      // Sync displayName
-      if (currentUser.displayName && existing.displayName !== currentUser.displayName) {
-        updates.displayName = currentUser.displayName;
-        // Simpan nama lama sebagai alias agar artikel lama tetap terdeteksi
-        const aliases = existing.authorAliases || [];
-        if (existing.displayName && !aliases.includes(existing.displayName))
-          updates.authorAliases = [...aliases, existing.displayName];
-      }
-      // Sync email
+      // ⚠️ JANGAN overwrite displayName di DB dengan nilai dari Firebase Auth.
+      // DB adalah sumber kebenaran — user bisa ganti nama lewat Settings,
+      // dan Firebase Auth displayName tidak reliable setelah re-login.
+      // Hanya sync email jika berubah.
       if (currentUser.email && existing.email !== currentUser.email)
         updates.email = currentUser.email;
       if (Object.keys(updates).length > 0)
         update(userRef, updates);
     }, { onlyOnce: true });
-  }, [currentUser]);
+  }, [currentUser?.uid]);
 
   // Sync data artikel dari Firebase Realtime — filter hanya milik user ini
   useEffect(() => {
