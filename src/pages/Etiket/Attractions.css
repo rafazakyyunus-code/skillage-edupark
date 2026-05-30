@@ -64,8 +64,8 @@
 
   border-radius: 999px;
 
-  background: #39ff14;
-  color: black;
+  background:#22c55e;
+  color:white;
 
   font-size: 12px;
   font-weight: 700;
@@ -128,9 +128,9 @@
 }
 
 .at-primary {
-  background: #39ff14;
-  color: black;
-}
+  background:#22c55e;
+  color:white;
+} 
 
 .at-secondary {
   background: rgba(255,255,255,0.15);
@@ -269,7 +269,8 @@
 }
 
 .at-filters button.active{
-  background:#39ff14;
+  background:#22c55e;
+  color:white;
 }
 
 /* GRID */
@@ -277,9 +278,27 @@
   display:grid;
 
   grid-template-columns:
-  repeat(auto-fit,minmax(300px,1fr));
+  repeat(4,1fr);
 
   gap:26px;
+}
+
+@media(max-width:1200px){
+  .at-grid{
+    grid-template-columns:repeat(3,1fr);
+  }
+}
+
+@media(max-width:900px){
+  .at-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:768px){
+  .at-grid{
+    grid-template-columns:1fr;
+  }
 }
 
 /* CARD */
@@ -317,7 +336,8 @@
   padding:7px 14px;
   border-radius:999px;
 
-  background:#39ff14;
+  background:#22c55e;
+  color:white;
 
   font-size:10px;
   font-weight:700;
@@ -368,62 +388,48 @@
 .at-pagination{
   display:flex;
   justify-content:center;
-  gap:12px;
+  align-items:center;
+  gap:8px;
 
-  margin-top:50px;
+  margin-top:60px;
 }
 
 .at-pagination button{
-  width:44px;
-  height:44px;
+  width:48px;
+  height:48px;
 
-  border-radius:50%;
   border:none;
+  border-radius:12px;
 
-  background:white;
+  background:#ffffff;
 
-  font-weight:700;
+  color:#1f2937;
+
+  font-size:16px;
+  font-weight:600;
+
   cursor:pointer;
+
+  box-shadow:
+    0 4px 15px rgba(0,0,0,0.08);
+
+  transition:all .3s ease;
+}
+
+.at-pagination button:hover{
+  transform:translateY(-2px);
 }
 
 .at-pagination .active-page{
-  background:#39ff14;
+  background:#22c55e;
+
+  color:white;
+
+  box-shadow:
+    0 8px 20px rgba(34,197,94,.35);
 }
 
-/* MOBILE */
-@media(max-width:768px){
-
-  .attractions-page{
-    padding:20px;
-  }
-
-  .at-hero{
-    height:500px;
-  }
-
-  .at-hero-content h1{
-    font-size:42px;
-  }
-
-  .at-hero-content p{
-    font-size:14px;
-  }
-
-  .at-buttons{
-    flex-direction:column;
-    width:100%;
-  }
-
-  .at-primary,
-  .at-secondary{
-    width:100%;
-  }
-
-  .at-header h2{
-    font-size:28px;
-  }
-
-  .at-grid{
-    grid-template-columns:1fr;
-  }
+.at-pagination button:disabled{
+  opacity:.4;
+  cursor:not-allowed;
 }
