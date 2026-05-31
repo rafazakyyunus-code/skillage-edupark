@@ -49,7 +49,7 @@ const aktivitas = [
   {
     title: "Pancoran Air",
     desc: "Sumber air alami...",
-    image: "/images/Pancoran Air.jpeg",
+    image: "/images/mata-air-edupark2.jpg",
     badge: "Sumber Mata Air",
 
     detail:

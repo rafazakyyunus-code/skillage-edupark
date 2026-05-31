@@ -52,7 +52,7 @@ export default function VenueAlam() {
     {
       title: "Pancoran Air",
       desc: "Sumber air alami yang segar dan edukatif. Temukan bagaimana ekosistem air mikro berlangsung.",
-      image: "/images/Pancoran Air.jpeg",
+      image: "/images/mata-air-edupark.jpg",
       badge: "Sumber Mata Air",
     },
     {

@@ -16,7 +16,7 @@ export default function About() {
           viewport={{ once: true }}
         >
           <img
-            src="https://images.unsplash.com/photo-1596495577886-d920f1fb7238?w=900&q=80"
+            src="public/images/about-edupark.jpg"
             alt="Edupark"
           />
 
