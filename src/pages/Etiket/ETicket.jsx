@@ -235,23 +235,6 @@ export default function ETicket() {
             </button>
           </div>
 
-          {/* Check Status */}
-          <div className="et-manage-card">
-            <div className="et-manage-icon et-gray">
-              <FaSearch />
-            </div>
-
-            <h3>Ticket Status</h3>
-
-            <input
-              type="text"
-              placeholder="Masukkan ID Booking"
-            />
-
-            <button className="et-secondary-btn et-status-btn">
-              Cek Status Tiket
-            </button>
-          </div>
 
           {/* Group Booking */}
           <div className="et-manage-card">

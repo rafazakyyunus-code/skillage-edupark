@@ -51,9 +51,9 @@ export default function Peternakan() {
                 secara menyenangkan dan edukatif.
               </p>
               <div className="stats-row">
-                <div className="stat"><strong>300+</strong><span>Peserta</span></div>
-                <div className="stat"><strong>4+</strong><span>Jenis Hewan</span></div>
-                <div className="stat"><strong>2 Ha</strong><span>Lahan</span></div>
+                {/* <div className="stat"><strong>300+</strong><span>Peserta</span></div> */}
+                <div className="stat"><strong>3+</strong><span>Jenis Hewan</span></div>
+                <div className="stat"><strong>2 Ha</strong><span>Tempat</span></div>
               </div>
             </div>
             <div className="about-visual">

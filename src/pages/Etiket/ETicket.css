@@ -72,7 +72,7 @@
 }
 
 .et-hero-left h1 span{
-  color:#19df58;
+  color:#0fa64b;
 }
 
 .et-hero-left p{
@@ -109,7 +109,7 @@
 }
 
 .et-buy-btn{
-  background:#19df58;
+  background:#0fa64b;
   color:#09120d;
 
   box-shadow:
@@ -300,7 +300,7 @@
 }
 
 .et-active{
-  border:3px solid #19df58;
+  border:3px solid #0fa64b;
 
   box-shadow:
     0 20px 40px rgba(25,223,88,0.14);
@@ -311,7 +311,7 @@
   top:-14px;
   right:28px;
 
-  background:#19df58;
+  background:#0fa64b;
   color:#09120d;
 
   font-size:12px;
@@ -325,7 +325,7 @@
   width:60px;
   height:60px;
   border-radius:16px;
-  background:#19df58;
+  background:#0fa64b;
 
   display:flex;
   align-items:center;
@@ -393,7 +393,7 @@
 }
 
 .et-card ul svg{
-  color:#19df58;
+  color:#0fa64b;
 }
 
 .et-card button{
@@ -401,10 +401,10 @@
   height:58px;
 
   border-radius:16px;
-  border:2px solid #19df58;
+  border:2px solid #0fa64b;
 
   background:transparent;
-  color:#19df58;
+  color:#0fa64b;
 
   font-size:15px;
   font-weight:700;
@@ -419,7 +419,7 @@
 }
 
 .et-card button:hover{
-  background:#19df58;
+  background:#0fa64b;
   color:#09120d;
 
   transform:
@@ -465,7 +465,7 @@
   height:52px;
 
   border-radius:16px;
-  background:#19df58;
+  background:#0fa64b;
 
   display:flex;
   align-items:center;
@@ -491,10 +491,10 @@
 
 .et-manage-grid{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(2, minmax(320px, 450px));
+  justify-content:center;
   gap:28px;
 }
-
 .et-manage-card{
   background:white;
   border-radius:28px;
@@ -524,7 +524,7 @@
   margin-bottom:26px;
 
   border-radius:18px;
-  background:#19df58;
+  background:#0fa64b;
 
   display:flex;
   align-items:center;
@@ -589,8 +589,8 @@
   border:none;
   border-radius:16px;
 
-  background:#19df58;
-  color:#09120d;
+ background:#0fa64b;
+ color:#09120d;
 
   font-weight:700;
   cursor:pointer;
@@ -606,7 +606,7 @@
     scale(1.03);
 
   box-shadow:
-    0 25px 40px rgba(25,223,88,0.3);
+     0 25px 40px rgba(15,166,75,0.3);
 }
 
 .et-card-beli{

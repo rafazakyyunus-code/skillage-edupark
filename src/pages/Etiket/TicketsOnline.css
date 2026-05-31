@@ -131,11 +131,7 @@
   font-weight: 600;
   padding: 14px;
   border-radius: 14px;
-  background: linear-gradient(
-    135deg,
-    #2f6f3e,
-    #4caf50
-  );
+  background: #0fa64b;
   transition: .3s;
 }
 
