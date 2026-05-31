@@ -72,7 +72,7 @@ export default function Footer() {
     rel="noopener noreferrer"
     className="contact-item"
   >
-    <FaPhoneAlt /> 0852-1980-1259
+    <FaPhoneAlt /> +62 852-1980-1259    
   </a>
 
   <a

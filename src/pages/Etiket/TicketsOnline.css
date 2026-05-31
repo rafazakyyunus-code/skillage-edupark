@@ -133,10 +133,18 @@
   border-radius: 14px;
   background: #0fa64b;
   transition: .3s;
+  
 }
 
 .book-btn:hover {
   transform: translateY(-3px);
+}
+
+.ticket-buttons a.book-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
 .detail-btn {

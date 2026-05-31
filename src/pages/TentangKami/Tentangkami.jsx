@@ -151,7 +151,14 @@ export default function TentangKami() {
           Mulailah petualangan belajar bersama Edupark sekarang juga. 
   
         </p>
-        <button>Hubungi Kami</button>
+       <a
+         href="https://wa.me/6285219801259?text=Halo%20Admin%20Skillage%20Edupark,%20saya%20ingin%20bertanya%20lebih%20lanjut%20mengenai%20program%20dan%20kegiatan%20yang%20tersedia."
+         target="_blank"
+         rel="noopener noreferrer"
+        className="tk-cta-btn"
+    >
+         Hubungi Kami
+        </a>
       </section>
     </>
   );

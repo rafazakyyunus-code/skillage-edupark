@@ -81,8 +81,7 @@ export default function ContactPage() {
             <h3>Alamat</h3>
 
             <p>
-              Jl. Edukasi Raya No. 123, BSD City,
-              Tangerang Selatan
+             Jl. Raya Jonggol-Dayeuh Kp. Tegal Putat, RT.01/RW.06, Sukasirna, Kec. Jonggol, Kabupaten Bogor, Jawa Barat 16830
             </p>
           </div>
 
@@ -93,8 +92,8 @@ export default function ContactPage() {
 
             <h3>Telepon</h3>
 
-            <p>+62 812-3456-7890</p>
-            <p>+62 21-500-1234</p>
+            <p>+62 821-1125-6508</p>
+            <p>+62 852-1980-1259 </p>
           </div>
 
           <div className="contact-card">
@@ -104,8 +103,8 @@ export default function ContactPage() {
 
             <h3>Email</h3>
 
-            <p>info@edupark.com</p>
-            <p>support@edupark.com</p>
+            <p>skillageislamic@gmail.com</p>
+            
           </div>
 
           <div className="contact-card">

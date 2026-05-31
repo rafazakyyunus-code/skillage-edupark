@@ -91,7 +91,7 @@ export default function VenueWorkshop() {
           <p>Hubungi kami untuk informasi ketersediaan dan harga sewa venue</p>
           <div className="cta-btns">
             <a
-              href="https://wa.me/6281234567890"
+              href="https://wa.me/6285219801259?text=Assalamualaikum%20saya%20ingin%20bertanya%20tentang%20Skillage%20Edupark"
               className="btn-primary"
               target="_blank"
               rel="noreferrer"
