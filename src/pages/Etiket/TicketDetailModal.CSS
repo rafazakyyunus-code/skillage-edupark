@@ -27,7 +27,7 @@
   max-width: 95%;
   height: 85vh; /* BUKAN max-height */
 
-  background: red; /* test dulu */
+  background: white; /* test dulu */
 
   border-radius: 28px;
 
@@ -48,7 +48,7 @@
 
   margin-top:60px;
   margin-bottom:30px;
-  border:8px solid blue;
+  border:8px solid green;
 
   overflow-y:auto;
 }
