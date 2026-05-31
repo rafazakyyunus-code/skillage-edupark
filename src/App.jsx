@@ -35,7 +35,6 @@ import Attractions from "./pages/Etiket/Attractions";
 import TicketsOnline from "./pages/Etiket/TicketsOnline";
 
 
-
 /* ───────── DASHBOARD ───────── */
 import CreateArticle from "./pages/dashboard/CreateArticle";
 import Editor from "./pages/dashboard/Editor";
