@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getAuth, signOut, updateProfile, updateEmail } from "firebase/auth";
 import { getDatabase, ref, push, onValue, remove, update } from "firebase/database";
 
 /* ─────────────────────────────────────────────
    CONSTANTS
 ───────────────────────────────────────────── */
-const CATEGORIES = ["Hewan Peternakan", "Sayuran", "Saprodi"];
+const DEFAULT_PRODUK_CATEGORIES = ["Hewan Peternakan", "Sayuran", "Saprodi"];
 const BADGE_OPTIONS = [
   { value: "",        label: "Tidak Ada" },
   { value: "NEW",     label: "NEW" },
@@ -265,7 +265,13 @@ function ProdukView() {
   const [filterCat, setFilterCat]       = useState("Semua");
   const [toast, setToast]               = useState("");
 
-  /* ── realtime listener ── */
+  // Dynamic categories
+  const [categories, setCategories]     = useState(DEFAULT_PRODUK_CATEGORIES);
+  const [showAddCat, setShowAddCat]     = useState(false);
+  const [newCatInput, setNewCatInput]   = useState("");
+  const [savingCat, setSavingCat]       = useState(false);
+
+  /* ── realtime listener produk ── */
   useEffect(() => {
     const produkRef = ref(db, "produk");
     const unsub = onValue(produkRef, (snap) => {
@@ -280,6 +286,55 @@ function ProdukView() {
     });
     return () => unsub();
   }, []);
+
+  /* ── realtime listener kategori produk ── */
+  useEffect(() => {
+    const catRef = ref(db, "produkCategories");
+    const unsub = onValue(catRef, (snap) => {
+      const data = snap.val();
+      if (data && Array.isArray(data)) {
+        setCategories(data);
+        setForm(f => ({ ...f, category: data.includes(f.category) ? f.category : data[0] }));
+      } else if (!data) {
+        // Initialize with defaults on first run
+        update(ref(db, "/"), { produkCategories: DEFAULT_PRODUK_CATEGORIES });
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  const handleAddCategory = async () => {
+    const trimmed = newCatInput.trim();
+    if (!trimmed) return;
+    if (categories.includes(trimmed)) { showToast("✗ Kategori sudah ada."); return; }
+    setSavingCat(true);
+    try {
+      const updated = [...categories, trimmed];
+      await update(ref(db, "/"), { produkCategories: updated });
+      setForm(f => ({ ...f, category: trimmed }));
+      setNewCatInput("");
+      setShowAddCat(false);
+      showToast("✓ Kategori berhasil ditambahkan!");
+    } catch (err) {
+      showToast("✗ Gagal tambah kategori: " + err.message);
+    } finally {
+      setSavingCat(false);
+    }
+  };
+
+  const handleDeleteCategory = async (cat) => {
+    if (categories.length <= 1) { showToast("✗ Minimal satu kategori harus ada."); return; }
+    const inUse = products.some(p => p.category === cat);
+    if (inUse) { showToast(`✗ Kategori "${cat}" masih dipakai produk. Pindahkan dulu.`); return; }
+    try {
+      const updated = categories.filter(c => c !== cat);
+      await update(ref(db, "/"), { produkCategories: updated });
+      if (form.category === cat) setForm(f => ({ ...f, category: updated[0] }));
+      showToast("✓ Kategori dihapus.");
+    } catch (err) {
+      showToast("✗ Gagal hapus: " + err.message);
+    }
+  };
 
   const showToast = (msg) => {
     setToast(msg);
@@ -498,10 +553,56 @@ function ProdukView() {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
               <div>
-                <label style={fieldLabel}>Kategori *</label>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:4 }}>
+                  <label style={{ ...fieldLabel, marginBottom:0 }}>Kategori *</label>
+                  <button
+                    onClick={() => setShowAddCat(v => !v)}
+                    style={{ fontSize:11, color:"#1B3A2A", background:"none", border:"none", cursor:"pointer", fontWeight:600, padding:0 }}>
+                    {showAddCat ? "✕ Tutup" : "+ Kelola"}
+                  </button>
+                </div>
                 <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} style={input}>
-                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  {categories.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
+
+                {/* Kelola kategori panel */}
+                {showAddCat && (
+                  <div style={{ marginTop:8, background:"#F9FAFB", border:"1px solid #E5E7EB", borderRadius:8, padding:10 }}>
+                    <p style={{ fontSize:11, fontWeight:700, color:"#374151", margin:"0 0 8px" }}>Kelola Kategori Produk</p>
+                    {/* Existing categories */}
+                    <div style={{ display:"flex", flexDirection:"column", gap:4, marginBottom:8 }}>
+                      {categories.map(c => (
+                        <div key={c} style={{ display:"flex", alignItems:"center", justifyContent:"space-between",
+                          background:"#fff", border:"1px solid #E5E7EB", borderRadius:6, padding:"4px 8px" }}>
+                          <span style={{ fontSize:12, color:"#374151" }}>{c}</span>
+                          <button
+                            onClick={() => handleDeleteCategory(c)}
+                            style={{ fontSize:11, color:"#DC2626", background:"none", border:"none", cursor:"pointer", fontWeight:700, padding:"0 2px" }}
+                            title="Hapus kategori">
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Add new */}
+                    <div style={{ display:"flex", gap:6 }}>
+                      <input
+                        value={newCatInput}
+                        onChange={e => setNewCatInput(e.target.value)}
+                        onKeyDown={e => e.key === "Enter" && handleAddCategory()}
+                        placeholder="Nama kategori baru..."
+                        style={{ ...input, flex:1, fontSize:12, padding:"6px 8px", marginBottom:0 }}
+                      />
+                      <button
+                        onClick={handleAddCategory}
+                        disabled={savingCat || !newCatInput.trim()}
+                        style={{ padding:"6px 10px", background:"#1B3A2A", color:"#fff", border:"none",
+                          borderRadius:6, fontSize:12, fontWeight:600, cursor:"pointer", whiteSpace:"nowrap" }}>
+                        {savingCat ? "..." : "+ Tambah"}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
               <div>
                 <label style={fieldLabel}>Harga (Rp) *</label>
@@ -634,7 +735,7 @@ function ProdukView() {
     <div>
       {/* Toast */}
       {toast && (
-        <div style={{ position: "fixed", top: 24, right: 24, background: "#1B3A2A", color: "#fff",
+        <div style={{ position: "fixed", top: 24, right: 24, background: toast.startsWith("✗") ? "#DC2626" : "#1B3A2A", color: "#fff",
           padding: "12px 20px", borderRadius: 10, fontSize: 14, fontWeight: 600, zIndex: 999,
           boxShadow: "0 4px 20px rgba(0,0,0,0.15)" }}>
           {toast}
@@ -659,15 +760,18 @@ function ProdukView() {
 
       {/* Filter bar */}
       <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
-        {["Semua", ...CATEGORIES].map(cat => (
-          <button key={cat} onClick={() => setFilterCat(cat)}
-            style={{ padding: "6px 14px", borderRadius: 20, fontSize: 13, fontWeight: filterCat === cat ? 600 : 400,
-              border: "1px solid " + (filterCat === cat ? "#1B3A2A" : "#E5E7EB"),
-              background: filterCat === cat ? "#1B3A2A" : "#fff",
-              color: filterCat === cat ? "#fff" : "#374151", cursor: "pointer" }}>
-            {cat}
-          </button>
-        ))}
+        {["Semua", ...categories].map(cat => {
+          const count = cat === "Semua" ? products.length : products.filter(p => p.category === cat).length;
+          return (
+            <button key={cat} onClick={() => setFilterCat(cat)}
+              style={{ padding: "6px 14px", borderRadius: 20, fontSize: 13, fontWeight: filterCat === cat ? 600 : 400,
+                border: "1px solid " + (filterCat === cat ? "#1B3A2A" : "#E5E7EB"),
+                background: filterCat === cat ? "#1B3A2A" : "#fff",
+                color: filterCat === cat ? "#fff" : "#374151", cursor: "pointer" }}>
+              {cat} <span style={{ opacity: 0.7, fontSize: 11 }}>({count})</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Empty */}
@@ -767,7 +871,7 @@ function ProdukView() {
 /* ─────────────────────────────────────────────
    GALLERY MANAGEMENT VIEW
 ───────────────────────────────────────────── */
-const GALLERY_CATEGORIES = ["Peternakan", "Perkebunan", "Workshop", "Pengunjung"];
+const DEFAULT_GALLERY_CATEGORIES = ["Peternakan", "Perkebunan", "Workshop", "Pengunjung"];
 const GALLERY_BLANK = { title: "", category: "Peternakan", desc: "", image: "" };
 
 function GalleryView() {
@@ -784,9 +888,15 @@ function GalleryView() {
   const [toast, setToast]               = useState("");
   const [imagePreview, setImagePreview] = useState("");
   const [uploading, setUploading]       = useState(false);
-  const fileInputRef                    = useState(null);
+  const fileInputRef                    = useRef(null);
 
-  /* ── realtime listener ── */
+  // Dynamic categories
+  const [galleryCategories, setGalleryCategories] = useState(DEFAULT_GALLERY_CATEGORIES);
+  const [showAddCat, setShowAddCat]               = useState(false);
+  const [newCatInput, setNewCatInput]             = useState("");
+  const [savingCat, setSavingCat]                 = useState(false);
+
+  /* ── realtime listener gallery ── */
   useEffect(() => {
     const galleryRef = ref(db, "gallery");
     const unsub = onValue(galleryRef, (snap) => {
@@ -801,6 +911,54 @@ function GalleryView() {
     });
     return () => unsub();
   }, []);
+
+  /* ── realtime listener kategori gallery ── */
+  useEffect(() => {
+    const catRef = ref(db, "galleryCategories");
+    const unsub = onValue(catRef, (snap) => {
+      const data = snap.val();
+      if (data && Array.isArray(data)) {
+        setGalleryCategories(data);
+        setForm(f => ({ ...f, category: data.includes(f.category) ? f.category : data[0] }));
+      } else if (!data) {
+        update(ref(db, "/"), { galleryCategories: DEFAULT_GALLERY_CATEGORIES });
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  const handleAddGalCategory = async () => {
+    const trimmed = newCatInput.trim();
+    if (!trimmed) return;
+    if (galleryCategories.includes(trimmed)) { showToast("✗ Kategori sudah ada."); return; }
+    setSavingCat(true);
+    try {
+      const updated = [...galleryCategories, trimmed];
+      await update(ref(db, "/"), { galleryCategories: updated });
+      setForm(f => ({ ...f, category: trimmed }));
+      setNewCatInput("");
+      setShowAddCat(false);
+      showToast("✓ Kategori berhasil ditambahkan!");
+    } catch (err) {
+      showToast("✗ Gagal tambah kategori: " + err.message);
+    } finally {
+      setSavingCat(false);
+    }
+  };
+
+  const handleDeleteGalCategory = async (cat) => {
+    if (galleryCategories.length <= 1) { showToast("✗ Minimal satu kategori harus ada."); return; }
+    const inUse = items.some(i => i.category === cat);
+    if (inUse) { showToast(`✗ Kategori "${cat}" masih dipakai item. Pindahkan dulu.`); return; }
+    try {
+      const updated = galleryCategories.filter(c => c !== cat);
+      await update(ref(db, "/"), { galleryCategories: updated });
+      if (form.category === cat) setForm(f => ({ ...f, category: updated[0] }));
+      showToast("✓ Kategori dihapus.");
+    } catch (err) {
+      showToast("✗ Gagal hapus: " + err.message);
+    }
+  };
 
   const showToast = (msg) => {
     setToast(msg);
@@ -993,10 +1151,54 @@ function GalleryView() {
                 placeholder="cth: Kandang Sapi Modern" style={input} />
             </div>
             <div style={{ marginBottom:12 }}>
-              <label style={fieldLabel}>Kategori *</label>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:4 }}>
+                <label style={{ ...fieldLabel, marginBottom:0 }}>Kategori *</label>
+                <button
+                  onClick={() => setShowAddCat(v => !v)}
+                  style={{ fontSize:11, color:"#1B3A2A", background:"none", border:"none", cursor:"pointer", fontWeight:600, padding:0 }}>
+                  {showAddCat ? "✕ Tutup" : "+ Kelola"}
+                </button>
+              </div>
               <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} style={input}>
-                {GALLERY_CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                {galleryCategories.map(c => <option key={c}>{c}</option>)}
               </select>
+
+              {/* Kelola kategori panel */}
+              {showAddCat && (
+                <div style={{ marginTop:8, background:"#F9FAFB", border:"1px solid #E5E7EB", borderRadius:8, padding:10 }}>
+                  <p style={{ fontSize:11, fontWeight:700, color:"#374151", margin:"0 0 8px" }}>Kelola Kategori Gallery</p>
+                  <div style={{ display:"flex", flexDirection:"column", gap:4, marginBottom:8 }}>
+                    {galleryCategories.map(c => (
+                      <div key={c} style={{ display:"flex", alignItems:"center", justifyContent:"space-between",
+                        background:"#fff", border:"1px solid #E5E7EB", borderRadius:6, padding:"4px 8px" }}>
+                        <span style={{ fontSize:12, color:"#374151" }}>{c}</span>
+                        <button
+                          onClick={() => handleDeleteGalCategory(c)}
+                          style={{ fontSize:11, color:"#DC2626", background:"none", border:"none", cursor:"pointer", fontWeight:700, padding:"0 2px" }}
+                          title="Hapus kategori">
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ display:"flex", gap:6 }}>
+                    <input
+                      value={newCatInput}
+                      onChange={e => setNewCatInput(e.target.value)}
+                      onKeyDown={e => e.key === "Enter" && handleAddGalCategory()}
+                      placeholder="Nama kategori baru..."
+                      style={{ ...input, flex:1, fontSize:12, padding:"6px 8px", marginBottom:0 }}
+                    />
+                    <button
+                      onClick={handleAddGalCategory}
+                      disabled={savingCat || !newCatInput.trim()}
+                      style={{ padding:"6px 10px", background:"#1B3A2A", color:"#fff", border:"none",
+                        borderRadius:6, fontSize:12, fontWeight:600, cursor:"pointer", whiteSpace:"nowrap" }}>
+                      {savingCat ? "..." : "+ Tambah"}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
             <div>
               <label style={fieldLabel}>Deskripsi *</label>
@@ -1074,7 +1276,7 @@ function GalleryView() {
 
       {/* Stats filter bar */}
       <div style={{ display:"flex", gap:8, marginBottom:20, flexWrap:"wrap" }}>
-        {["Semua", ...GALLERY_CATEGORIES].map(cat => {
+        {["Semua", ...galleryCategories].map(cat => {
           const count = cat === "Semua" ? items.length : items.filter(i => i.category === cat).length;
           return (
             <button key={cat} onClick={() => setFilterCat(cat)}
@@ -1510,9 +1712,9 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
             {/* ── ROW 2: 3 module stat cards (produk, gallery, writers) ── */}
             <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14, marginBottom:18 }}>
               {[
-                { label:"Total Produk", val:produkList.length, sub:`${CATEGORIES.map(c=>produkList.filter(p=>p.category===c).length).join(" · ")} per kategori`, valColor:"#6D28D9", bg:"#FAF5FF", border:"#DDD6FE", onClick:()=>setActiveNav("produk"),
+                { label:"Total Produk", val:produkList.length, sub:`${DEFAULT_PRODUK_CATEGORIES.map(c=>produkList.filter(p=>p.category===c).length).join(" · ")} per kategori`, valColor:"#6D28D9", bg:"#FAF5FF", border:"#DDD6FE", onClick:()=>setActiveNav("produk"),
                   icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6D28D9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> },
-                { label:"Gallery Item", val:galleryList.length, sub:`${GALLERY_CATEGORIES.map(c=>galleryList.filter(g=>g.category===c).length).join(" · ")} per kategori`, valColor:"#0E7490", bg:"#ECFEFF", border:"#A5F3FC", onClick:()=>setActiveNav("gallery"),
+                { label:"Gallery Item", val:galleryList.length, sub:`${DEFAULT_GALLERY_CATEGORIES.map(c=>galleryList.filter(g=>g.category===c).length).join(" · ")} per kategori`, valColor:"#0E7490", bg:"#ECFEFF", border:"#A5F3FC", onClick:()=>setActiveNav("gallery"),
                   icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0E7490" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> },
                 { label:"Total Penulis", val:uniqueWriters.length, sub:`${articles.length} total artikel ditulis`, valColor:"#BE185D", bg:"#FDF2F8", border:"#FBCFE8", onClick:()=>setActiveNav("writers"),
                   icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#BE185D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
@@ -1635,7 +1837,7 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
                 {/* category breakdown bar */}
                 {galleryList.length > 0 && (
                   <div style={{ marginTop:14, display:"flex", gap:8, flexWrap:"wrap" }}>
-                    {GALLERY_CATEGORIES.map(cat=>{
+                    {DEFAULT_GALLERY_CATEGORIES.map(cat=>{
                       const cnt = galleryList.filter(g=>g.category===cat).length;
                       const pct = galleryList.length ? Math.round(cnt/galleryList.length*100) : 0;
                       return cnt > 0 ? (

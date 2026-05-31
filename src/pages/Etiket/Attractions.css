@@ -65,7 +65,6 @@
   border-radius: 999px;
 
   background:#22c55e;
-  color:white;
 
   font-size: 12px;
   font-weight: 700;
@@ -201,7 +200,7 @@
 }
 
 .at-primary{
-  background:#39ff14;
+  background:#22c55e;
   color:black;
 }
 
