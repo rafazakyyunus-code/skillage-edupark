@@ -1,18 +1,9 @@
 // src/pages/SemuaProduk/SemuaProdukData.js
-// ──────────────────────────────────────────────────────────────────────────
-// Data produk sekarang bersumber dari Firebase Realtime Database (node: /produk)
-// yang dikelola melalui Editor Portal → menu "Produk".
-//
-// CARA KERJA:
-//   • useProdukData()  → hook untuk listen realtime dari Firebase
-//   • filterProducts() → helper filter (tidak berubah)
-//   • CATEGORIES, SORT_OPTIONS, ITEMS_PER_PAGE, formatRp, getPages → tidak berubah
-// ──────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect } from "react";
 import { getDatabase, ref, onValue } from "firebase/database";
 
-/* ── Realtime hook (dipakai oleh Index.jsx dan ProdukDetail.jsx) ── */
+/* ── Hook: realtime produk dari Firebase ── */
 export function useProdukData() {
   const [products, setProducts] = useState([]);
   const [loading,  setLoading]  = useState(true);
@@ -26,11 +17,9 @@ export function useProdukData() {
       if (data) {
         const list = Object.entries(data).map(([key, val]) => ({
           ...val,
-          // Pastikan id unik tersedia untuk routing /produk/:id
-          id:         key,         // Firebase key (string)
+          id:         key,
           firebaseId: key,
         }));
-        // Urutkan terbaru dulu (createdAt DESC)
         list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
         setProducts(list);
       } else {
@@ -45,6 +34,32 @@ export function useProdukData() {
   return { products, loading };
 }
 
+/* ── Hook: realtime kategori produk dari Firebase ── */
+export function useProdukCategories() {
+  const [categories, setCategories] = useState(["Semua Produk"]);
+
+  useEffect(() => {
+    const db     = getDatabase();
+    const catRef = ref(db, "produkCategories");
+
+    const unsub = onValue(catRef, (snap) => {
+      const data = snap.val();
+      if (data) {
+        const cats = Array.isArray(data)
+          ? data.filter(Boolean)
+          : Object.values(data).filter(Boolean);
+        setCategories(["Semua Produk", ...cats]);
+      } else {
+        setCategories(["Semua Produk"]);
+      }
+    });
+
+    return () => unsub();
+  }, []);
+
+  return categories;
+}
+
 /* ── Filter helper ── */
 export function filterProducts(products, search, category) {
   return products.filter((p) => {
@@ -54,7 +69,7 @@ export function filterProducts(products, search, category) {
   });
 }
 
-/* ── Konstanta (tidak berubah) ── */
+/* ── Konstanta statis (fallback) ── */
 export const CATEGORIES = [
   "Semua Produk",
   "Hewan Peternakan",
@@ -63,10 +78,10 @@ export const CATEGORIES = [
 ];
 
 export const SORT_OPTIONS = [
-  { value: "terbaru",   label: "Terbaru" },
-  { value: "terlaris",  label: "Terlaris" },
-  { value: "harga-asc", label: "Harga Terendah" },
-  { value: "harga-desc",label: "Harga Tertinggi" },
+  { value: "terbaru",    label: "Terbaru" },
+  { value: "terlaris",   label: "Terlaris" },
+  { value: "harga-asc",  label: "Harga Terendah" },
+  { value: "harga-desc", label: "Harga Tertinggi" },
 ];
 
 export const ITEMS_PER_PAGE = 8;

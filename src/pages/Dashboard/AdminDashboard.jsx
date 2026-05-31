@@ -41,6 +41,7 @@ import {
   Link as LinkIcon,
   ImagePlus,
   Upload,
+  MapPin,
 } from "lucide-react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -65,6 +66,9 @@ import { db } from "../../firebase";
    CONSTANTS
 ───────────────────────────────────────────── */
 const ROLES = ["admin", "editor", "writer"];
+
+/* Force semua URL gambar ke https:// agar tidak kena ERR_SSL_VERSION_OR_CIPHER_MISMATCH */
+const safeImg = (url) => (url || "").replace(/^http:\/\//i, "https://");
 
 const ROLE_COLORS = {
   admin:  { bg: "#FEE2E2", text: "#991B1B", border: "#FECACA" },
@@ -121,6 +125,7 @@ const NAV = [
       { id: "review-articles", label: "Review Articles",   Icon: ClipboardList },
       { id: "produk",          label: "Produk",             Icon: ShoppingBag },
       { id: "gallery",         label: "Gallery",            Icon: Image },
+      { id: "attractions",     label: "Attractions",        Icon: MapPin },
     ],
   },
   {
@@ -521,7 +526,7 @@ function AllArticlesView({ articles }) {
             {displayed.map(a => (
               <div key={a.id} className="ad-article-row-card">
                 <div className="ad-article-row-card__thumb">
-                  {a.image ? <img src={a.image} alt={a.title} /> : <FileText size={20} color="#D1D5DB" />}
+                  {a.image ? <img src={safeImg(a.image)} alt={a.title} /> : <FileText size={20} color="#D1D5DB" />}
                 </div>
                 <div className="ad-article-row-card__body">
                   <div className="ad-article-row-card__cat">{a.category}</div>
@@ -927,7 +932,7 @@ function ReviewArticlesView({ articles }) {
             {displayed.map(a => (
               <div key={a.id} className="ad-article-row-card" onClick={() => setSelected(a)} style={{ cursor:"pointer" }}>
                 <div className="ad-article-row-card__thumb">
-                  {a.image ? <img src={a.image} alt={a.title} /> : <FileText size={20} color="#D1D5DB" />}
+                  {a.image ? <img src={safeImg(a.image)} alt={a.title} /> : <FileText size={20} color="#D1D5DB" />}
                 </div>
                 <div className="ad-article-row-card__body">
                   <div className="ad-article-row-card__cat">{a.category}</div>
@@ -979,7 +984,8 @@ function ProdukView() {
     const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method:"POST", body:fd });
     const json = await res.json();
     if (!json.success) throw new Error("Upload gagal");
-    return json.data.url;
+    const raw = json.data.display_url || json.data.url || "";
+    return raw.replace(/^http:\/\//i, "https://");
   };
 
   const handleProdukFileChange = async e => {
@@ -1022,7 +1028,7 @@ function ProdukView() {
 
   const handleEdit = p => {
     setForm({ name:p.name, category:p.category, price:String(p.price), desc:p.desc, badge:p.badge||"", badgeColor:p.badgeColor||"green", image:p.image||"", feature1:p.feature1||PRODUK_BLANK.feature1, feature2:p.feature2||PRODUK_BLANK.feature2, feature3:p.feature3||PRODUK_BLANK.feature3 });
-    setEditId(p.firebaseId); setImagePreview(p.image||""); setView("form");
+    setEditId(p.firebaseId); setImagePreview(safeImg(p.image)); setView("form");
   };
 
   const handleDelete = async id => {
@@ -1181,7 +1187,7 @@ function ProdukView() {
             {displayed.map(p => (
               <div key={p.firebaseId} className="ad-produk-card">
                 <div className="ad-produk-card__img">
-                  {p.image ? <img src={p.image} alt={p.name} onError={e=>e.target.style.display="none"} /> : <ShoppingBag size={32} color="#D1D5DB" />}
+                  {p.image ? <img src={safeImg(p.image)} alt={p.name} onError={e=>e.target.style.display="none"} /> : <ShoppingBag size={32} color="#D1D5DB" />}
                   {p.badge && <span style={{ position:"absolute", top:8, left:8, padding:"3px 10px", fontSize:10, fontWeight:700, borderRadius:4, color:"#fff", background:p.badgeColor==="red"?"#ef4444":"#16c35b" }}>{p.badge}</span>}
                 </div>
                 <div className="ad-produk-card__body">
@@ -1239,7 +1245,8 @@ function GalleryView() {
     const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method:"POST", body:fd });
     const json = await res.json();
     if (!json.success) throw new Error("Upload gagal");
-    return json.data.url;
+    const raw = json.data.display_url || json.data.url || "";
+    return raw.replace(/^http:\/\//i, "https://");
   };
 
   const handleFileChange = async e => {
@@ -1275,7 +1282,7 @@ function GalleryView() {
 
   const handleEdit = item => {
     setForm({ title:item.title, category:item.category, desc:item.desc, image:item.image||"" });
-    setEditId(item.firebaseId); setImagePreview(item.image||""); setView("form");
+    setEditId(item.firebaseId); setImagePreview(safeImg(item.image)); setView("form");
   };
 
   const handleDelete = async id => {
@@ -1396,7 +1403,7 @@ function GalleryView() {
               <div key={item.firebaseId} className="ad-gallery-card">
                 <div style={{ position:"relative", height:180, background:"#f0f0f0", overflow:"hidden" }}>
                   {item.image
-                    ? <img src={item.image} alt={item.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                    ? <img src={safeImg(item.image)} alt={item.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                     : <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%", color:"#CBD5E1" }}><Image size={40} /></div>
                   }
                   <span style={{ position:"absolute", top:8, right:8, background:"rgba(22,195,91,0.9)", color:"#fff", fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:20 }}>{item.category}</span>
@@ -1417,6 +1424,387 @@ function GalleryView() {
             ))}
           </div>
         )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   ATTRACTIONS MANAGEMENT VIEW
+───────────────────────────────────────────── */
+const DEFAULT_ATTRACTION_CATEGORIES = ["Workshop", "Nature", "Animals", "Edukasi"];
+const ATTRACTION_BLANK = {
+  name: "", category: "Workshop", location: "", desc: "", image: "", badge: "",
+};
+const IMGBB_KEY_ATT = "6604bf748a40b7eaf83a5d4792bff01e";
+
+function AttractionsView() {
+  const [items, setItems]                 = useState([]);
+  const [loading, setLoading]             = useState(true);
+  const [view, setView]                   = useState("list");
+  const [form, setForm]                   = useState(ATTRACTION_BLANK);
+  const [editId, setEditId]               = useState(null);
+  const [saving, setSaving]               = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [filterCat, setFilterCat]         = useState("Semua");
+  const [toast, setToast]                 = useState("");
+  const [imagePreview, setImagePreview]   = useState("");
+  const [uploading, setUploading]         = useState(false);
+  const [categories, setCategories]       = useState(DEFAULT_ATTRACTION_CATEGORIES);
+  const [showAddCat, setShowAddCat]       = useState(false);
+  const [newCatInput, setNewCatInput]     = useState("");
+  const [savingCat, setSavingCat]         = useState(false);
+
+  const iStyle = {
+    width:"100%", padding:"9px 12px", borderRadius:8,
+    border:"1px solid #D1D5DB", fontSize:14, boxSizing:"border-box",
+    fontFamily:"inherit", color:"#111827", outline:"none",
+  };
+
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
+
+  useEffect(() => {
+    const attRef = ref(db, "attractions");
+    const unsub = onValue(attRef, (snap) => {
+      const data = snap.val();
+      if (data) {
+        const list = Object.entries(data).map(([key, val]) => ({ ...val, firebaseId: key }));
+        setItems(list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)));
+      } else { setItems([]); }
+      setLoading(false);
+    }, () => { setItems([]); setLoading(false); });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const catRef = ref(db, "attractionCategories");
+    const unsub = onValue(catRef, (snap) => {
+      const data = snap.val();
+      if (data && Array.isArray(data)) setCategories(data);
+      else if (!data) update(ref(db, "/"), { attractionCategories: DEFAULT_ATTRACTION_CATEGORIES });
+    });
+    return () => unsub();
+  }, []);
+
+  const uploadImage = async (file) => {
+    const fd = new FormData(); fd.append("image", file);
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY_ATT}`, { method:"POST", body:fd });
+    const json = await res.json();
+    if (!json.success) throw new Error("Upload gagal");
+    const raw = json.data.display_url || json.data.url || "";
+    return raw.replace(/^http:\/\//i, "https://");
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    setImagePreview(URL.createObjectURL(file));
+    setUploading(true);
+    try {
+      const url = await uploadImage(file);
+      setForm(f => ({ ...f, image: url }));
+      showToast("✓ Foto berhasil diupload!");
+    } catch (err) { showToast("✗ Upload foto gagal: " + err.message); }
+    finally { setUploading(false); }
+  };
+
+  const handleAddCategory = async () => {
+    const trimmed = newCatInput.trim(); if (!trimmed) return;
+    if (categories.includes(trimmed)) { showToast("✗ Kategori sudah ada."); return; }
+    setSavingCat(true);
+    try {
+      await update(ref(db, "/"), { attractionCategories: [...categories, trimmed] });
+      setNewCatInput(""); setShowAddCat(false); showToast("✓ Kategori ditambahkan!");
+    } catch (err) { showToast("✗ Gagal: " + err.message); }
+    finally { setSavingCat(false); }
+  };
+
+  const handleDeleteCategory = async (cat) => {
+    if (categories.length <= 1) { showToast("✗ Minimal satu kategori harus ada."); return; }
+    if (items.some(i => i.category === cat)) {
+      const count = items.filter(i => i.category === cat).length;
+      if (!window.confirm(`Kategori "${cat}" digunakan oleh ${count} attraction. Tetap hapus?`)) return;
+    }
+    try {
+      const updated = categories.filter(c => c !== cat);
+      await update(ref(db, "/"), { attractionCategories: updated });
+      if (form.category === cat) setForm(f => ({ ...f, category: updated[0] }));
+      showToast("✓ Kategori dihapus.");
+    } catch (err) { showToast("✗ Gagal: " + err.message); }
+  };
+
+  const handleSave = async () => {
+    if (!form.name.trim())     return showToast("✗ Nama attraction wajib diisi.");
+    if (!form.desc.trim())     return showToast("✗ Deskripsi wajib diisi.");
+    if (!form.location.trim()) return showToast("✗ Lokasi wajib diisi.");
+    if (!form.image.trim())    return showToast("✗ Upload foto atau masukkan URL foto.");
+    setSaving(true);
+    try {
+      const payload = {
+        title: form.name.trim(), name: form.name.trim(),
+        category: form.category, location: form.location.trim(),
+        desc: form.desc.trim(), image: form.image.trim(),
+        badge: form.badge || null, updatedAt: new Date().toISOString(),
+      };
+      if (editId) {
+        await update(ref(db, `attractions/${editId}`), payload);
+        showToast("✓ Attraction berhasil diperbarui!");
+      } else {
+        await push(ref(db, "attractions"), { ...payload, id: Date.now(), createdAt: new Date().toISOString() });
+        showToast("✓ Attraction berhasil ditambahkan!");
+      }
+      setView("list"); resetForm();
+    } catch (err) { showToast("✗ Gagal menyimpan: " + err.message); }
+    finally { setSaving(false); }
+  };
+
+  const resetForm = () => { setForm(ATTRACTION_BLANK); setEditId(null); setImagePreview(""); };
+
+  const handleEdit = (item) => {
+    setForm({
+      name: item.name || item.title || "",
+      category: item.category || "Workshop",
+      location: item.location || "",
+      desc: item.desc || "",
+      image: item.image || "",
+      badge: item.badge || "",
+    });
+    setEditId(item.firebaseId); setImagePreview(safeImg(item.image)); setView("form");
+  };
+
+  const handleDelete = async (id) => {
+    try { await remove(ref(db, `attractions/${id}`)); showToast("Item dihapus."); setDeleteConfirm(null); }
+    catch (err) { showToast("✗ Gagal menghapus: " + err.message); }
+  };
+
+  const displayed = filterCat === "Semua" ? items : items.filter(i => i.category === filterCat);
+
+  /* ── FORM VIEW ── */
+  if (view === "form") return (
+    <div>
+      {toast && <div style={{ position:"fixed", top:24, right:24, background:toast.startsWith("✓")?"#1B3A2A":"#DC2626", color:"#fff", padding:"12px 20px", borderRadius:10, fontSize:14, fontWeight:600, zIndex:999, boxShadow:"0 4px 20px rgba(0,0,0,0.15)" }}>{toast}</div>}
+
+      <div style={{ display:"flex", alignItems:"center", marginBottom:24 }}>
+        <div>
+          <button onClick={() => { setView("list"); resetForm(); }} style={{ background:"none", border:"none", color:"#6B7280", fontSize:13, cursor:"pointer", marginBottom:4, fontWeight:500, padding:0 }}>← Kembali ke daftar</button>
+          <h1 style={{ fontSize:22, fontWeight:700, color:"#111827", margin:0 }}>{editId ? "Edit Attraction" : "Tambah Attraction Baru"}</h1>
+        </div>
+      </div>
+
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 320px", gap:20, alignItems:"flex-start" }}>
+        {/* LEFT */}
+        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+          {/* Foto */}
+          <div style={card}>
+            <label style={sectionLabel}>Foto Attraction</label>
+            <div onClick={() => document.getElementById("adm-att-file-input").click()}
+              style={{ border:"2px dashed #D1D5DB", borderRadius:12, cursor:"pointer", overflow:"hidden", transition:"border-color 0.2s", minHeight:imagePreview?"auto":160, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}
+              onMouseEnter={e => e.currentTarget.style.borderColor="#16c35b"}
+              onMouseLeave={e => e.currentTarget.style.borderColor="#D1D5DB"}>
+              {imagePreview ? (
+                <div style={{ position:"relative", width:"100%" }}>
+                  <img src={imagePreview} alt="preview" style={{ width:"100%", height:240, objectFit:"cover", display:"block" }} />
+                  <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.4)", display:"flex", alignItems:"center", justifyContent:"center", opacity:0, transition:"0.3s" }}
+                    onMouseEnter={e => e.currentTarget.style.opacity=1} onMouseLeave={e => e.currentTarget.style.opacity=0}>
+                    <span style={{ color:"#fff", fontWeight:600, fontSize:14 }}>Klik untuk ganti foto</span>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ padding:"40px 20px", textAlign:"center" }}>
+                  <Upload size={36} color="#D1D5DB" style={{ marginBottom:10 }} />
+                  <p style={{ fontSize:15, fontWeight:600, color:"#374151", margin:"0 0 6px" }}>{uploading ? "Mengupload..." : "Klik untuk pilih foto"}</p>
+                  <span style={{ fontSize:12, color:"#9CA3AF" }}>JPG, PNG, WEBP • Maks 10MB</span>
+                </div>
+              )}
+            </div>
+            <input id="adm-att-file-input" type="file" accept="image/*" onChange={handleFileChange} style={{ display:"none" }} />
+            {uploading && <p style={{ fontSize:12, color:"#16c35b", marginTop:8, fontWeight:600 }}>Sedang mengupload foto...</p>}
+            <div style={{ marginTop:10 }}>
+              <label style={fieldLabel}>Atau masukkan URL foto langsung</label>
+              <input value={form.image} onChange={e => { setForm(f => ({ ...f, image: e.target.value })); setImagePreview(e.target.value); }}
+                placeholder="https://i.ibb.co/... atau URL gambar lain" style={inputStyle} />
+            </div>
+          </div>
+
+          {/* Info */}
+          <div style={card}>
+            <label style={sectionLabel}>Informasi Attraction</label>
+            <div style={{ marginBottom:12 }}>
+              <label style={fieldLabel}>Nama Attraction *</label>
+              <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="cth. Kandang Edukasi Sapi Perah" style={inputStyle} />
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:12 }}>
+              <div>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:4 }}>
+                  <label style={{ ...fieldLabel, marginBottom:0 }}>Kategori *</label>
+                  <button onClick={() => setShowAddCat(v => !v)} style={{ fontSize:11, color:"#1B3A2A", background:"none", border:"none", cursor:"pointer", fontWeight:600, padding:0 }}>{showAddCat ? "✕ Tutup" : "+ Kelola"}</button>
+                </div>
+                <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} style={inputStyle}>
+                  {categories.map(c => <option key={c}>{c}</option>)}
+                </select>
+                {showAddCat && (
+                  <div style={{ marginTop:8, background:"#F9FAFB", border:"1px solid #E5E7EB", borderRadius:8, padding:10 }}>
+                    <p style={{ fontSize:11, fontWeight:700, color:"#374151", margin:"0 0 8px" }}>Kelola Kategori Attractions</p>
+                    <div style={{ display:"flex", flexDirection:"column", gap:4, marginBottom:8 }}>
+                      {categories.map(c => (
+                        <div key={c} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:"#fff", border:"1px solid #E5E7EB", borderRadius:6, padding:"4px 8px" }}>
+                          <span style={{ fontSize:12, color:"#374151" }}>{c}</span>
+                          <button onClick={() => handleDeleteCategory(c)} style={{ fontSize:11, color:"#DC2626", background:"none", border:"none", cursor:"pointer", fontWeight:700 }}>✕</button>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ display:"flex", gap:6 }}>
+                      <input value={newCatInput} onChange={e => setNewCatInput(e.target.value)} onKeyDown={e => e.key==="Enter" && handleAddCategory()} placeholder="Nama kategori baru..." style={{ ...inputStyle, flex:1, fontSize:12, padding:"6px 8px" }} />
+                      <button onClick={handleAddCategory} disabled={savingCat || !newCatInput.trim()} style={{ padding:"6px 10px", background:"#1B3A2A", color:"#fff", border:"none", borderRadius:6, fontSize:12, fontWeight:600, cursor:"pointer" }}>{savingCat ? "..." : "+ Tambah"}</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div>
+                <label style={fieldLabel}>Badge <span style={{ fontWeight:400, color:"#9CA3AF" }}>(opsional)</span></label>
+                <select value={form.badge} onChange={e => setForm(f => ({ ...f, badge: e.target.value }))} style={inputStyle}>
+                  <option value="">Tidak Ada</option>
+                  <option value="NEW">NEW</option>
+                  <option value="HOT">HOT</option>
+                  <option value="POPULER">POPULER</option>
+                  <option value="EDUKASI">EDUKASI</option>
+                </select>
+              </div>
+            </div>
+            <div style={{ marginBottom:12 }}>
+              <label style={fieldLabel}>Lokasi / Area *</label>
+              <input value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} placeholder="cth. Zona Peternakan, Blok A" style={inputStyle} />
+            </div>
+            <div>
+              <label style={fieldLabel}>Deskripsi *</label>
+              <textarea value={form.desc} onChange={e => setForm(f => ({ ...f, desc: e.target.value }))} placeholder="Ceritakan tentang attraction ini — apa yang bisa dilakukan pengunjung, pengalaman uniknya, dll." style={{ ...inputStyle, height:110, resize:"vertical" }} />
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT – Preview + Save */}
+        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+          <div style={card}>
+            <label style={sectionLabel}>Preview Card</label>
+            <div style={{ border:"1px solid #E5E7EB", borderRadius:10, overflow:"hidden" }}>
+              <div style={{ position:"relative", background:"#f0f0f0", height:160 }}>
+                {imagePreview
+                  ? <img src={imagePreview} alt="preview" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                  : <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%", color:"#CBD5E1" }}><Image size={36} color="#CBD5E1" /></div>
+                }
+                {form.badge && <span style={{ position:"absolute", top:8, left:8, padding:"3px 10px", fontSize:10, fontWeight:700, borderRadius:4, color:"#fff", background: form.badge==="HOT"?"#ef4444":"#16c35b" }}>{form.badge}</span>}
+                <span style={{ position:"absolute", top:8, right:8, background:"rgba(22,195,91,0.9)", color:"#fff", fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:20 }}>{form.category}</span>
+              </div>
+              <div style={{ padding:"12px 14px" }}>
+                <div style={{ fontSize:15, fontWeight:700, color:"#111827", marginBottom:4 }}>{form.name || "Nama Attraction"}</div>
+                <div style={{ fontSize:12, color:"#6B7280", marginBottom:6, display:"flex", alignItems:"center", gap:4 }}>
+                  <MapPin size={13} /><span>{form.location || "Lokasi"}</span>
+                </div>
+                <div style={{ fontSize:12, color:"#6B7280", lineHeight:1.6, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>
+                  {form.desc || "Deskripsi attraction akan muncul di sini..."}
+                </div>
+              </div>
+            </div>
+          </div>
+          <button onClick={handleSave} disabled={saving || uploading}
+            style={{ width:"100%", padding:"14px", background:(saving||uploading)?"#9CA3AF":"#1B3A2A", color:"#fff", border:"none", borderRadius:10, fontSize:15, fontWeight:700, cursor:(saving||uploading)?"not-allowed":"pointer" }}>
+            {saving ? "Menyimpan..." : uploading ? "Menunggu upload..." : editId ? "Perbarui Attraction" : "Simpan Attraction"}
+          </button>
+          <button onClick={() => { setView("list"); resetForm(); }}
+            style={{ width:"100%", padding:"12px", background:"#fff", border:"1px solid #E5E7EB", color:"#374151", borderRadius:10, fontSize:14, fontWeight:600, cursor:"pointer" }}>
+            Batal
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  /* ── LIST VIEW ── */
+  return (
+    <div>
+      {toast && <div style={{ position:"fixed", top:24, right:24, background:toast.startsWith("✓")?"#1B3A2A":"#DC2626", color:"#fff", padding:"12px 20px", borderRadius:10, fontSize:14, fontWeight:600, zIndex:999, boxShadow:"0 4px 20px rgba(0,0,0,0.15)" }}>{toast}</div>}
+
+      <div className="ad-page-header" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
+        <div>
+          <h1 className="ad-page-title">Manajemen Attractions</h1>
+          <p className="ad-page-sub">{items.length} attraction · data realtime dari Firebase</p>
+        </div>
+        <button onClick={() => { resetForm(); setView("form"); }}
+          style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 18px", background:"#1B3A2A", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:600, cursor:"pointer" }}>
+          <Plus size={16} /> Tambah Attraction
+        </button>
+      </div>
+
+      {/* Filter bar */}
+      <div style={{ display:"flex", gap:8, marginBottom:20, flexWrap:"wrap" }}>
+        {["Semua", ...categories].map(cat => {
+          const count = cat === "Semua" ? items.length : items.filter(i => i.category === cat).length;
+          return (
+            <button key={cat} onClick={() => setFilterCat(cat)}
+              style={{ padding:"6px 14px", borderRadius:20, fontSize:13, fontWeight:filterCat===cat?600:400, border:"1px solid "+(filterCat===cat?"#1B3A2A":"#E5E7EB"), background:filterCat===cat?"#1B3A2A":"#fff", color:filterCat===cat?"#fff":"#374151", cursor:"pointer" }}>
+              {cat} <span style={{ opacity:0.7, fontSize:11 }}>({count})</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {loading && <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:200 }}><Loader size={28} color="#9CA3AF" /></div>}
+
+      {!loading && displayed.length === 0 && (
+        <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:12, padding:"60px 20px", textAlign:"center" }}>
+          <MapPin size={40} color="#D1D5DB" style={{ marginBottom:12 }} />
+          <p style={{ color:"#6B7280", fontSize:14 }}>Belum ada attraction. Klik "Tambah Attraction" untuk mulai.</p>
+        </div>
+      )}
+
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(260px, 1fr))", gap:16 }}>
+        {displayed.map(item => (
+          <div key={item.firebaseId} style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:12, overflow:"hidden", boxShadow:"0 2px 8px rgba(0,0,0,0.05)", display:"flex", flexDirection:"column" }}>
+            <div style={{ position:"relative", height:180, background:"#f0f0f0", overflow:"hidden" }}>
+              {item.image
+                ? <img src={safeImg(item.image)} alt={item.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                : <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%", color:"#CBD5E1" }}><Image size={40} color="#CBD5E1" /></div>
+              }
+              <span style={{ position:"absolute", top:8, right:8, background:"rgba(22,195,91,0.9)", color:"#fff", fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:20 }}>{item.category}</span>
+              {item.badge && <span style={{ position:"absolute", top:8, left:8, background: item.badge==="HOT"?"#ef4444":"#16c35b", color:"#fff", fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:4 }}>{item.badge}</span>}
+            </div>
+            <div style={{ padding:"14px 16px", flex:1, display:"flex", flexDirection:"column" }}>
+              <div style={{ fontSize:15, fontWeight:700, color:"#111827", marginBottom:4 }}>{item.title || item.name}</div>
+              <div style={{ fontSize:12, color:"#6B7280", marginBottom:6, display:"flex", alignItems:"center", gap:4 }}>
+                <MapPin size={12} /><span>{item.location}</span>
+              </div>
+              <div style={{ fontSize:12, color:"#6B7280", lineHeight:1.6, flex:1, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{item.desc}</div>
+            </div>
+            <div style={{ display:"flex", gap:8, padding:"0 16px 14px" }}>
+              <button onClick={() => handleEdit(item)}
+                style={{ flex:1, padding:8, background:"#F0FDF4", color:"#1B3A2A", border:"none", borderRadius:8, fontSize:13, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                <Pencil size={13} /> Edit
+              </button>
+              <button onClick={() => setDeleteConfirm(item)}
+                style={{ flex:1, padding:8, background:"#FEF2F2", color:"#DC2626", border:"none", borderRadius:8, fontSize:13, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                <Trash2 size={13} /> Hapus
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Delete confirm modal */}
+      {deleteConfirm && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.45)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1000 }}>
+          <div style={{ background:"#fff", padding:28, borderRadius:14, width:360, textAlign:"center", boxShadow:"0 20px 60px rgba(0,0,0,0.2)" }}>
+            <div style={{ width:56, height:56, borderRadius:"50%", background:"#FEF2F2", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 14px" }}>
+              <Trash2 size={24} color="#DC2626" />
+            </div>
+            <h3 style={{ margin:"0 0 8px", color:"#111827", fontSize:17, fontWeight:700 }}>Hapus Attraction?</h3>
+            <p style={{ color:"#6B7280", fontSize:13, marginBottom:22 }}>
+              Attraction <strong>"{deleteConfirm.title || deleteConfirm.name}"</strong> akan dihapus permanen.
+            </p>
+            <div style={{ display:"flex", gap:10, justifyContent:"center" }}>
+              <button onClick={() => setDeleteConfirm(null)} style={{ padding:"9px 20px", borderRadius:8, border:"1px solid #E5E7EB", background:"#fff", color:"#374151", fontSize:14, cursor:"pointer", fontWeight:600 }}>Batal</button>
+              <button onClick={() => handleDelete(deleteConfirm.firebaseId)} style={{ padding:"9px 20px", borderRadius:8, border:"none", background:"#DC2626", color:"#fff", fontSize:14, cursor:"pointer", fontWeight:700 }}>Ya, Hapus</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -2060,7 +2448,7 @@ function MyArticlesAdminView({ articles, currentUser, setActiveNav }) {
             {displayed.map(a => (
               <div key={a.id} className={`ad-article-row-card${a.status==="revision"?" ad-article-row-card--revision":""}`}>
                 <div className="ad-article-row-card__thumb">
-                  {a.image ? <img src={a.image} alt={a.title} /> : <FileText size={20} color="#D1D5DB" />}
+                  {a.image ? <img src={safeImg(a.image)} alt={a.title} /> : <FileText size={20} color="#D1D5DB" />}
                 </div>
                 <div className="ad-article-row-card__body">
                   <div className="ad-article-row-card__cat">{a.category}</div>
@@ -2161,6 +2549,8 @@ export default function AdminDashboard() {
         return <ProdukView />;
       case "gallery":
         return <GalleryView />;
+      case "attractions":
+        return <AttractionsView />;
       case "writer-directory":
         return <WriterDirectoryView articles={articles} users={users} />;
       case "manage-users":

@@ -328,6 +328,33 @@ body {
 
   transform: translateX(4px);
 }
+
+/* ================= DROPDOWN SCROLLABLE (PRODUK) ================= */
+
+.dropdown-menu.scrollable {
+  max-height: 230px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* scrollbar tipis & elegan */
+
+.dropdown-menu.scrollable::-webkit-scrollbar {
+  width: 4px;
+}
+
+.dropdown-menu.scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dropdown-menu.scrollable::-webkit-scrollbar-thumb {
+  background: rgba(22, 195, 91, 0.35);
+  border-radius: 20px;
+}
+
+.dropdown-menu.scrollable::-webkit-scrollbar-thumb:hover {
+  background: rgba(22, 195, 91, 0.6);
+}
 /* ================= PROFILE MENU ================= */
 
 .profile-menu {
@@ -660,6 +687,18 @@ body {
   }
 
   .dropdown-menu.show {
+    display: block;
+  }
+
+  /* dropdown produk mobile tetap scrollable */
+
+  .dropdown-menu.scrollable {
+    max-height: 220px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .dropdown-menu.scrollable.show {
     display: block;
   }
 

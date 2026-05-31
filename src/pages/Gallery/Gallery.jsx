@@ -4,18 +4,20 @@ import { getDatabase, ref, onValue } from "firebase/database"
 import "./Gallery.css"
 
 const itemsPerPage = 6
-const CATEGORIES = ["Semua", "Peternakan", "Perkebunan", "Workshop", "Pengunjung"]
 
 export default function Gallery() {
   const [galleryData, setGalleryData]           = useState([])
+  const [categories, setCategories]             = useState(["Semua"])
   const [loading, setLoading]                   = useState(true)
   const [currentPage, setCurrentPage]           = useState(1)
   const [selectedCategory, setSelectedCategory] = useState("Semua")
 
   useEffect(() => {
-    const db  = getDatabase()
+    const db = getDatabase()
+
+    // Load gallery items
     const galleryRef = ref(db, "gallery")
-    const unsub = onValue(galleryRef, (snapshot) => {
+    const unsubGallery = onValue(galleryRef, (snapshot) => {
       const data = snapshot.val()
       if (data) {
         const arr = Object.entries(data).map(([key, val]) => ({ id: key, ...val }))
@@ -26,7 +28,22 @@ export default function Gallery() {
       }
       setLoading(false)
     })
-    return () => unsub()
+
+    // Load categories dynamically from Firebase
+    const catRef = ref(db, "galleryCategories")
+    const unsubCat = onValue(catRef, (snapshot) => {
+      const data = snapshot.val()
+      if (data) {
+        const cats = Array.isArray(data)
+          ? data.filter(Boolean)
+          : Object.values(data).filter(Boolean)
+        setCategories(["Semua", ...cats])
+      } else {
+        setCategories(["Semua"])
+      }
+    })
+
+    return () => { unsubGallery(); unsubCat() }
   }, [])
 
   const filteredData =
@@ -46,7 +63,7 @@ export default function Gallery() {
   return (
     <div className="gallery-page">
 
-      {/* HERO — sama strukturnya dengan Tentang Kami */}
+      {/* HERO */}
       <div className="gallery-hero">
         <div className="gallery-hero-content">
           <span className="gallery-hero-tag">Gallery Edupark</span>
@@ -60,7 +77,7 @@ export default function Gallery() {
         {/* SIDEBAR */}
         <aside className="gallery-sidebar">
           <h3>Kategori</h3>
-          {CATEGORIES.map(cat => {
+          {categories.map(cat => {
             const count = cat === "Semua"
               ? galleryData.length
               : galleryData.filter(i => i.category === cat).length
