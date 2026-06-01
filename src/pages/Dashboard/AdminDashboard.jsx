@@ -67,8 +67,16 @@ import { db } from "../../firebase";
 ───────────────────────────────────────────── */
 const ROLES = ["admin", "editor", "writer"];
 
-/* Force semua URL gambar ke https:// agar tidak kena ERR_SSL_VERSION_OR_CIPHER_MISMATCH */
-const safeImg = (url) => (url || "").replace(/^http:\/\//i, "https://");
+/* Force semua URL gambar ke https:// dan gunakan proxy untuk i.ibb.co
+   yang sering ERR_SSL_VERSION_OR_CIPHER_MISMATCH */
+const safeImg = (url) => {
+  if (!url) return "";
+  let u = url.replace(/^http:\/\//i, "https://");
+  if (/i\.ibb\.co/i.test(u)) {
+    return "https://images.weserv.nl/?url=" + encodeURIComponent(u);
+  }
+  return u;
+};
 
 const ROLE_COLORS = {
   admin:  { bg: "#FEE2E2", text: "#991B1B", border: "#FECACA" },
@@ -404,7 +412,7 @@ function DashboardView({ articles, users, products, gallery, setActiveNav, curre
             {[...gallery].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,8).map(g => (
               <div key={g.id} style={{ borderRadius:10, overflow:"hidden", aspectRatio:"1", background:"#f0f0f0", position:"relative", cursor:"pointer" }}
                 onClick={() => setActiveNav("gallery")}>
-                {g.image && <img src={g.image} alt={g.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />}
+                {g.image && <img src={safeImg(g.image)} alt={g.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />}
                 <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top,rgba(0,0,0,0.6),transparent)", display:"flex", alignItems:"flex-end" }}>
                   <div style={{ padding:"6px 8px", fontSize:10, fontWeight:700, color:"#fff", lineHeight:1.3, overflow:"hidden" }}>{g.title}</div>
                 </div>
@@ -879,7 +887,7 @@ function ReviewArticlesView({ articles }) {
       <button className="ad-back-btn" onClick={() => { setSelected(null); setFeedback(""); }} style={{ display:"flex", alignItems:"center", gap:6 }}><ArrowLeft size={14} /> Kembali</button>
       <div className="ad-review-grid">
         <div className="ad-card" style={{ padding:"28px 32px" }}>
-          {selected.image && <img src={selected.image} alt={selected.title} className="ad-article-img" />}
+          {selected.image && <img src={safeImg(selected.image)} alt={selected.title} className="ad-article-img" />}
           <div style={{ marginBottom:8 }}><span className="ad-cat-pill">{selected.category}</span></div>
           <h1 className="ad-article-title">{selected.title}</h1>
           <div className="ad-article-meta">{selected.author} · {selected.date} · {selected.wordCount} kata</div>
@@ -980,12 +988,25 @@ function ProdukView() {
   const resetForm = () => { setForm(PRODUK_BLANK); setEditId(null); setImagePreview(""); };
 
   const uploadProdukImage = async file => {
-    const fd = new FormData(); fd.append("image", file);
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method:"POST", body:fd });
-    const json = await res.json();
-    if (!json.success) throw new Error("Upload gagal");
-    const raw = json.data.display_url || json.data.url || "";
-    return raw.replace(/^http:\/\//i, "https://");
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new window.Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const MAX = 1200; let w = img.width, h = img.height;
+          if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+          if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL("image/jpeg", 0.82));
+        };
+        img.onerror = () => reject(new Error("Gagal membaca gambar"));
+        img.src = e.target.result;
+      };
+      reader.onerror = () => reject(new Error("Gagal membaca file"));
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleProdukFileChange = async e => {
@@ -993,8 +1014,9 @@ function ProdukView() {
     setImagePreview(URL.createObjectURL(file));
     setUploading(true);
     try {
-      const url = await uploadProdukImage(file);
-      setForm(f => ({...f, image:url}));
+      const base64 = await uploadProdukImage(file);
+      setForm(f => ({...f, image:base64}));
+      setImagePreview(base64);
       showToast("✓ Foto berhasil diupload!");
     } catch (err) { showToast("✗ Upload gagal: "+err.message); }
     finally { setUploading(false); }
@@ -1057,7 +1079,7 @@ function ProdukView() {
               onMouseEnter={e => e.currentTarget.style.borderColor="#16c35b"}
               onMouseLeave={e => e.currentTarget.style.borderColor="#D1D5DB"}>
               {imagePreview
-                ? <img src={imagePreview} alt="preview" style={{ width:"100%", height:220, objectFit:"cover", display:"block" }} />
+                ? <img src={safeImg(imagePreview)} alt="preview" style={{ width:"100%", height:220, objectFit:"cover", display:"block" }} />
                 : <div style={{ padding:"40px 20px", textAlign:"center" }}>
                     <Upload size={36} color="#D1D5DB" style={{ display:"block", margin:"0 auto 10px" }} />
                     <p style={{ fontSize:15, fontWeight:600, color:"#374151", margin:"0 0 6px" }}>{uploading?"Mengupload...":"Klik untuk pilih foto"}</p>
@@ -1070,13 +1092,12 @@ function ProdukView() {
             <div style={{ marginTop:10 }}>
               <label style={fieldLabel}>Atau masukkan URL foto langsung</label>
               <input
-                value={form.image}
-                onChange={e => { setForm(f=>({...f,image:e.target.value})); setImagePreview(e.target.value); }}
-                placeholder="https://i.ibb.co/... atau URL gambar lain"
+                value={form.image.startsWith("data:") ? "" : form.image}
+                onChange={e => { setForm(f=>({...f,image:e.target.value})); setImagePreview(safeImg(e.target.value)); }}
+                placeholder="https://... URL gambar (opsional jika sudah upload)"
                 style={inputStyle}
               />
             </div>
-            <p style={{ fontSize:11, color:"#9CA3AF", margin:"6px 0 0" }}>Atau upload ke <a href="https://imgbb.com" target="_blank" rel="noreferrer" style={{ color:"#1B3A2A" }}>imgbb.com</a> lalu paste URL-nya.</p>
           </div>
           <div style={card}>
             <label style={sectionLabel}>Informasi Produk</label>
@@ -1140,7 +1161,7 @@ function ProdukView() {
             <label style={sectionLabel}>Preview Card</label>
             <div style={{ border:"1px solid #E5E7EB", borderRadius:10, overflow:"hidden" }}>
               <div style={{ position:"relative", background:"#f0f0f0", height:130 }}>
-                {form.image ? <img src={form.image} alt="preview" style={{ width:"100%", height:"100%", objectFit:"cover" }} /> : <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%", color:"#CBD5E1" }}><Image size={36} /></div>}
+                {form.image ? <img src={safeImg(form.image)} alt="preview" style={{ width:"100%", height:"100%", objectFit:"cover" }} /> : <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%", color:"#CBD5E1" }}><Image size={36} /></div>}
                 {form.badge && <span style={{ position:"absolute", top:8, left:8, padding:"3px 10px", fontSize:10, fontWeight:700, borderRadius:4, color:"#fff", background:form.badgeColor==="red"?"#ef4444":"#16c35b" }}>{form.badge}</span>}
               </div>
               <div style={{ padding:"12px 14px" }}>
@@ -1241,12 +1262,25 @@ function GalleryView() {
   const resetForm = () => { setForm(GALLERY_BLANK); setEditId(null); setImagePreview(""); };
 
   const uploadImage = async file => {
-    const fd = new FormData(); fd.append("image", file);
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method:"POST", body:fd });
-    const json = await res.json();
-    if (!json.success) throw new Error("Upload gagal");
-    const raw = json.data.display_url || json.data.url || "";
-    return raw.replace(/^http:\/\//i, "https://");
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new window.Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const MAX = 1200; let w = img.width, h = img.height;
+          if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+          if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL("image/jpeg", 0.82));
+        };
+        img.onerror = () => reject(new Error("Gagal membaca gambar"));
+        img.src = e.target.result;
+      };
+      reader.onerror = () => reject(new Error("Gagal membaca file"));
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleFileChange = async e => {
@@ -1254,8 +1288,9 @@ function GalleryView() {
     setImagePreview(URL.createObjectURL(file));
     setUploading(true);
     try {
-      const url = await uploadImage(file);
-      setForm(f => ({...f, image:url}));
+      const base64 = await uploadImage(file);
+      setForm(f => ({...f, image:base64}));
+      setImagePreview(base64);
       showToast("✓ Foto berhasil diupload!");
     } catch (err) { showToast("✗ Upload gagal: "+err.message); }
     finally { setUploading(false); }
@@ -1311,7 +1346,7 @@ function GalleryView() {
               onMouseEnter={e=>e.currentTarget.style.borderColor="#16c35b"}
               onMouseLeave={e=>e.currentTarget.style.borderColor="#D1D5DB"}>
               {imagePreview
-                ? <img src={imagePreview} alt="preview" style={{ width:"100%", height:240, objectFit:"cover", display:"block" }} />
+                ? <img src={safeImg(imagePreview)} alt="preview" style={{ width:"100%", height:240, objectFit:"cover", display:"block" }} />
                 : <div style={{ padding:"40px 20px", textAlign:"center" }}>
                     <Image size={36} color="#D1D5DB" style={{ display:"block", margin:"0 auto 10px" }} />
                     <p style={{ fontSize:15, fontWeight:600, color:"#374151", margin:"0 0 6px" }}>{uploading?"Mengupload...":"Klik untuk pilih foto"}</p>
@@ -1350,7 +1385,7 @@ function GalleryView() {
             <div style={{ border:"1px solid #E5E7EB", borderRadius:10, overflow:"hidden" }}>
               <div style={{ position:"relative", background:"#f0f0f0", height:160 }}>
                 {imagePreview
-                  ? <img src={imagePreview} alt="preview" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                  ? <img src={safeImg(imagePreview)} alt="preview" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                   : <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%", color:"#CBD5E1" }}><Image size={36} /></div>
                 }
                 <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top,rgba(0,0,0,0.6),transparent)", display:"flex", alignItems:"flex-end" }}>
@@ -1486,21 +1521,37 @@ function AttractionsView() {
   }, []);
 
   const uploadImage = async (file) => {
-    const fd = new FormData(); fd.append("image", file);
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY_ATT}`, { method:"POST", body:fd });
-    const json = await res.json();
-    if (!json.success) throw new Error("Upload gagal");
-    const raw = json.data.display_url || json.data.url || "";
-    return raw.replace(/^http:\/\//i, "https://");
+    // Kompres & konversi ke base64 — tidak perlu layanan eksternal, tidak ada SSL issue
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new window.Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const MAX = 1200;
+          let w = img.width, h = img.height;
+          if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+          if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL("image/jpeg", 0.82));
+        };
+        img.onerror = () => reject(new Error("Gagal membaca gambar"));
+        img.src = e.target.result;
+      };
+      reader.onerror = () => reject(new Error("Gagal membaca file"));
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0]; if (!file) return;
-    setImagePreview(URL.createObjectURL(file));
+    setImagePreview(URL.createObjectURL(file)); // preview sementara
     setUploading(true);
     try {
-      const url = await uploadImage(file);
-      setForm(f => ({ ...f, image: url }));
+      const base64 = await uploadImage(file);
+      setForm(f => ({ ...f, image: base64 }));
+      setImagePreview(base64); // base64 langsung tampil, tidak perlu proxy
       showToast("✓ Foto berhasil diupload!");
     } catch (err) { showToast("✗ Upload foto gagal: " + err.message); }
     finally { setUploading(false); }
@@ -1601,7 +1652,7 @@ function AttractionsView() {
               onMouseLeave={e => e.currentTarget.style.borderColor="#D1D5DB"}>
               {imagePreview ? (
                 <div style={{ position:"relative", width:"100%" }}>
-                  <img src={imagePreview} alt="preview" style={{ width:"100%", height:240, objectFit:"cover", display:"block" }} />
+                  <img src={safeImg(imagePreview)} alt="preview" style={{ width:"100%", height:240, objectFit:"cover", display:"block" }} />
                   <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.4)", display:"flex", alignItems:"center", justifyContent:"center", opacity:0, transition:"0.3s" }}
                     onMouseEnter={e => e.currentTarget.style.opacity=1} onMouseLeave={e => e.currentTarget.style.opacity=0}>
                     <span style={{ color:"#fff", fontWeight:600, fontSize:14 }}>Klik untuk ganti foto</span>
@@ -1619,7 +1670,7 @@ function AttractionsView() {
             {uploading && <p style={{ fontSize:12, color:"#16c35b", marginTop:8, fontWeight:600 }}>Sedang mengupload foto...</p>}
             <div style={{ marginTop:10 }}>
               <label style={fieldLabel}>Atau masukkan URL foto langsung</label>
-              <input value={form.image} onChange={e => { setForm(f => ({ ...f, image: e.target.value })); setImagePreview(e.target.value); }}
+              <input value={form.image} onChange={e => { setForm(f => ({ ...f, image: e.target.value })); setImagePreview(safeImg(e.target.value)); }}
                 placeholder="https://i.ibb.co/... atau URL gambar lain" style={inputStyle} />
             </div>
           </div>
@@ -1687,7 +1738,7 @@ function AttractionsView() {
             <div style={{ border:"1px solid #E5E7EB", borderRadius:10, overflow:"hidden" }}>
               <div style={{ position:"relative", background:"#f0f0f0", height:160 }}>
                 {imagePreview
-                  ? <img src={imagePreview} alt="preview" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                  ? <img src={safeImg(imagePreview)} alt="preview" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                   : <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%", color:"#CBD5E1" }}><Image size={36} color="#CBD5E1" /></div>
                 }
                 {form.badge && <span style={{ position:"absolute", top:8, left:8, padding:"3px 10px", fontSize:10, fontWeight:700, borderRadius:4, color:"#fff", background: form.badge==="HOT"?"#ef4444":"#16c35b" }}>{form.badge}</span>}
