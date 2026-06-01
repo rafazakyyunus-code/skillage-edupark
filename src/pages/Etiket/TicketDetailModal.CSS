@@ -1,382 +1,591 @@
-/* =========================
+/* =========================================
    OVERLAY
-========================= */
+========================================= */
 
 .td-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(8px);
-
+  background: rgba(30, 40, 30, 0.52);
+  backdrop-filter: blur(6px);
   display: flex;
   justify-content: center;
   align-items: center;
-
   padding: 20px;
   z-index: 9999;
-
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.25s ease;
 }
 
-/* =========================
-   MODAL
-========================= */
+/* =========================================
+   MODAL SHELL
+========================================= */
 
-.td-modal{
-  width: 900px;
-  max-width: 95%;
-  height: 85vh; /* BUKAN max-height */
-
-  background: white; /* test dulu */
-
-  border-radius: 28px;
-
-  position: relative;
-
+.td-modal {
+  width: 640px;
+  max-width: 96vw;
+  max-height: 90vh;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
   display: flex;
   flex-direction: column;
-
-  padding: 24px;
-
   overflow: hidden;
-}
-.td-scroll-content{
-  flex:1;
-
-  background:white;
-  border-radius:24px;
-
-  margin-top:60px;
-  margin-bottom:30px;
-  border:8px solid green;
-
-  overflow-y:auto;
+  animation: popup 0.28s cubic-bezier(0.34, 1.36, 0.64, 1);
 }
 
-/* Scrollbar */
+/* =========================================
+   MODAL TOP BAR (branding header)
+========================================= */
 
-.td-scroll-content::-webkit-scrollbar {
-  width: 8px;
+.td-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 16px;
+  border-bottom: 1px solid #eff2ef;
+  flex-shrink: 0;
 }
 
-.td-scroll-content::-webkit-scrollbar-thumb {
-  background: #cfd8cf;
-  border-radius: 999px;
+.td-topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.td-scroll-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.td-modal::-webkit-scrollbar-thumb {
-  background: #cfd8cf;
-  border-radius: 999px;
-}
-
-/* =========================
-   CLOSE BUTTON
-========================= */
-
-.td-close {
-  position: absolute;
-  top: 28px;
-  right: 28px;
-
-  width: 42px;
-  height: 42px;
-
-  border: none;
+.td-topbar-icon {
+  width: 34px;
+  height: 34px;
+  background: #1a5c2a;
   border-radius: 50%;
-
-  background: rgba(255,255,255,.95);
-
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #fff;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
 
+.td-topbar-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a3322;
+  letter-spacing: -0.01em;
+}
+
+.td-close {
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid #e0e8e0;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-
-  z-index: 100;
-  transition: all .3s ease;
+  color: #555;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .td-close:hover {
+  background: #f4f4f4;
+  border-color: #bbb;
   transform: rotate(90deg);
-  background: #f1f1f1;
 }
 
-/* =========================
-   HEADER
-========================= */
+/* =========================================
+   SCROLLABLE BODY
+========================================= */
 
-.td-header {
+.td-scroll-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.td-scroll-content::-webkit-scrollbar { width: 5px; }
+.td-scroll-content::-webkit-scrollbar-thumb {
+  background: #c8d8c8;
+  border-radius: 999px;
+}
+.td-scroll-content::-webkit-scrollbar-track { background: transparent; }
+
+/* =========================================
+   HERO IMAGE
+========================================= */
+
+.td-hero {
   position: relative;
-  padding: 20px 20px 10px;
+  margin: 16px 16px 0;
 }
 
-.td-header img {
+.td-hero img {
   width: 100%;
-  height: 340px;
-
+  height: 280px;
   object-fit: cover;
-  border-radius: 24px;
+  border-radius: 16px;
+  display: block;
 }
 
 .td-badge {
   position: absolute;
-  top: 35px;
-  left: 35px;
-
-  background: #dff3df;
-  color: #2f6f3e;
-
-  padding: 8px 16px;
+  top: 14px;
+  left: 14px;
+  background: #c4922a;
+  color: #fff;
+  padding: 5px 14px;
   border-radius: 999px;
-
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
-/* =========================
-   PRICE SECTION
-========================= */
+/* =========================================
+   PRICE CARDS
+========================================= */
 
 .td-prices {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-
-  gap: 16px;
-  padding: 10px 20px 0;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 16px 16px 0;
 }
 
 .td-price-card {
-  background: #f5f7f4;
-  border-radius: 18px;
-
-  padding: 18px;
-
+  background: #f4f8f4;
+  border-radius: 14px;
+  padding: 14px 16px;
   display: flex;
   align-items: center;
-  gap: 14px;
-
-  transition: all 0.3s ease;
+  gap: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .td-price-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
 }
 
-.td-price-card svg {
-  color: #4caf50;
-  font-size: 1.5rem;
+.td-price-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #1a5c2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1rem;
   flex-shrink: 0;
 }
 
 .td-price-card small {
   display: block;
-  color: #777;
-  margin-bottom: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 3px;
 }
 
 .td-price-card strong {
-  font-size: 1.35rem;
-  color: #111;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1a3322;
 }
 
-/* =========================
-   CONTENT
-========================= */
+/* =========================================
+   SECTION LABEL
+========================================= */
 
-.td-content {
-  padding: 28px 24px;
-}
-
-.td-content h2 {
-  color: #21472c;
-  margin-bottom: 14px;
-}
-
-.td-content p {
-  color: #666;
-  line-height: 1.8;
-  margin-bottom: 24px;
-}
-
-/* =========================
-   FEATURES
-========================= */
-
-.td-features {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-
-  gap: 14px;
-}
-
-.td-features div {
-  background: #fafafa;
-  border-radius: 14px;
-
-  padding: 16px;
-
+.td-section-label {
   display: flex;
   align-items: center;
   gap: 10px;
-
-  transition: all 0.3s ease;
+  padding: 20px 16px 10px;
 }
 
-.td-features div:hover {
-  background: #f1f8f0;
-  transform: translateX(5px);
-}
-
-.td-features svg {
-  color: #4caf50;
+.td-section-label::before {
+  content: "";
+  display: block;
+  width: 4px;
+  height: 20px;
+  background: #1a5c2a;
+  border-radius: 999px;
   flex-shrink: 0;
 }
 
-/* =========================
-   FOOTER
-========================= */
+.td-section-label span {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a3322;
+}
+
+/* =========================================
+   FEATURES GRID
+========================================= */
+
+.td-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 16px 20px;
+}
+
+.td-features div {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.88rem;
+  color: #444;
+  padding: 11px 14px;
+  background: #f8faf8;
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+.td-features div:hover {
+  background: #edf5ed;
+}
+
+.td-features svg {
+  color: #2e9e4f;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+/* =========================================
+   DESCRIPTION TEXT (detail view)
+========================================= */
+
+.td-desc {
+  padding: 0 16px;
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.75;
+  margin-bottom: 4px;
+}
+
+/* =========================================
+   FOOTER (sticky bottom)
+========================================= */
 
 .td-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 14px;
-
-  padding: 24px;
-
-  border-top: 1px solid #edf1ed;
-  margin-top: 20px;
-}
-
-.td-cancel,
-.td-book {
-  min-width: 140px;
-  padding: 13px 24px;
-
-  border-radius: 999px;
-  font-weight: 600;
-  cursor: pointer;
-
-  transition: all 0.3s ease;
+  gap: 12px;
+  padding: 14px 16px;
+  border-top: 1px solid #eff2ef;
+  background: #fff;
+  flex-shrink: 0;
 }
 
 .td-cancel {
-  border: 2px solid #2f6f3e;
+  padding: 11px 26px;
+  border-radius: 999px;
+  border: 1.5px solid #2a6b3c;
   background: #fff;
-  color: #2f6f3e;
+  color: #2a6b3c;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 .td-cancel:hover {
-  background: #f4faf4;
+  background: #f1f8f2;
 }
 
 .td-book {
+  padding: 11px 28px;
+  border-radius: 999px;
   border: none;
-  color: white;
-
-  background: linear-gradient(
-    135deg,
-    #2f6f3e,
-    #4caf50
-  );
+  background: #1a5c2a;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .td-book:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 25px rgba(76, 175, 80, 0.35);
+  background: #145022;
+  transform: translateY(-2px);
 }
 
-/* =========================
-   RESPONSIVE TABLET
-========================= */
+.td-book svg {
+  font-size: 1rem;
+}
 
-@media (max-width: 768px) {
+/* =========================================
+   FORM VIEW — HEADER
+========================================= */
 
-  .td-modal {
-    max-height: 92vh;
-    padding: 12px;
-  }
+.td-form-header {
+  padding: 22px 16px 16px;
+  border-bottom: 1px solid #eff2ef;
+}
 
-  .td-scroll-content {
-    max-height: calc(92vh - 24px);
-  }
+.td-form-package-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #e6f4ea;
+  color: #1a5c2a;
+  padding: 5px 13px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
 
-  .td-header img {
-    height: 240px;
-  }
+.td-form-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a3322;
+  margin: 0 0 5px;
+}
 
-  .td-prices,
-  .td-features {
-    grid-template-columns: 1fr;
-  }
+.td-form-header p {
+  font-size: 0.87rem;
+  color: #888;
+  margin: 0;
+}
+
+/* =========================================
+   FORM VIEW — FIELDS
+========================================= */
+
+.td-form-body {
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.td-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.td-field label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #2a6b3c;
+}
+
+.td-field label svg {
+  font-size: 0.85rem;
+}
+
+.td-field input[type="text"],
+.td-field input[type="date"] {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #dce8dc;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  color: #222;
+  background: #f8faf8;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.td-field input[type="text"]:focus,
+.td-field input[type="date"]:focus {
+  border-color: #2e9e4f;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(46, 158, 79, 0.12);
+}
+
+.td-field.has-error input {
+  border-color: #e05252;
+  background: #fff9f9;
+}
+
+.td-error {
+  font-size: 0.8rem;
+  color: #c0392b;
+  padding-left: 2px;
+}
+
+.td-day-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.td-day-badge.weekday {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.td-day-badge.weekend {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+/* =========================================
+   FORM VIEW — QTY STEPPER
+========================================= */
+
+.td-qty-row {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+}
+
+.td-qty-btn {
+  width: 42px;
+  height: 46px;
+  background: #f4f8f4;
+  border: 1.5px solid #dce8dc;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #2a6b3c;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  line-height: 1;
+}
+
+.td-qty-btn:first-child {
+  border-radius: 12px 0 0 12px;
+  border-right: none;
+}
+
+.td-qty-btn:last-child {
+  border-radius: 0 12px 12px 0;
+  border-left: none;
+}
+
+.td-qty-btn:hover {
+  background: #e0f0e4;
+}
+
+.td-qty-row input[type="number"] {
+  width: 68px;
+  height: 46px;
+  border: 1.5px solid #dce8dc;
+  border-radius: 0;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a3322;
+  background: #fff;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.td-qty-row input[type="number"]::-webkit-outer-spin-button,
+.td-qty-row input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* =========================================
+   FORM VIEW — TOTAL BOX
+========================================= */
+
+.td-total-box {
+  background: #f4f8f4;
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+
+.td-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.td-total-row strong {
+  color: #1a3322;
+  font-size: 0.92rem;
+}
+
+.td-total-divider {
+  height: 1px;
+  background: #d8e8d8;
+  margin: 8px 0;
+}
+
+.td-total-row.total {
+  font-weight: 700;
+  color: #1a3322;
+}
+
+.td-total-row.total strong {
+  font-size: 1.2rem;
+  color: #1a5c2a;
+}
+
+/* =========================================
+   BACK BUTTON (form view)
+========================================= */
+
+.td-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #2a6b3c;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.2s ease;
+}
+
+.td-back:hover {
+  opacity: 0.7;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 520px) {
+  .td-hero img { height: 210px; }
+  .td-prices { grid-template-columns: 1fr; }
+  .td-features { grid-template-columns: 1fr; }
 
   .td-footer {
-    flex-direction: column;
+    flex-direction: column-reverse;
+    gap: 8px;
   }
 
-  .td-cancel,
-  .td-book {
+  .td-cancel, .td-book {
     width: 100%;
+    justify-content: center;
+    text-align: center;
   }
 }
 
-/* =========================
-   RESPONSIVE MOBILE
-========================= */
-
-@media (max-width: 480px) {
-
-  .td-header {
-    padding: 12px;
-  }
-
-  .td-header img {
-    height: 200px;
-    border-radius: 16px;
-  }
-
-  .td-content {
-    padding: 20px;
-  }
-
-  .td-badge {
-    top: 24px;
-    left: 24px;
-    font-size: 12px;
-  }
-
-  .td-close {
-    top: 20px;
-    right: 20px;
-  }
-}
-
-/* =========================
-   ANIMATION
-========================= */
+/* =========================================
+   ANIMATIONS
+========================================= */
 
 @keyframes popup {
-  from {
-    opacity: 0;
-    transform: scale(0.92);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.94) translateY(10px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
