@@ -173,12 +173,16 @@ export default function TicketDetailModal({ selected, initialView = "detail", on
               </div>
 
               <div className="td-features">
-                <div><FaCheckCircle />Kolam anak dengan wahana interaktif</div>
-                <div><FaCheckCircle />Family slide aman untuk segala usia</div>
-                <div><FaCheckCircle />Gazebo dan area santai keluarga</div>
-                <div><FaCheckCircle />Fasilitas keamanan lengkap</div>
-                <div><FaCheckCircle />Area foto instagramable</div>
-                <div><FaCheckCircle />Pemandu wisata profesional</div>
+                {Array.isArray(selected.features) && selected.features.filter(Boolean).length > 0
+                  ? selected.features.filter(Boolean).map((feat, idx) => (
+                      <div key={idx}><FaCheckCircle />{feat}</div>
+                    ))
+                  : (
+                    <div style={{ gridColumn: "1 / -1", color: "#aaa", fontSize: "0.88rem", padding: "8px 0" }}>
+                      Belum ada detail paket yang ditambahkan.
+                    </div>
+                  )
+                }
               </div>
             </>
           )}

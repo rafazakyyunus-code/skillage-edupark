@@ -1974,6 +1974,7 @@ const TICKET_BLANK = {
   weekend: "",
   featured: false,
   iconName: "FaSwimmingPool",
+  features: ["", "", "", "", "", ""],
 };
 
 const TICKET_ICON_OPTIONS = [
@@ -2066,6 +2067,7 @@ function TicketsOnlineView() {
         weekend:   fmtPrice(form.weekend),
         featured:  !!form.featured,
         iconName:  form.iconName || "FaTicketAlt",
+        features:  (form.features || []).map(f => f.trim()).filter(Boolean),
         updatedAt: new Date().toISOString(),
       };
       if (editId) {
@@ -2096,6 +2098,9 @@ function TicketsOnlineView() {
       weekend:  rawPrice(item.weekend),
       featured: !!item.featured,
       iconName: item.iconName || "FaTicketAlt",
+      features: Array.isArray(item.features)
+        ? [...item.features, "", "", "", "", "", ""].slice(0, 6)
+        : ["", "", "", "", "", ""],
     });
     setEditId(item.firebaseId);
     setImagePreview(item.image || "");
@@ -2251,6 +2256,38 @@ function TicketsOnlineView() {
                 Tandai sebagai paket unggulan (featured)
               </label>
               <p style={{ fontSize:11, color:"#9CA3AF", marginTop:3 }}>Paket featured akan ditampilkan dengan border hijau di halaman publik.</p>
+            </div>
+          </div>
+
+          {/* Detail Paket / Features */}
+          <div style={card}>
+            <label style={sectionLabel}>
+              <span style={{ display:"flex", alignItems:"center", gap:6 }}>
+                <IcoCheck size={15} color="#374151"/>
+                Detail Paket
+                <span style={{ fontWeight:400, color:"#9CA3AF", fontSize:12 }}>(tampil di modal detail — maks 6 item)</span>
+              </span>
+            </label>
+            <p style={{ fontSize:12, color:"#9CA3AF", margin:"0 0 12px" }}>
+              Isi keunggulan / fasilitas yang termasuk dalam paket ini. Kosongkan baris yang tidak diperlukan.
+            </p>
+            <div style={{ display:"flex", flexDirection:"column", gap:9 }}>
+              {(form.features || ["","","","","",""]).map((feat, idx) => (
+                <div key={idx} style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <span style={{ fontSize:12, color:"#9CA3AF", width:20, textAlign:"right", flexShrink:0 }}>{idx+1}.</span>
+                  <input
+                    type="text"
+                    placeholder={`Fasilitas ke-${idx+1}, misal: Kolam anak dengan wahana interaktif`}
+                    value={feat}
+                    onChange={e => {
+                      const updated = [...(form.features || ["","","","","",""])];
+                      updated[idx] = e.target.value;
+                      setForm(f => ({ ...f, features: updated }));
+                    }}
+                    style={{ ...input, flex:1 }}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>
