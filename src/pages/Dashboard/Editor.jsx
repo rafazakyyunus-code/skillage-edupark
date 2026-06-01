@@ -80,6 +80,18 @@ function AttractionsIcon({ active }) {
     </svg>
   );
 }
+function TicketsOnlineIcon({ active }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+      stroke={active ? "#fff" : "rgba(255,255,255,0.6)"} strokeWidth="2"
+      strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/>
+      <line x1="9" y1="9" x2="9" y2="9.01"/>
+      <line x1="9" y1="12" x2="9" y2="12.01"/>
+      <line x1="9" y1="15" x2="9" y2="15.01"/>
+    </svg>
+  );
+}
 
 /* ─────────────────────────────────────────────
    INLINE SVG ICONS (UI use – not sidebar)
@@ -114,7 +126,8 @@ const NAV_ITEMS = [
   { id: "writers",     label: "Writer Directory", Icon: WritersIcon },
   { id: "produk",      label: "Produk",            Icon: ProdukIcon },
   { id: "gallery",     label: "Gallery",           Icon: GalleryIcon },
-  { id: "attractions", label: "Attractions",       Icon: AttractionsIcon },
+  { id: "attractions",  label: "Attractions",       Icon: AttractionsIcon },
+  { id: "ticketonline", label: "Tiket Online",      Icon: TicketsOnlineIcon },
 ];
 
 /* ─────────────────────────────────────────────
@@ -1951,7 +1964,475 @@ function AttractionsView() {
 }
 
 /* ─────────────────────────────────────────────
-   SHARED STYLE SHORTCUTS
+   TICKETS ONLINE MANAGEMENT VIEW
+───────────────────────────────────────────── */
+const TICKET_BLANK = {
+  title: "",
+  category: "Paket Wisata",
+  image: "",
+  weekday: "",
+  weekend: "",
+  featured: false,
+  iconName: "FaSwimmingPool",
+};
+
+const TICKET_ICON_OPTIONS = [
+  { value: "FaSwimmingPool", label: "Kolam Renang" },
+  { value: "FaTree",         label: "Alam / Pohon" },
+  { value: "FaCampground",   label: "Camping" },
+  { value: "FaTicketAlt",    label: "Tiket" },
+  { value: "FaUsers",        label: "Rombongan" },
+  { value: "FaStar",         label: "Unggulan" },
+];
+
+function TicketsOnlineView() {
+  const db = getDatabase();
+
+  const [items, setItems]               = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [view, setView]                 = useState("list"); // "list" | "form"
+  const [form, setForm]                 = useState(TICKET_BLANK);
+  const [editId, setEditId]             = useState(null);
+  const [saving, setSaving]             = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [toast, setToast]               = useState("");
+  const [imagePreview, setImagePreview] = useState("");
+  const [uploading, setUploading]       = useState(false);
+
+  /* ── realtime listener ── */
+  useEffect(() => {
+    const tickRef = ref(db, "ticketsOnline");
+    const unsub = onValue(tickRef, (snap) => {
+      const data = snap.val();
+      if (data) {
+        const list = Object.entries(data).map(([key, val]) => ({ ...val, firebaseId: key }));
+        setItems(list.sort((a, b) => (a.order || 0) - (b.order || 0) || (b.createdAt || 0) - (a.createdAt || 0)));
+      } else {
+        setItems([]);
+      }
+      setLoading(false);
+    });
+    return () => unsub();
+  }, []);
+
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
+
+  /* ── upload foto ke ImgBB ── */
+  const IMGBB_KEY = "6604bf748a40b7eaf83a5d4792bff01e";
+  const uploadImage = async (file) => {
+    const fd = new FormData();
+    fd.append("image", file);
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: "POST", body: fd });
+    const json = await res.json();
+    if (!json.success) throw new Error("Upload gagal");
+    return json.data.url;
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImagePreview(URL.createObjectURL(file));
+    setUploading(true);
+    try {
+      const url = await uploadImage(file);
+      setForm(f => ({ ...f, image: url }));
+      showToast("✓ Foto berhasil diupload!");
+    } catch (err) {
+      showToast("✗ Upload foto gagal: " + err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  /* ── save ── */
+  const handleSave = async () => {
+    if (!form.title.trim()) return showToast("✗ Nama paket wajib diisi.");
+    if (!form.weekday || isNaN(Number(String(form.weekday).replace(/\D/g,"")))) return showToast("✗ Harga weekday harus angka.");
+    if (!form.weekend || isNaN(Number(String(form.weekend).replace(/\D/g,"")))) return showToast("✗ Harga weekend harus angka.");
+    if (!form.image.trim()) return showToast("✗ Upload foto terlebih dahulu.");
+
+    setSaving(true);
+    try {
+      // Store prices as formatted string "Rp X.XXX.XXX"
+      const fmtPrice = (val) => {
+        const num = parseInt(String(val).replace(/\D/g,""), 10) || 0;
+        return "Rp " + num.toLocaleString("id-ID");
+      };
+      const payload = {
+        title:     form.title.trim(),
+        category:  form.category.trim() || "Paket Wisata",
+        image:     form.image.trim(),
+        weekday:   fmtPrice(form.weekday),
+        weekend:   fmtPrice(form.weekend),
+        featured:  !!form.featured,
+        iconName:  form.iconName || "FaTicketAlt",
+        updatedAt: new Date().toISOString(),
+      };
+      if (editId) {
+        await update(ref(db, `ticketsOnline/${editId}`), payload);
+        showToast("✓ Paket berhasil diperbarui!");
+      } else {
+        await push(ref(db, "ticketsOnline"), { ...payload, order: items.length, createdAt: new Date().toISOString() });
+        showToast("✓ Paket berhasil ditambahkan!");
+      }
+      setView("list"); resetForm();
+    } catch (err) {
+      showToast("✗ Gagal menyimpan: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const resetForm = () => { setForm(TICKET_BLANK); setEditId(null); setImagePreview(""); };
+
+  const handleEdit = (item) => {
+    // Strip "Rp " prefix and dots for editing
+    const rawPrice = (str) => str ? str.replace(/[^\d]/g, "") : "";
+    setForm({
+      title:    item.title || "",
+      category: item.category || "Paket Wisata",
+      image:    item.image || "",
+      weekday:  rawPrice(item.weekday),
+      weekend:  rawPrice(item.weekend),
+      featured: !!item.featured,
+      iconName: item.iconName || "FaTicketAlt",
+    });
+    setEditId(item.firebaseId);
+    setImagePreview(item.image || "");
+    setView("form");
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await remove(ref(db, `ticketsOnline/${id}`));
+      showToast("Paket dihapus."); setDeleteConfirm(null);
+    } catch (err) { showToast("✗ Gagal menghapus: " + err.message); }
+  };
+
+  const fmtRp = (val) => {
+    const num = parseInt(String(val).replace(/\D/g,""), 10) || 0;
+    return num ? "Rp " + num.toLocaleString("id-ID") : "";
+  };
+
+  /* ════════ FORM VIEW ════════ */
+  if (view === "form") return (
+    <div>
+      {toast && (
+        <div style={{ position:"fixed", top:24, right:24, background: toast.startsWith("✓") ? "#1B3A2A" : "#DC2626",
+          color:"#fff", padding:"12px 20px", borderRadius:10, fontSize:14, fontWeight:600, zIndex:999,
+          boxShadow:"0 4px 20px rgba(0,0,0,0.15)" }}>{toast}</div>
+      )}
+
+      <div style={{ marginBottom:24 }}>
+        <button onClick={() => { setView("list"); resetForm(); }}
+          style={{ background:"none", border:"none", color:"#6B7280", fontSize:13, cursor:"pointer", marginBottom:4, fontWeight:500, padding:0 }}>
+          ← Kembali ke daftar
+        </button>
+        <h1 style={{ fontSize:22, fontWeight:700, color:"#111827", margin:0 }}>
+          {editId ? "Edit Paket Tiket Online" : "Tambah Paket Tiket Online Baru"}
+        </h1>
+        <p style={{ color:"#6B7280", fontSize:14, margin:"4px 0 0" }}>Paket yang ditambahkan akan langsung tampil di halaman /tickets-online</p>
+      </div>
+
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 300px", gap:20, alignItems:"flex-start" }}>
+
+        {/* LEFT */}
+        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+
+          {/* Upload Foto */}
+          <div style={card}>
+            <label style={sectionLabel}>Foto Paket</label>
+            <div
+              onClick={() => document.getElementById("ticket-file-input").click()}
+              style={{
+                border:"2px dashed #D1D5DB", borderRadius:12, cursor:"pointer",
+                overflow:"hidden", minHeight: imagePreview ? "auto" : 160,
+                display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+                transition:"border-color 0.2s",
+              }}
+              onMouseEnter={e => e.currentTarget.style.borderColor="#16c35b"}
+              onMouseLeave={e => e.currentTarget.style.borderColor="#D1D5DB"}
+            >
+              {imagePreview ? (
+                <img src={imagePreview} alt="preview" style={{ width:"100%", maxHeight:240, objectFit:"cover", display:"block" }} />
+              ) : (
+                <div style={{ textAlign:"center", padding:32, color:"#9CA3AF" }}>
+                  <IcoImage size={36} color="#D1D5DB" />
+                  <p style={{ marginTop:10, fontSize:13 }}>Klik untuk upload foto paket</p>
+                  <p style={{ fontSize:11, color:"#D1D5DB", margin:"4px 0 0" }}>PNG, JPG, WEBP</p>
+                </div>
+              )}
+            </div>
+            <input id="ticket-file-input" type="file" accept="image/*" style={{ display:"none" }} onChange={handleFileChange} />
+            {uploading && <p style={{ fontSize:12, color:"#6B7280", marginTop:6 }}>⏳ Mengupload foto...</p>}
+            <div style={{ marginTop:12 }}>
+              <label style={fieldLabel}>Atau masukkan URL foto</label>
+              <input
+                type="text"
+                placeholder="https://..."
+                value={form.image}
+                onChange={e => { setForm(f => ({ ...f, image: e.target.value })); setImagePreview(e.target.value); }}
+                style={input}
+              />
+            </div>
+          </div>
+
+          {/* Info Paket */}
+          <div style={card}>
+            <label style={sectionLabel}>Informasi Paket</label>
+
+            <div style={{ marginBottom:12 }}>
+              <label style={fieldLabel}>Nama Paket *</label>
+              <input
+                type="text"
+                placeholder="cth. Paket Keluarga, Tiket Per Orang"
+                value={form.title}
+                onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                style={input}
+              />
+            </div>
+
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:12 }}>
+              <div>
+                <label style={fieldLabel}>Harga Weekday (Rp) *</label>
+                <input
+                  type="number"
+                  placeholder="cth. 150000"
+                  value={form.weekday}
+                  onChange={e => setForm(f => ({ ...f, weekday: e.target.value }))}
+                  style={input}
+                  min={0}
+                />
+                {form.weekday && <p style={{ fontSize:11, color:"#16a34a", marginTop:3 }}>{fmtRp(form.weekday)}</p>}
+              </div>
+              <div>
+                <label style={fieldLabel}>Harga Weekend (Rp) *</label>
+                <input
+                  type="number"
+                  placeholder="cth. 50000"
+                  value={form.weekend}
+                  onChange={e => setForm(f => ({ ...f, weekend: e.target.value }))}
+                  style={input}
+                  min={0}
+                />
+                {form.weekend && <p style={{ fontSize:11, color:"#16a34a", marginTop:3 }}>{fmtRp(form.weekend)}</p>}
+              </div>
+            </div>
+
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+              <div>
+                <label style={fieldLabel}>Kategori</label>
+                <input
+                  type="text"
+                  placeholder="Paket Wisata"
+                  value={form.category}
+                  onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
+                  style={input}
+                />
+              </div>
+              <div>
+                <label style={fieldLabel}>Icon</label>
+                <select value={form.iconName} onChange={e => setForm(f => ({ ...f, iconName: e.target.value }))} style={input}>
+                  {TICKET_ICON_OPTIONS.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div style={{ marginTop:12 }}>
+              <label style={{ display:"flex", alignItems:"center", gap:8, cursor:"pointer", fontSize:13, fontWeight:600, color:"#374151" }}>
+                <input
+                  type="checkbox"
+                  checked={form.featured}
+                  onChange={e => setForm(f => ({ ...f, featured: e.target.checked }))}
+                  style={{ width:16, height:16, accentColor:"#1B3A2A" }}
+                />
+                Tandai sebagai paket unggulan (featured)
+              </label>
+              <p style={{ fontSize:11, color:"#9CA3AF", marginTop:3 }}>Paket featured akan ditampilkan dengan border hijau di halaman publik.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT */}
+        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+          {/* Preview */}
+          <div style={card}>
+            <label style={sectionLabel}>
+              <span style={{ display:"flex", alignItems:"center", gap:6 }}><IcoEye size={15} color="#374151"/>Preview Card</span>
+            </label>
+            <div style={{ border: form.featured ? "2px solid #4caf50" : "1px solid #E5E7EB", borderRadius:14, overflow:"hidden" }}>
+              <div style={{ height:140, background:"#f0f0f0", overflow:"hidden" }}>
+                {imagePreview
+                  ? <img src={imagePreview} alt="preview" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                  : <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%" }}>
+                      <IcoImage size={32} color="#D1D5DB" />
+                    </div>
+                }
+              </div>
+              <div style={{ padding:"12px 14px" }}>
+                <div style={{ fontSize:11, color:"#4caf50", fontWeight:700, marginBottom:6 }}>🌿 {form.category || "Paket Wisata"}</div>
+                <div style={{ fontSize:15, fontWeight:700, color:"#1e3b25", marginBottom:10 }}>{form.title || "Nama Paket"}</div>
+                <div style={{ display:"flex", gap:8 }}>
+                  <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
+                    <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKDAY</div>
+                    <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{form.weekday ? fmtRp(form.weekday) : "—"}</div>
+                  </div>
+                  <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
+                    <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKEND</div>
+                    <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{form.weekend ? fmtRp(form.weekend) : "—"}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button onClick={handleSave} disabled={saving || uploading}
+            style={{ width:"100%", padding:"14px", background:(saving||uploading)?"#9CA3AF":"#1B3A2A",
+              color:"#fff", border:"none", borderRadius:10, fontSize:15, fontWeight:700,
+              cursor:(saving||uploading)?"not-allowed":"pointer" }}>
+            {saving ? "Menyimpan..." : uploading ? "Menunggu upload..." : editId
+              ? <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}><IcoSave size={16} color="#fff"/>Perbarui Paket</span>
+              : <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}><IcoPlus size={16} color="#fff"/>Simpan Paket</span>
+            }
+          </button>
+          <button onClick={() => { setView("list"); resetForm(); }}
+            style={{ width:"100%", padding:"12px", background:"#fff", border:"1px solid #E5E7EB",
+              color:"#374151", borderRadius:10, fontSize:14, fontWeight:600, cursor:"pointer" }}>
+            Batal
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  /* ════════ LIST VIEW ════════ */
+  return (
+    <div>
+      {toast && (
+        <div style={{ position:"fixed", top:24, right:24, background: toast.startsWith("✓") ? "#1B3A2A" : "#DC2626",
+          color:"#fff", padding:"12px 20px", borderRadius:10, fontSize:14, fontWeight:600, zIndex:999,
+          boxShadow:"0 4px 20px rgba(0,0,0,0.15)" }}>{toast}</div>
+      )}
+
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20 }}>
+        <div>
+          <h1 style={{ fontSize:22, fontWeight:700, color:"#111827", margin:0 }}>Manajemen Tiket Online</h1>
+          <p style={{ color:"#6B7280", fontSize:14, margin:"4px 0 0" }}>
+            {items.length} paket aktif · tampil realtime di /tickets-online
+          </p>
+        </div>
+        <button onClick={() => { resetForm(); setView("form"); }}
+          style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 18px",
+            background:"#1B3A2A", color:"#fff", border:"none", borderRadius:10,
+            fontSize:14, fontWeight:600, cursor:"pointer" }}>
+          + Tambah Paket
+        </button>
+      </div>
+
+      {loading && (
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:200 }}>
+          <IcoLoader size={28} color="#9CA3AF" />
+        </div>
+      )}
+
+      {!loading && items.length === 0 && (
+        <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:12,
+          padding:"60px 20px", textAlign:"center" }}>
+          <div style={{ display:"flex", justifyContent:"center", marginBottom:12 }}>
+            <TicketsOnlineIcon active={false} />
+          </div>
+          <p style={{ color:"#6B7280", fontSize:14 }}>Belum ada paket tiket online. Klik "+ Tambah Paket" untuk mulai.</p>
+        </div>
+      )}
+
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(280px, 1fr))", gap:16 }}>
+        {items.map(item => (
+          <div key={item.firebaseId} style={{
+            background:"#fff",
+            border: item.featured ? "2px solid #4caf50" : "1px solid #E5E7EB",
+            borderRadius:12, overflow:"hidden",
+            boxShadow:"0 2px 8px rgba(0,0,0,0.05)", display:"flex", flexDirection:"column",
+          }}>
+            <div style={{ position:"relative", height:160, background:"#f0f0f0", overflow:"hidden" }}>
+              {item.image
+                ? <img src={item.image} alt={item.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                : <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%" }}>
+                    <IcoImage size={32} color="#D1D5DB" />
+                  </div>
+              }
+              {item.featured && (
+                <span style={{ position:"absolute", top:8, right:8, background:"#4caf50",
+                  color:"#fff", fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:20 }}>
+                  FEATURED
+                </span>
+              )}
+            </div>
+
+            <div style={{ padding:"14px 16px", flex:1 }}>
+              <div style={{ fontSize:11, color:"#4caf50", fontWeight:700, marginBottom:4 }}>🌿 {item.category}</div>
+              <div style={{ fontSize:16, fontWeight:700, color:"#111827", marginBottom:10, lineHeight:1.3 }}>{item.title}</div>
+              <div style={{ display:"flex", gap:8 }}>
+                <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
+                  <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600, marginBottom:2 }}>WEEKDAY</div>
+                  <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{item.weekday}</div>
+                </div>
+                <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
+                  <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600, marginBottom:2 }}>WEEKEND</div>
+                  <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{item.weekend}</div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ padding:"10px 16px", borderTop:"1px solid #F3F4F6", display:"flex", gap:8 }}>
+              <button onClick={() => handleEdit(item)}
+                style={{ flex:1, padding:"8px", background:"#E8F4EE", color:"#1B3A2A",
+                  border:"none", borderRadius:8, fontSize:13, fontWeight:600, cursor:"pointer",
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                <IcoEdit size={14} color="#1B3A2A" /> Edit
+              </button>
+              <button onClick={() => setDeleteConfirm(item)}
+                style={{ flex:1, padding:"8px", background:"#FEF2F2", color:"#DC2626",
+                  border:"none", borderRadius:8, fontSize:13, fontWeight:600, cursor:"pointer",
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                <IcoTrash size={14} color="#DC2626" /> Hapus
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Delete Confirm Modal */}
+      {deleteConfirm && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.45)", display:"flex",
+          alignItems:"center", justifyContent:"center", zIndex:1000 }}>
+          <div style={{ background:"#fff", padding:28, borderRadius:14, width:340, textAlign:"center" }}>
+            <div style={{ display:"flex", justifyContent:"center", marginBottom:10 }}><IcoAlert size={36} color="#DC2626" /></div>
+            <h3 style={{ margin:"0 0 8px", color:"#111827", fontSize:17, fontWeight:700 }}>Hapus Paket Tiket?</h3>
+            <p style={{ color:"#6B7280", fontSize:13, marginBottom:20 }}>
+              Paket <strong>"{deleteConfirm.title}"</strong> akan dihapus permanen dari database.
+            </p>
+            <div style={{ display:"flex", gap:10, justifyContent:"center" }}>
+              <button onClick={() => setDeleteConfirm(null)}
+                style={{ padding:"9px 20px", borderRadius:8, border:"1px solid #E5E7EB",
+                  background:"#fff", color:"#374151", fontSize:14, cursor:"pointer", fontWeight:600 }}>
+                Batal
+              </button>
+              <button onClick={() => handleDelete(deleteConfirm.firebaseId)}
+                style={{ padding:"9px 20px", borderRadius:8, border:"none",
+                  background:"#DC2626", color:"#fff", fontSize:14, cursor:"pointer", fontWeight:700 }}>
+                Ya, Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
 ───────────────────────────────────────────── */
 const card = {
   background: "#fff", border: "1px solid #E5E7EB",
@@ -2097,6 +2578,7 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
   const [produkList, setProdukList]           = useState([]);
   const [galleryList, setGalleryList]         = useState([]);
   const [attractionsList, setAttractionsList] = useState([]);
+  const [ticketsList, setTicketsList]         = useState([]);
   useEffect(() => {
     const db = getDatabase();
     const unsubP = onValue(ref(db, "produk"), snap => {
@@ -2111,7 +2593,11 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
       const d = snap.val();
       setAttractionsList(d ? Object.entries(d).map(([k,v])=>({...v, firebaseId:k})) : []);
     });
-    return () => { unsubP(); unsubG(); unsubA(); };
+    const unsubT = onValue(ref(db, "ticketsOnline"), snap => {
+      const d = snap.val();
+      setTicketsList(d ? Object.entries(d).map(([k,v])=>({...v, firebaseId:k})) : []);
+    });
+    return () => { unsubP(); unsubG(); unsubA(); unsubT(); };
   }, []);
 
   const articles  = externalArticles;
@@ -2161,6 +2647,7 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
                         : id === "produk" ? produkList.length
                         : id === "gallery" ? galleryList.length
                         : id === "attractions" ? attractionsList.length
+                        : id === "ticketonline" ? ticketsList.length
                         : id === "writers" ? [...new Set(articles.map(a=>a.author))].length
                         : null;
             return (
@@ -2560,6 +3047,9 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
 
         {/* ATTRACTIONS */}
         {activeNav === "attractions" && <AttractionsView />}
+
+        {/* TICKETS ONLINE */}
+        {activeNav === "ticketonline" && <TicketsOnlineView />}
 
         {/* SETTINGS */}
         {activeNav === "settings" && <EditorSettingsView onLogout={handleLogout} onNameChange={setProfileName} />}

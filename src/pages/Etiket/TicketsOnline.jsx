@@ -1,7 +1,8 @@
 // src/pages/Etiket/TicketsOnline.jsx
 
 import "./TicketsOnline.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getDatabase, ref, onValue } from "firebase/database";
 import TicketDetailModal from "./TicketDetailModal";
 
 import {
@@ -9,39 +10,46 @@ import {
   FaTree,
   FaCampground,
   FaArrowRight,
+  FaTicketAlt,
+  FaUsers,
+  FaStar,
 } from "react-icons/fa";
+
+// Map iconName string → JSX icon component
+const ICON_MAP = {
+  FaSwimmingPool: <FaSwimmingPool />,
+  FaTree:         <FaTree />,
+  FaCampground:   <FaCampground />,
+  FaTicketAlt:    <FaTicketAlt />,
+  FaUsers:        <FaUsers />,
+  FaStar:         <FaStar />,
+};
 
 export default function TicketsOnline() {
 
+  const [packages, setPackages]         = useState([]);
+  const [loading, setLoading]           = useState(true);
   const [selectedPackage, setSelectedPackage] = useState(null);
-  // "detail" = buka modal di view detail
-  // "form"   = buka modal langsung di view form (dari tombol Pesan Sekarang card)
-  const [initialView, setInitialView] = useState("detail");
+  const [initialView, setInitialView]   = useState("detail");
 
-  const packages = [
-    {
-      title: "Paket Keluarga",
-      icon: <FaSwimmingPool />,
-      image: "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=1200",
-      weekday: "Rp 1.500.000",
-      weekend: "Rp 750.000",
-    },
-    {
-      title: "Paket Rombongan",
-      icon: <FaTree />,
-      image: "https://images.unsplash.com/photo-1511497584788-876760111969?w=1200",
-      weekday: "Rp 1.000.000",
-      weekend: "Rp 550.000",
-      featured: true,
-    },
-    {
-      title: "Tiket Per Orang",
-      icon: <FaCampground />,
-      image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
-      weekday: "Rp 150.000",
-      weekend: "Rp 50.000",
-    },
-  ];
+  /* ── load realtime dari Firebase ── */
+  useEffect(() => {
+    const db = getDatabase();
+    const tickRef = ref(db, "ticketsOnline");
+    const unsub = onValue(tickRef, (snap) => {
+      const data = snap.val();
+      if (data) {
+        const list = Object.entries(data)
+          .map(([key, val]) => ({ ...val, firebaseId: key }))
+          .sort((a, b) => (a.order || 0) - (b.order || 0) || (a.createdAt || "").localeCompare(b.createdAt || ""));
+        setPackages(list);
+      } else {
+        setPackages([]);
+      }
+      setLoading(false);
+    });
+    return () => unsub();
+  }, []);
 
   function openDetail(item) {
     setInitialView("detail");
@@ -73,64 +81,78 @@ export default function TicketsOnline() {
 
       </section>
 
+      {/* LOADING */}
+      {loading && (
+        <div style={{ textAlign:"center", padding:"60px 0", color:"#6b7c6b", fontSize:15 }}>
+          Memuat paket tiket...
+        </div>
+      )}
+
+      {/* EMPTY STATE */}
+      {!loading && packages.length === 0 && (
+        <div style={{ textAlign:"center", padding:"60px 20px", color:"#6b7c6b" }}>
+          <p style={{ fontSize:15 }}>Belum ada paket tiket yang tersedia saat ini.</p>
+        </div>
+      )}
+
       {/* PACKAGE GRID */}
-      <section className="ticket-grid">
-
-        {packages.map((item, index) => (
-          <div
-            className={`ticket-card ${item.featured ? "featured" : ""}`}
-            key={index}
-          >
-            <div className="ticket-image">
-              <img src={item.image} alt={item.title} />
-            </div>
-
-            <div className="ticket-content">
-
-              <span className="ticket-category">
-                {item.icon}
-                Paket Wisata
-              </span>
-
-              <h3>{item.title}</h3>
-
-              <div className="price-wrapper">
-                <div className="price-box">
-                  <small>Harga Weekday</small>
-                  <strong>{item.weekday}</strong>
-                </div>
-                <div className="price-box">
-                  <small>Harga Weekend</small>
-                  <strong>{item.weekend}</strong>
-                </div>
+      {!loading && packages.length > 0 && (
+        <section className="ticket-grid">
+          {packages.map((item) => (
+            <div
+              className={`ticket-card ${item.featured ? "featured" : ""}`}
+              key={item.firebaseId}
+            >
+              <div className="ticket-image">
+                <img src={item.image} alt={item.title} />
               </div>
 
-              <div className="ticket-buttons">
+              <div className="ticket-content">
 
-                {/* Pesan Sekarang → buka modal di view form */}
-                <button
-                  className="book-btn"
-                  onClick={() => openForm(item)}
-                >
-                  Pesan Sekarang
-                </button>
+                <span className="ticket-category">
+                  {ICON_MAP[item.iconName] || <FaTicketAlt />}
+                  {item.category || "Paket Wisata"}
+                </span>
 
-                {/* Selengkapnya → buka modal di view detail */}
-                <button
-                  className="detail-btn"
-                  onClick={() => openDetail(item)}
-                >
-                  Selengkapnya
-                  <FaArrowRight />
-                </button>
+                <h3>{item.title}</h3>
+
+                <div className="price-wrapper">
+                  <div className="price-box">
+                    <small>Harga Weekday</small>
+                    <strong>{item.weekday}</strong>
+                  </div>
+                  <div className="price-box">
+                    <small>Harga Weekend</small>
+                    <strong>{item.weekend}</strong>
+                  </div>
+                </div>
+
+                <div className="ticket-buttons">
+
+                  {/* Pesan Sekarang → buka modal di view form */}
+                  <button
+                    className="book-btn"
+                    onClick={() => openForm(item)}
+                  >
+                    Pesan Sekarang
+                  </button>
+
+                  {/* Selengkapnya → buka modal di view detail */}
+                  <button
+                    className="detail-btn"
+                    onClick={() => openDetail(item)}
+                  >
+                    Selengkapnya
+                    <FaArrowRight />
+                  </button>
+
+                </div>
 
               </div>
-
             </div>
-          </div>
-        ))}
-
-      </section>
+          ))}
+        </section>
+      )}
 
       {/* MISSION */}
       <section className="ticket-mission">
