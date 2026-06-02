@@ -84,19 +84,22 @@ export default function TicketDetailModal({ selected, initialView = "detail", on
     return Object.keys(e).length === 0;
   }
 
-  function handleSendWA() {
+    function handleSendWA() {
     if (!validate()) return;
     const message =
-      `🌿 *Booking Skillage Edupark*\n\n` +
-      `• *Paket*      : ${selected.title}\n` +
-      `• *Nama*       : ${nama.trim()}\n` +
-      `• *Tanggal*    : ${formatDateDisplay(tanggal)} (${dayType})\n` +
-      `• *Jumlah*     : ${jumlah} Tiket/Paket\n` +
-      `• *Harga/unit* : ${formatRupiah(pricePerUnit)}\n` +
-      `• *Total Biaya*: ${formatRupiah(totalHarga)}\n\n` +
-      `Mohon instruksi pembayaran selanjutnya, terima kasih. 🙏`;
+      `*BOOKING SKILLAGE EDUPARK*\n` +
+      `-----------------------------------------\n\n` +
+      `▪ *Paket* : ${selected.title}\n` +
+      `▪ *Nama* : ${nama.trim()}\n` +
+      `▪ *Tanggal* : ${formatDateDisplay(tanggal)} (${dayType})\n` +
+      `▪ *Jumlah* : ${jumlah} Tiket/Paket\n` +
+      `▪ *Harga/unit* : ${formatRupiah(pricePerUnit)}\n` +
+      `▪ *Total Biaya* : *${formatRupiah(totalHarga)}*\n\n` +
+      `Mohon instruksi pembayaran selanjutnya, terima kasih.`;
+      
     window.open(
       `https://wa.me/6285219801259?text=${encodeURIComponent(message)}`,
+      "_blank",
       "_blank",
       "noopener,noreferrer"
     );

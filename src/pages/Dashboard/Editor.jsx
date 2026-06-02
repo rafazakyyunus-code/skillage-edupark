@@ -2309,7 +2309,12 @@ function TicketsOnlineView() {
                 }
               </div>
               <div style={{ padding:"12px 14px" }}>
-                <div style={{ fontSize:11, color:"#4caf50", fontWeight:700, marginBottom:6 }}>🌿 {form.category || "Paket Wisata"}</div>
+                <div style={{ fontSize: 11, color: "#4caf50", fontWeight: 700, marginBottom: 6, display: "flex", alignItems: "center", gap: 4 }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4caf50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", flexShrink: 0 }}>
+                  <path d="M2 22 A10 10 0 0 1 12 12 A10 10 0 0 1 22 2 A10 10 0 0 1 12 12 A10 10 0 0 1 2 22Z"/>
+                </svg>
+                {form.category || "Paket Wisata"}
+              </div>
                 <div style={{ fontSize:15, fontWeight:700, color:"#1e3b25", marginBottom:10 }}>{form.title || "Nama Paket"}</div>
                 <div style={{ display:"flex", gap:8 }}>
                   <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
@@ -2408,7 +2413,10 @@ function TicketsOnlineView() {
             </div>
 
             <div style={{ padding:"14px 16px", flex:1 }}>
-              <div style={{ fontSize:11, color:"#4caf50", fontWeight:700, marginBottom:4 }}>🌿 {item.category}</div>
+              <div style={{ fontSize: 11, color: "#4caf50", fontWeight: 700, marginBottom: 4, display: "flex", alignItems: "center", gap: 4 }}>
+              <IcoTag size={13} color="#4caf50" />
+              {item.category}
+            </div>
               <div style={{ fontSize:16, fontWeight:700, color:"#111827", marginBottom:10, lineHeight:1.3 }}>{item.title}</div>
               <div style={{ display:"flex", gap:8 }}>
                 <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
