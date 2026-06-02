@@ -5,7 +5,7 @@ const aktivitas = [
   {
   title: "Area Sawah",
   desc: "Area persawahan alami...",
-  image: "/images/Sawah.jpeg",
+  image: "/images/Pemandangan sawah.png",
   badge: "Edukasi Pertanian",
 
   detail: "Area persawahan alami yang dirancang sebagai sarana edukasi pertanian dan wisata berbasis alam. Pengunjung dapat belajar langsung proses menanam padi dari awal hingga panen.",

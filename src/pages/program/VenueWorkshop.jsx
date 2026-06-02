@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import "./ProgramPage.css";
 import programData from "./Programdata";   // ← sesuaikan path jika perlu
-import workshop from "/src/assets/images/workshop1.jpg";
+import workshop from "/src/assets/images/rawat tanaman.png";
 import { MessageCircle, Leaf } from 'lucide-react';
 
 // Ambil heroImage dari sumber terpusat

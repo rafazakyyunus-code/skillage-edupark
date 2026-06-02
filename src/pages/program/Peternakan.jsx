@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import "./ProgramPage.css";
 import programData from "./Programdata";   // ← sesuaikan path jika perlu
-import kambing from "/src/assets/images/kambing.jpg";
+import kambing from "/src/assets/images/beri makan domba.png";
 import { MessageCircle, Leaf } from 'lucide-react';
 
 // Ambil heroImage dari sumber terpusat
