@@ -7,11 +7,18 @@
 
 .contact-hero {
   height: 100vh;
+
   background:
-    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.5)),
-    url("https://images.unsplash.com/photo-1506744038136-46273834b3fb");
-  background-size: cover;
+    linear-gradient(
+      rgba(0,0,0,0.45),
+      rgba(0,0,0,0.5)
+    ),
+    url("/images/foto skill village.jpg");
+
+  background-repeat: no-repeat;
   background-position: center;
+  background-size: cover;
+
   display: flex;
   justify-content: center;
   align-items: center;

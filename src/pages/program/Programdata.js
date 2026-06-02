@@ -5,10 +5,10 @@
 // ============================================================
 
 import hydroponicHero  from "/src/assets/images/hydroponicc.jpeg";
-import peternakanHero  from "/src/assets/images/pertenakan domba.jpeg";
-import workshopHero    from "/src/assets/images/panen.jpg";
+import peternakanHero  from "/src/assets/images/foto kandang.png";
+import workshopHero    from "/src/assets/images/foto bareng bareng.png";
 // VenueAlam pakai path publik (/images/...), samakan di sini:
-const venueAlamHero = "/images/Sawah.jpeg";
+const venueAlamHero = "/images/hero-edupark.png";
 
 const programData = [
   {

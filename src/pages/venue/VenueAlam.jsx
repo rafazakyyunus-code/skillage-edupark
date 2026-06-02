@@ -11,7 +11,7 @@ export default function VenueAlam() {
     {
       title: "Area Sawah",
       desc: "Area persawahan alami untuk edukasi pertanian dan wisata.",
-      image: "/images/Sawah.jpeg",
+      image: "/images/Pemandangan sawah.png",
       badge: "Edukasi Pertanian",
       detail: `
         Area persawahan alami yang dirancang sebagai sarana edukasi pertanian dan wisata berbasis alam.
