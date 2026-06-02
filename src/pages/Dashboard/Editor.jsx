@@ -2813,12 +2813,54 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
             </div>
 
             {/* ── ROW 2: 3 module stat cards (produk, gallery, writers) ── */}
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14, marginBottom:18 }}>
+            {/* ── ROW 2: 5 module stat cards ── */}
+            <div style={{
+              display:"grid",
+              gridTemplateColumns:"repeat(5,1fr)",
+              gap:14,
+              marginBottom:18
+            }}>
               {[
                 { label:"Total Produk", val:produkList.length, sub:`${DEFAULT_PRODUK_CATEGORIES.map(c=>produkList.filter(p=>p.category===c).length).join(" · ")} per kategori`, valColor:"#6D28D9", bg:"#FAF5FF", border:"#DDD6FE", onClick:()=>setActiveNav("produk"),
                   icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6D28D9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> },
                 { label:"Gallery Item", val:galleryList.length, sub:`${DEFAULT_GALLERY_CATEGORIES.map(c=>galleryList.filter(g=>g.category===c).length).join(" · ")} per kategori`, valColor:"#0E7490", bg:"#ECFEFF", border:"#A5F3FC", onClick:()=>setActiveNav("gallery"),
                   icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0E7490" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> },
+                {
+                  label:"Attractions",
+                  val:attractionsList.length,
+                  sub:"wahana & destinasi aktif",
+                  valColor:"#DC2626",
+                  bg:"#FEF2F2",
+                  border:"#FECACA",
+                  onClick:()=>setActiveNav("attractions"),
+                  icon: (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                      stroke="#DC2626" strokeWidth="2"
+                      strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                      <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                  )
+                },
+                {
+                  label:"Tiket Online",
+                  val:ticketsList.length,
+                  sub:"paket tiket tersedia",
+                  valColor:"#059669",
+                  bg:"#ECFDF5",
+                  border:"#A7F3D0",
+                  onClick:()=>setActiveNav("tickets"),
+                  icon: (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                      stroke="#059669" strokeWidth="2"
+                      strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/>
+                      <line x1="9" y1="9" x2="9" y2="9.01"/>
+                      <line x1="9" y1="12" x2="9" y2="12.01"/>
+                      <line x1="9" y1="15" x2="9" y2="15.01"/>
+                    </svg>
+                  )
+                },  
                 { label:"Total Penulis", val:uniqueWriters.length, sub:`${articles.length} total artikel ditulis`, valColor:"#BE185D", bg:"#FDF2F8", border:"#FBCFE8", onClick:()=>setActiveNav("writers"),
                   icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#BE185D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
               ].map(s=>(

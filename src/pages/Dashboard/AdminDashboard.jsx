@@ -42,6 +42,7 @@ import {
   ImagePlus,
   Upload,
   MapPin,
+  Ticket,
 } from "lucide-react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -133,7 +134,26 @@ const NAV = [
       { id: "review-articles", label: "Review Articles",   Icon: ClipboardList },
       { id: "produk",          label: "Produk",             Icon: ShoppingBag },
       { id: "gallery",         label: "Gallery",            Icon: Image },
-      { id: "attractions",     label: "Attractions",        Icon: MapPin },
+      { 
+      id: "attractions", 
+      label: "Attractions", 
+      Icon: ({ active }) => (
+        <svg 
+          width="18" 
+          height="18" 
+          viewBox="0 0 24 24" 
+          fill="none"
+          stroke={active ? "#fff" : "rgba(255,255,255,0.6)"} 
+          strokeWidth="2"
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+        >
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      )
+    },
+      { id: "tiket-online",    label: "Tiket Online",       Icon: Ticket },
     ],
   },
   {
@@ -310,30 +330,33 @@ function DeleteModal({ name, onConfirm, onCancel }) {
 /* ─────────────────────────────────────────────
    DASHBOARD VIEW
 ───────────────────────────────────────────── */
-function DashboardView({ articles, users, products, gallery, setActiveNav, currentUser }) {
-  const published   = articles.filter(a => a.status === "published").length;
-  const pending     = articles.filter(a => a.status === "pending").length;
-  const totalViews  = articles.reduce((s, a) => s + (a.views || 0), 0);
-  const totalUsers  = users.length;
-  const adminCount  = users.filter(u => u.role === "admin").length;
-  const editorCount = users.filter(u => u.role === "editor").length;
-  const writerCount = users.filter(u => u.role === "writer").length;
-  const recentArts  = [...articles].sort((a,b)=>(b.date||"").localeCompare(a.date||"")).slice(0,5);
+function DashboardView({ articles, users, products, gallery, attractions, ticketsOnline, setActiveNav, currentUser }) {
+  const published      = articles.filter(a => a.status === "published").length;
+  const pending        = articles.filter(a => a.status === "pending").length;
+  const totalViews     = articles.reduce((s, a) => s + (a.views || 0), 0);
+  const totalUsers     = users.length;
+  const adminCount     = users.filter(u => u.role === "admin").length;
+  const editorCount    = users.filter(u => u.role === "editor").length;
+  const writerCount    = users.filter(u => u.role === "writer").length;
+  const recentArts     = [...articles].sort((a,b)=>(b.date||"").localeCompare(a.date||"")).slice(0,5);
+  const featuredTickets = (ticketsOnline||[]).filter(t => t.featured).length;
 
   // Admin's own articles
-  const myArticles = articles.filter(a => a.authorUid === currentUser?.uid);
-  const myRevision = myArticles.filter(a => a.status === "revision");
+  const myArticles  = articles.filter(a => a.authorUid === currentUser?.uid);
+  const myRevision  = myArticles.filter(a => a.status === "revision");
   const myPublished = myArticles.filter(a => a.status === "published");
-  const myPending = myArticles.filter(a => a.status === "pending");
-  const myLatest = [...myArticles].sort((a,b) => (b.createdAt||0)-(a.createdAt||0)).slice(0, 3);
+  const myPending   = myArticles.filter(a => a.status === "pending");
+  const myLatest    = [...myArticles].sort((a,b) => (b.createdAt||0)-(a.createdAt||0)).slice(0, 3);
 
   const STAT_CARDS = [
-    { label:"Total Artikel",  value:articles.length,           color:"#1B3A2A", Icon:FileText,    sub:`${published} published` },
-    { label:"Total Views",    value:totalViews.toLocaleString(),color:"#1565C0", Icon:Eye,         sub:"semua artikel" },
-    { label:"Pending Review", value:pending,                   color:"#E65100", Icon:AlertCircle, sub:"menunggu review" },
-    { label:"Total Produk",   value:products.length,           color:"#0E7490", Icon:ShoppingBag, sub:"item terdaftar" },
-    { label:"Gallery Item",   value:gallery.length,            color:"#6D28D9", Icon:Image,       sub:"foto terupload" },
-    { label:"Total Pengguna", value:totalUsers,                color:"#5B21B6", Icon:Users,       sub:`${writerCount}W · ${editorCount}E · ${adminCount}A` },
+    { label:"Total Artikel",  value:articles.length,              color:"#1B3A2A", Icon:FileText,    sub:`${published} published`,                          nav:"all-articles" },
+    { label:"Total Views",    value:totalViews.toLocaleString(),  color:"#1565C0", Icon:Eye,         sub:"semua artikel",                                   nav:"all-articles" },
+    { label:"Pending Review", value:pending,                      color:"#E65100", Icon:AlertCircle, sub:"menunggu review",                                 nav:"review-articles" },
+    { label:"Total Produk",   value:products.length,              color:"#0E7490", Icon:ShoppingBag, sub:"item terdaftar",                                  nav:"produk" },
+    { label:"Gallery Item",   value:gallery.length,               color:"#6D28D9", Icon:Image,       sub:"foto terupload",                                  nav:"gallery" },
+    { label:"Total Pengguna", value:totalUsers,                   color:"#5B21B6", Icon:Users,       sub:`${writerCount}W · ${editorCount}E · ${adminCount}A`, nav:"manage-users" },
+    { label:"Attractions",    value:(attractions||[]).length,     color:"#065F46", Icon:MapPin,      sub:"lokasi wisata aktif",                             nav:"attractions" },
+    { label:"Tiket Online",   value:(ticketsOnline||[]).length,   color:"#B45309", Icon:Ticket,      sub:`${featuredTickets} unggulan`,                     nav:"tiket-online" },
   ];
 
   return (
@@ -344,8 +367,12 @@ function DashboardView({ articles, users, products, gallery, setActiveNav, curre
       </div>
 
       <div className="ad-stats-grid">
-        {STAT_CARDS.map(({ label, value, color, Icon, sub }) => (
-          <div key={label} className="ad-stat-card">
+        {STAT_CARDS.map(({ label, value, color, Icon, sub, nav }) => (
+          <div key={label} className="ad-stat-card"
+            onClick={() => nav && setActiveNav(nav)}
+            style={{ cursor: nav ? "pointer" : "default", transition:"box-shadow 0.15s" }}
+            onMouseEnter={e => { if(nav) e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.10)"; }}
+            onMouseLeave={e => { e.currentTarget.style.boxShadow=""; }}>
             <div className="ad-stat-card__icon" style={{ background:color+"15", color }}><Icon size={20} /></div>
             <div>
               <div className="ad-stat-card__value" style={{ color }}>{value}</div>
@@ -401,6 +428,99 @@ function DashboardView({ articles, users, products, gallery, setActiveNav, curre
         </div>
       </div>
 
+      {/* Attractions & Tiket Online Preview Row */}
+      <div className="ad-two-col" style={{ marginTop:16 }}>
+        {/* Attractions Preview */}
+        <div className="ad-card">
+          <div className="ad-card__head">
+            <h3 className="ad-card__title" style={{ display:"flex", alignItems:"center", gap:7 }}>
+              <MapPin size={16} color="#065F46" /> Attractions Terbaru
+            </h3>
+            <button className="ad-see-all" onClick={() => setActiveNav("attractions")} style={{ display:"flex", alignItems:"center", gap:4 }}>
+              Kelola <ChevronRight size={13} />
+            </button>
+          </div>
+          {(!attractions || attractions.length === 0) ? (
+            <div style={{ textAlign:"center", padding:"24px 0" }}>
+              <MapPin size={32} color="#D1D5DB" style={{ marginBottom:8, display:"block", margin:"0 auto 8px" }} />
+              <p className="ad-empty-hint">Belum ada attraction. <button onClick={() => setActiveNav("attractions")} style={{ background:"none", border:"none", color:"#1B3A2A", cursor:"pointer", fontWeight:600 }}>Tambah →</button></p>
+            </div>
+          ) : (
+            <div style={{ display:"flex", flexDirection:"column" }}>
+              {[...attractions].sort((a,b)=>(b.createdAt||"")>(a.createdAt||"")?-1:1).slice(0,4).map((att,i) => (
+                <div key={att.firebaseId||i} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 0", borderBottom:"1px solid #F3F4F6" }}>
+                  <div style={{ width:48, height:48, borderRadius:8, overflow:"hidden", flexShrink:0, background:"#F0FDF4" }}>
+                    {att.image
+                      ? <img src={safeImg(att.image)} alt={att.title||att.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                      : <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%" }}><MapPin size={20} color="#D1D5DB" /></div>
+                    }
+                  </div>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontSize:13, fontWeight:700, color:"#111827", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{att.title || att.name}</div>
+                    <div style={{ fontSize:11, color:"#6B7280", marginTop:2, display:"flex", alignItems:"center", gap:4 }}>
+                      <MapPin size={10} />{att.location || att.category}
+                    </div>
+                  </div>
+                  {att.badge && (
+                    <span style={{ fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:4, background: att.badge==="HOT"?"#FEE2E2":"#D1FAE5", color: att.badge==="HOT"?"#DC2626":"#065F46", flexShrink:0 }}>{att.badge}</span>
+                  )}
+                </div>
+              ))}
+              {attractions.length > 4 && (
+                <button onClick={() => setActiveNav("attractions")} style={{ fontSize:12, color:"#1B3A2A", background:"none", border:"none", cursor:"pointer", fontWeight:600, padding:"10px 0 4px", textAlign:"left" }}>
+                  +{attractions.length - 4} attraction lainnya →
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Tiket Online Preview */}
+        <div className="ad-card">
+          <div className="ad-card__head">
+            <h3 className="ad-card__title" style={{ display:"flex", alignItems:"center", gap:7 }}>
+              <Ticket size={16} color="#B45309" /> Paket Tiket Online
+            </h3>
+            <button className="ad-see-all" onClick={() => setActiveNav("tiket-online")} style={{ display:"flex", alignItems:"center", gap:4 }}>
+              Kelola <ChevronRight size={13} />
+            </button>
+          </div>
+          {(!ticketsOnline || ticketsOnline.length === 0) ? (
+            <div style={{ textAlign:"center", padding:"24px 0" }}>
+              <Ticket size={32} color="#D1D5DB" style={{ display:"block", margin:"0 auto 8px" }} />
+              <p className="ad-empty-hint">Belum ada paket tiket. <button onClick={() => setActiveNav("tiket-online")} style={{ background:"none", border:"none", color:"#1B3A2A", cursor:"pointer", fontWeight:600 }}>Tambah →</button></p>
+            </div>
+          ) : (
+            <div style={{ display:"flex", flexDirection:"column" }}>
+              {[...ticketsOnline].sort((a,b)=>(b.featured?1:0)-(a.featured?1:0)).slice(0,4).map((tick,i) => (
+                <div key={tick.firebaseId||i} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 0", borderBottom:"1px solid #F3F4F6" }}>
+                  <div style={{ width:48, height:48, borderRadius:8, overflow:"hidden", flexShrink:0, background:"#FFFBEB" }}>
+                    {tick.image
+                      ? <img src={safeImg(tick.image)} alt={tick.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                      : <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%" }}><Ticket size={20} color="#D1D5DB" /></div>
+                    }
+                  </div>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontSize:13, fontWeight:700, color:"#111827", display:"flex", alignItems:"center", gap:6, overflow:"hidden" }}>
+                      <span style={{ whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{tick.title}</span>
+                      {tick.featured && <span style={{ fontSize:9, fontWeight:700, padding:"1px 6px", borderRadius:3, background:"#D1FAE5", color:"#065F46", flexShrink:0 }}>UNGGULAN</span>}
+                    </div>
+                    <div style={{ fontSize:11, color:"#6B7280", marginTop:2 }}>
+                      WD: <span style={{ color:"#065F46", fontWeight:600 }}>{tick.weekday}</span> · WE: <span style={{ color:"#065F46", fontWeight:600 }}>{tick.weekend}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {ticketsOnline.length > 4 && (
+                <button onClick={() => setActiveNav("tiket-online")} style={{ fontSize:12, color:"#1B3A2A", background:"none", border:"none", cursor:"pointer", fontWeight:600, padding:"10px 0 4px", textAlign:"left" }}>
+                  +{ticketsOnline.length - 4} paket lainnya →
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Quick preview: Gallery terbaru */}
       {gallery.length > 0 && (
         <div className="ad-card" style={{ marginTop:16 }}>
@@ -425,11 +545,13 @@ function DashboardView({ articles, users, products, gallery, setActiveNav, curre
       {/* Quick Actions */}
       <div className="ad-quick-actions">
         {[
-          { label:"Review Articles", nav:"review-articles", Icon:ClipboardList, color:"#1B3A2A" },
-          { label:"Buat Artikel",    nav:"create-article",  Icon:PenSquare,     color:"#1565C0" },
-          { label:"My Articles",     nav:"my-articles",     Icon:BookOpen,      color:"#7C3AED" },
-          { label:"Tambah Produk",   nav:"produk",          Icon:ShoppingBag,   color:"#0E7490" },
-          { label:"Upload Gallery",  nav:"gallery",         Icon:Image,         color:"#6D28D9" },
+          { label:"Review Articles",    nav:"review-articles", Icon:ClipboardList, color:"#1B3A2A" },
+          { label:"Buat Artikel",       nav:"create-article",  Icon:PenSquare,     color:"#1565C0" },
+          { label:"My Articles",        nav:"my-articles",     Icon:BookOpen,      color:"#7C3AED" },
+          { label:"Tambah Produk",      nav:"produk",          Icon:ShoppingBag,   color:"#0E7490" },
+          { label:"Upload Gallery",     nav:"gallery",         Icon:Image,         color:"#6D28D9" },
+          { label:"Kelola Attractions", nav:"attractions",     Icon:MapPin,        color:"#065F46" },
+          { label:"Kelola Tiket",       nav:"tiket-online",    Icon:Ticket,        color:"#B45309" },
         ].map(({ label, nav, Icon, color }) => (
           <button key={nav} className="ad-quick-btn" style={{ borderColor:color+"30" }} onClick={() => setActiveNav(nav)}>
             <div className="ad-quick-btn__icon" style={{ background:color+"15", color }}><Icon size={18} /></div>
@@ -1861,6 +1983,465 @@ function AttractionsView() {
 }
 
 /* ─────────────────────────────────────────────
+   TICKETS ONLINE MANAGEMENT VIEW
+───────────────────────────────────────────── */
+const TICKET_BLANK = {
+  title: "",
+  category: "Paket Wisata",
+  image: "",
+  weekday: "",
+  weekend: "",
+  featured: false,
+  iconName: "FaSwimmingPool",
+  features: ["", "", "", "", "", ""],
+};
+
+const TICKET_ICON_OPTIONS = [
+  { value: "FaSwimmingPool", label: "Kolam Renang" },
+  { value: "FaTree",         label: "Alam / Pohon" },
+  { value: "FaCampground",   label: "Camping" },
+  { value: "FaTicketAlt",    label: "Tiket" },
+  { value: "FaUsers",        label: "Rombongan" },
+  { value: "FaStar",         label: "Unggulan" },
+];
+
+const IMGBB_KEY_TICKET = "6604bf748a40b7eaf83a5d4792bff01e";
+
+function TicketsOnlineAdminView() {
+  const [items, setItems]               = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [view, setView]                 = useState("list"); // "list" | "form"
+  const [form, setForm]                 = useState(TICKET_BLANK);
+  const [editId, setEditId]             = useState(null);
+  const [saving, setSaving]             = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [toast, setToast]               = useState("");
+  const [imagePreview, setImagePreview] = useState("");
+  const [uploading, setUploading]       = useState(false);
+
+  const iStyle = {
+    width:"100%", padding:"9px 12px", borderRadius:8,
+    border:"1px solid #D1D5DB", fontSize:14, boxSizing:"border-box",
+    fontFamily:"inherit", color:"#111827", outline:"none",
+  };
+
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
+
+  /* ── realtime listener ── */
+  useEffect(() => {
+    const tickRef = ref(db, "ticketsOnline");
+    const unsub = onValue(tickRef, (snap) => {
+      const data = snap.val();
+      if (data) {
+        const list = Object.entries(data).map(([key, val]) => ({ ...val, firebaseId: key }));
+        setItems(list.sort((a, b) => (a.order || 0) - (b.order || 0) || (b.createdAt || "") > (a.createdAt || "") ? -1 : 1));
+      } else {
+        setItems([]);
+      }
+      setLoading(false);
+    }, () => { setItems([]); setLoading(false); });
+    return () => unsub();
+  }, []);
+
+  /* ── upload foto ke ImgBB ── */
+  const uploadImage = async (file) => {
+    const fd = new FormData();
+    fd.append("image", file);
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY_TICKET}`, { method: "POST", body: fd });
+    const json = await res.json();
+    if (!json.success) throw new Error("Upload gagal");
+    return json.data.url;
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImagePreview(URL.createObjectURL(file));
+    setUploading(true);
+    try {
+      const url = await uploadImage(file);
+      setForm(f => ({ ...f, image: url }));
+      showToast("✓ Foto berhasil diupload!");
+    } catch (err) {
+      showToast("✗ Upload foto gagal: " + err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const fmtRp = (val) => {
+    const num = parseInt(String(val).replace(/\D/g,""), 10) || 0;
+    return num ? "Rp " + num.toLocaleString("id-ID") : "";
+  };
+
+  /* ── save ── */
+  const handleSave = async () => {
+    if (!form.title.trim()) return showToast("✗ Nama paket wajib diisi.");
+    if (!form.weekday || isNaN(Number(String(form.weekday).replace(/\D/g,"")))) return showToast("✗ Harga weekday harus angka.");
+    if (!form.weekend || isNaN(Number(String(form.weekend).replace(/\D/g,"")))) return showToast("✗ Harga weekend harus angka.");
+    if (!form.image.trim()) return showToast("✗ Upload foto terlebih dahulu.");
+
+    setSaving(true);
+    try {
+      const fmtPrice = (val) => {
+        const num = parseInt(String(val).replace(/\D/g,""), 10) || 0;
+        return "Rp " + num.toLocaleString("id-ID");
+      };
+      const payload = {
+        title:     form.title.trim(),
+        category:  form.category.trim() || "Paket Wisata",
+        image:     form.image.trim(),
+        weekday:   fmtPrice(form.weekday),
+        weekend:   fmtPrice(form.weekend),
+        featured:  !!form.featured,
+        iconName:  form.iconName || "FaTicketAlt",
+        features:  (form.features || []).map(f => f.trim()).filter(Boolean),
+        updatedAt: new Date().toISOString(),
+      };
+      if (editId) {
+        await update(ref(db, `ticketsOnline/${editId}`), payload);
+        showToast("✓ Paket berhasil diperbarui!");
+      } else {
+        await push(ref(db, "ticketsOnline"), { ...payload, order: items.length, createdAt: new Date().toISOString() });
+        showToast("✓ Paket berhasil ditambahkan!");
+      }
+      setView("list"); resetForm();
+    } catch (err) {
+      showToast("✗ Gagal menyimpan: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const resetForm = () => { setForm(TICKET_BLANK); setEditId(null); setImagePreview(""); };
+
+  const handleEdit = (item) => {
+    const rawPrice = (str) => str ? str.replace(/[^\d]/g, "") : "";
+    setForm({
+      title:    item.title || "",
+      category: item.category || "Paket Wisata",
+      image:    item.image || "",
+      weekday:  rawPrice(item.weekday),
+      weekend:  rawPrice(item.weekend),
+      featured: !!item.featured,
+      iconName: item.iconName || "FaTicketAlt",
+      features: Array.isArray(item.features)
+        ? [...item.features, "", "", "", "", "", ""].slice(0, 6)
+        : ["", "", "", "", "", ""],
+    });
+    setEditId(item.firebaseId);
+    setImagePreview(safeImg(item.image || ""));
+    setView("form");
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await remove(ref(db, `ticketsOnline/${id}`));
+      showToast("Paket dihapus."); setDeleteConfirm(null);
+    } catch (err) { showToast("✗ Gagal menghapus: " + err.message); }
+  };
+
+  /* ════════ FORM VIEW ════════ */
+  if (view === "form") return (
+    <div>
+      {toast && (
+        <div style={{ position:"fixed", top:24, right:24, background: toast.startsWith("✓") ? "#1B3A2A" : "#DC2626",
+          color:"#fff", padding:"12px 20px", borderRadius:10, fontSize:14, fontWeight:600, zIndex:999,
+          boxShadow:"0 4px 20px rgba(0,0,0,0.15)" }}>{toast}</div>
+      )}
+
+      <div style={{ marginBottom:24 }}>
+        <button onClick={() => { setView("list"); resetForm(); }}
+          style={{ background:"none", border:"none", color:"#6B7280", fontSize:13, cursor:"pointer", marginBottom:4, fontWeight:500, padding:0 }}>
+          ← Kembali ke daftar
+        </button>
+        <h1 style={{ fontSize:22, fontWeight:700, color:"#111827", margin:0 }}>
+          {editId ? "Edit Paket Tiket Online" : "Tambah Paket Tiket Online Baru"}
+        </h1>
+        <p style={{ color:"#6B7280", fontSize:14, margin:"4px 0 0" }}>Paket yang ditambahkan akan langsung tampil di halaman /tickets-online</p>
+      </div>
+
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 320px", gap:20, alignItems:"flex-start" }}>
+        {/* LEFT */}
+        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+          {/* Foto */}
+          <div style={card}>
+            <label style={sectionLabel}>Foto Paket</label>
+            <div onClick={() => document.getElementById("adm-ticket-file-input").click()}
+              style={{ border:"2px dashed #D1D5DB", borderRadius:12, cursor:"pointer", overflow:"hidden",
+                transition:"border-color 0.2s", minHeight: imagePreview ? "auto" : 160,
+                display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}
+              onMouseEnter={e => e.currentTarget.style.borderColor="#16c35b"}
+              onMouseLeave={e => e.currentTarget.style.borderColor="#D1D5DB"}>
+              {imagePreview ? (
+                <div style={{ position:"relative", width:"100%" }}>
+                  <img src={safeImg(imagePreview)} alt="preview" style={{ width:"100%", height:240, objectFit:"cover", display:"block" }} />
+                  <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.4)", display:"flex", alignItems:"center", justifyContent:"center", opacity:0, transition:"0.3s" }}
+                    onMouseEnter={e => e.currentTarget.style.opacity=1} onMouseLeave={e => e.currentTarget.style.opacity=0}>
+                    <span style={{ color:"#fff", fontWeight:600, fontSize:14 }}>Klik untuk ganti foto</span>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ padding:"40px 20px", textAlign:"center" }}>
+                  <Upload size={36} color="#D1D5DB" style={{ marginBottom:10 }} />
+                  <p style={{ fontSize:15, fontWeight:600, color:"#374151", margin:"0 0 6px" }}>{uploading ? "Mengupload..." : "Klik untuk upload foto paket"}</p>
+                  <span style={{ fontSize:12, color:"#9CA3AF" }}>PNG, JPG, WEBP</span>
+                </div>
+              )}
+            </div>
+            <input id="adm-ticket-file-input" type="file" accept="image/*" onChange={handleFileChange} style={{ display:"none" }} />
+            {uploading && <p style={{ fontSize:12, color:"#16c35b", marginTop:8, fontWeight:600 }}>Sedang mengupload foto...</p>}
+            <div style={{ marginTop:10 }}>
+              <label style={fieldLabel}>Atau masukkan URL foto</label>
+              <input value={form.image} onChange={e => { setForm(f => ({ ...f, image: e.target.value })); setImagePreview(safeImg(e.target.value)); }}
+                placeholder="https://..." style={iStyle} />
+            </div>
+          </div>
+
+          {/* Info Paket */}
+          <div style={card}>
+            <label style={sectionLabel}>Informasi Paket</label>
+            <div style={{ marginBottom:12 }}>
+              <label style={fieldLabel}>Nama Paket *</label>
+              <input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                placeholder="cth. Paket Keluarga Weekday" style={iStyle} />
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:12 }}>
+              <div>
+                <label style={fieldLabel}>Harga Weekday (Rp) *</label>
+                <input type="number" min="0" value={form.weekday}
+                  onChange={e => setForm(f => ({ ...f, weekday: e.target.value }))}
+                  placeholder="cth. 50000" style={iStyle} />
+              </div>
+              <div>
+                <label style={fieldLabel}>Harga Weekend (Rp) *</label>
+                <input type="number" min="0" value={form.weekend}
+                  onChange={e => setForm(f => ({ ...f, weekend: e.target.value }))}
+                  placeholder="cth. 75000" style={iStyle} />
+              </div>
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:12 }}>
+              <div>
+                <label style={fieldLabel}>Kategori</label>
+                <input type="text" placeholder="Paket Wisata" value={form.category}
+                  onChange={e => setForm(f => ({ ...f, category: e.target.value }))} style={iStyle} />
+              </div>
+              <div>
+                <label style={fieldLabel}>Icon</label>
+                <select value={form.iconName} onChange={e => setForm(f => ({ ...f, iconName: e.target.value }))} style={iStyle}>
+                  {TICKET_ICON_OPTIONS.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div style={{ marginTop:4 }}>
+              <label style={{ display:"flex", alignItems:"center", gap:8, cursor:"pointer", fontSize:13, fontWeight:600, color:"#374151" }}>
+                <input type="checkbox" checked={form.featured}
+                  onChange={e => setForm(f => ({ ...f, featured: e.target.checked }))}
+                  style={{ width:16, height:16, accentColor:"#1B3A2A" }} />
+                Tandai sebagai paket unggulan (featured)
+              </label>
+              <p style={{ fontSize:11, color:"#9CA3AF", marginTop:3, marginLeft:24 }}>Paket featured akan ditampilkan dengan border hijau di halaman publik.</p>
+            </div>
+          </div>
+
+          {/* Detail Paket / Features */}
+          <div style={card}>
+            <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:4 }}>
+              Detail Paket <span style={{ fontWeight:400, color:"#9CA3AF", fontSize:12 }}>(tampil di modal detail — maks 6 item)</span>
+            </label>
+            <p style={{ fontSize:12, color:"#9CA3AF", margin:"0 0 12px" }}>
+              Isi keunggulan / fasilitas yang termasuk dalam paket ini. Kosongkan baris yang tidak diperlukan.
+            </p>
+            <div style={{ display:"flex", flexDirection:"column", gap:9 }}>
+              {(form.features || ["","","","","",""]).map((feat, idx) => (
+                <div key={idx} style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <span style={{ fontSize:12, color:"#9CA3AF", width:20, textAlign:"right", flexShrink:0 }}>{idx+1}.</span>
+                  <input type="text"
+                    placeholder={`Fasilitas ke-${idx+1}, misal: Kolam anak dengan wahana interaktif`}
+                    value={feat}
+                    onChange={e => {
+                      const updated = [...(form.features || ["","","","","",""])];
+                      updated[idx] = e.target.value;
+                      setForm(f => ({ ...f, features: updated }));
+                    }}
+                    style={{ ...iStyle, flex:1 }} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT – Preview + Save */}
+        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+          {/* Preview */}
+          <div style={card}>
+            <label style={sectionLabel}>Preview Card</label>
+            <div style={{ border: form.featured ? "2px solid #4caf50" : "1px solid #E5E7EB", borderRadius:14, overflow:"hidden" }}>
+              <div style={{ height:140, background:"#f0f0f0", overflow:"hidden" }}>
+                {imagePreview
+                  ? <img src={safeImg(imagePreview)} alt="preview" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                  : <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%" }}>
+                      <Image size={32} color="#D1D5DB" />
+                    </div>
+                }
+              </div>
+              <div style={{ padding:"12px 14px" }}>
+                <div style={{ fontSize:11, color:"#4caf50", fontWeight:700, marginBottom:6 }}>
+                  {form.category || "Paket Wisata"}
+                </div>
+                <div style={{ fontSize:15, fontWeight:700, color:"#1e3b25", marginBottom:10 }}>{form.title || "Nama Paket"}</div>
+                <div style={{ display:"flex", gap:8 }}>
+                  <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
+                    <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKDAY</div>
+                    <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{form.weekday ? fmtRp(form.weekday) : "—"}</div>
+                  </div>
+                  <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
+                    <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKEND</div>
+                    <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{form.weekend ? fmtRp(form.weekend) : "—"}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button onClick={handleSave} disabled={saving || uploading}
+            style={{ width:"100%", padding:"14px", background:(saving||uploading)?"#9CA3AF":"#1B3A2A",
+              color:"#fff", border:"none", borderRadius:10, fontSize:15, fontWeight:700,
+              cursor:(saving||uploading)?"not-allowed":"pointer" }}>
+            {saving ? "Menyimpan..." : uploading ? "Menunggu upload..." : editId ? "Perbarui Paket" : "Simpan Paket"}
+          </button>
+          <button onClick={() => { setView("list"); resetForm(); }}
+            style={{ width:"100%", padding:"12px", background:"#fff", border:"1px solid #E5E7EB",
+              color:"#374151", borderRadius:10, fontSize:14, fontWeight:600, cursor:"pointer" }}>
+            Batal
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  /* ════════ LIST VIEW ════════ */
+  return (
+    <div>
+      {toast && (
+        <div style={{ position:"fixed", top:24, right:24, background: toast.startsWith("✓") ? "#1B3A2A" : "#DC2626",
+          color:"#fff", padding:"12px 20px", borderRadius:10, fontSize:14, fontWeight:600, zIndex:999,
+          boxShadow:"0 4px 20px rgba(0,0,0,0.15)" }}>{toast}</div>
+      )}
+
+      <div className="ad-page-header" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
+        <div>
+          <h1 className="ad-page-title">Manajemen Tiket Online</h1>
+          <p className="ad-page-sub">{items.length} paket aktif · tampil realtime di /tickets-online</p>
+        </div>
+        <button onClick={() => { resetForm(); setView("form"); }}
+          style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 18px",
+            background:"#1B3A2A", color:"#fff", border:"none", borderRadius:10,
+            fontSize:14, fontWeight:600, cursor:"pointer" }}>
+          <Plus size={16} /> Tambah Paket
+        </button>
+      </div>
+
+      {loading && (
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:200 }}>
+          <Loader size={28} color="#9CA3AF" />
+        </div>
+      )}
+
+      {!loading && items.length === 0 && (
+        <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:12,
+          padding:"60px 20px", textAlign:"center" }}>
+          <Ticket size={40} color="#D1D5DB" style={{ marginBottom:12 }} />
+          <p style={{ color:"#6B7280", fontSize:14 }}>Belum ada paket tiket online. Klik "+ Tambah Paket" untuk mulai.</p>
+        </div>
+      )}
+
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(280px, 1fr))", gap:16 }}>
+        {items.map(item => (
+          <div key={item.firebaseId} style={{
+            background:"#fff",
+            border: item.featured ? "2px solid #4caf50" : "1px solid #E5E7EB",
+            borderRadius:12, overflow:"hidden",
+            boxShadow:"0 2px 8px rgba(0,0,0,0.05)", display:"flex", flexDirection:"column",
+          }}>
+            <div style={{ position:"relative", height:160, background:"#f0f0f0", overflow:"hidden" }}>
+              {item.image
+                ? <img src={safeImg(item.image)} alt={item.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                : <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%" }}><Image size={36} color="#D1D5DB" /></div>
+              }
+              {item.featured && (
+                <span style={{ position:"absolute", top:8, left:8, background:"#4caf50", color:"#fff",
+                  fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:4 }}>UNGGULAN</span>
+              )}
+              <span style={{ position:"absolute", top:8, right:8, background:"rgba(22,195,91,0.9)", color:"#fff",
+                fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:20 }}>{item.category}</span>
+            </div>
+            <div style={{ padding:"14px 16px", flex:1 }}>
+              <div style={{ fontSize:15, fontWeight:700, color:"#111827", marginBottom:8 }}>{item.title}</div>
+              <div style={{ display:"flex", gap:8 }}>
+                <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
+                  <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKDAY</div>
+                  <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{item.weekday || "—"}</div>
+                </div>
+                <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
+                  <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKEND</div>
+                  <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{item.weekend || "—"}</div>
+                </div>
+              </div>
+              {Array.isArray(item.features) && item.features.length > 0 && (
+                <div style={{ marginTop:10 }}>
+                  {item.features.slice(0,3).map((f, i) => (
+                    <div key={i} style={{ fontSize:12, color:"#374151", display:"flex", alignItems:"flex-start", gap:5, marginBottom:3 }}>
+                      <span style={{ color:"#4caf50", fontWeight:700, flexShrink:0 }}>✓</span> {f}
+                    </div>
+                  ))}
+                  {item.features.length > 3 && <div style={{ fontSize:11, color:"#9CA3AF", marginTop:3 }}>+{item.features.length-3} lainnya</div>}
+                </div>
+              )}
+            </div>
+            <div style={{ display:"flex", gap:8, padding:"0 16px 14px" }}>
+              <button onClick={() => handleEdit(item)}
+                style={{ flex:1, padding:8, background:"#F0FDF4", color:"#1B3A2A", border:"none",
+                  borderRadius:8, fontSize:13, fontWeight:600, cursor:"pointer",
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                <Pencil size={13} /> Edit
+              </button>
+              <button onClick={() => setDeleteConfirm(item)}
+                style={{ flex:1, padding:8, background:"#FEF2F2", color:"#DC2626", border:"none",
+                  borderRadius:8, fontSize:13, fontWeight:600, cursor:"pointer",
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                <Trash2 size={13} /> Hapus
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Delete confirm modal */}
+      {deleteConfirm && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.45)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1000 }}>
+          <div style={{ background:"#fff", padding:28, borderRadius:14, width:360, textAlign:"center", boxShadow:"0 20px 60px rgba(0,0,0,0.2)" }}>
+            <div style={{ width:56, height:56, borderRadius:"50%", background:"#FEF2F2", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 14px" }}>
+              <Trash2 size={24} color="#DC2626" />
+            </div>
+            <h3 style={{ margin:"0 0 8px", color:"#111827", fontSize:17, fontWeight:700 }}>Hapus Paket?</h3>
+            <p style={{ color:"#6B7280", fontSize:13, marginBottom:22 }}>
+              Paket <strong>"{deleteConfirm.title}"</strong> akan dihapus permanen dari halaman /tickets-online.
+            </p>
+            <div style={{ display:"flex", gap:10, justifyContent:"center" }}>
+              <button onClick={() => setDeleteConfirm(null)} style={{ padding:"9px 20px", borderRadius:8, border:"1px solid #E5E7EB", background:"#fff", color:"#374151", fontSize:14, cursor:"pointer", fontWeight:600 }}>Batal</button>
+              <button onClick={() => handleDelete(deleteConfirm.firebaseId)} style={{ padding:"9px 20px", borderRadius:8, border:"none", background:"#DC2626", color:"#fff", fontSize:14, cursor:"pointer", fontWeight:700 }}>Ya, Hapus</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
    WRITER DIRECTORY VIEW
 ───────────────────────────────────────────── */
 function WriterDirectoryView({ articles, users }) {
@@ -2541,10 +3122,12 @@ export default function AdminDashboard() {
   const { user, logout } = useAuth();
   const [activeNav, setActiveNav] = useState("dashboard");
 
-  const [articles, setArticles] = useState([]);
-  const [users,    setUsers]    = useState([]);
-  const [products, setProducts] = useState([]);
-  const [gallery,  setGallery]  = useState([]);
+  const [articles,      setArticles]      = useState([]);
+  const [users,         setUsers]         = useState([]);
+  const [products,      setProducts]      = useState([]);
+  const [gallery,       setGallery]       = useState([]);
+  const [attractions,   setAttractions]   = useState([]);
+  const [ticketsOnline, setTicketsOnline] = useState([]);
 
   /* ── Auto-create/update user entry in /users ──
      CATATAN: Pembuatan user baru & sinkronisasi role kini ditangani sepenuhnya
@@ -2573,8 +3156,16 @@ export default function AdminDashboard() {
       const d = snap.val();
       setGallery(d ? Object.entries(d).map(([id,v])=>({id,...v})) : []);
     });
+    const unsubAtt = onValue(ref(db, "attractions"), snap => {
+      const d = snap.val();
+      setAttractions(d ? Object.entries(d).map(([id,v])=>({...v, firebaseId:id})) : []);
+    });
+    const unsubTick = onValue(ref(db, "ticketsOnline"), snap => {
+      const d = snap.val();
+      setTicketsOnline(d ? Object.entries(d).map(([id,v])=>({...v, firebaseId:id})) : []);
+    });
 
-    return () => { unsubA(); unsubU(); unsubP(); unsubG(); };
+    return () => { unsubA(); unsubU(); unsubP(); unsubG(); unsubAtt(); unsubTick(); };
   }, [user]);
 
   const handleLogout = async () => { await logout(); };
@@ -2585,7 +3176,7 @@ export default function AdminDashboard() {
   const renderContent = () => {
     switch (activeNav) {
       case "dashboard":
-        return <DashboardView articles={articles} users={users} products={products} gallery={gallery} setActiveNav={setActiveNav} currentUser={user} />;
+        return <DashboardView articles={articles} users={users} products={products} gallery={gallery} attractions={attractions} ticketsOnline={ticketsOnline} setActiveNav={setActiveNav} currentUser={user} />;
       case "create-article":
         return <CreateArticleView currentUser={user} onDone={() => setActiveNav("my-articles")} />;
       case "my-articles":
@@ -2602,6 +3193,8 @@ export default function AdminDashboard() {
         return <GalleryView />;
       case "attractions":
         return <AttractionsView />;
+      case "tiket-online":
+        return <TicketsOnlineAdminView />;
       case "writer-directory":
         return <WriterDirectoryView articles={articles} users={users} />;
       case "manage-users":
