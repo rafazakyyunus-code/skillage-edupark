@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaGlobe, FaMapMarkerAlt, FaLeaf } from "react-icons/fa";
 import { subscribeAttractions } from "./AttractionsService.JS";
-
+import AttractionHero from "../../assets/images/keretaan sawah.jpeg";
 export default function Attractions() {
   const navigate = useNavigate();
 
@@ -76,11 +76,11 @@ export default function Attractions() {
     <div className="attractions-page">
 
       {/* HERO */}
-      <section className="at-hero">
-        <img
-          src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1400&auto=format&fit=crop"
-          alt=""
-        />
+        <section className="at-hero">
+          <img
+            src={AttractionHero}
+            alt="Attraction Hero"
+          />
         <div className="at-overlay" />
         <div className="at-hero-content">
           <span className="at-badge">PETUALANGAN MENANTI</span>

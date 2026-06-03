@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDatabase, ref, onValue } from "firebase/database";
 import TicketDetailModal from "./TicketDetailModal";
-
+import HeroTicket from "../../assets/images/foto dafi.png";
 import {
   FaTicketAlt,
   FaCheckCircle,
@@ -137,59 +137,53 @@ export default function ETicket() {
 
   return (
     <div className="eticket-page">
+      {/* HERO */}
+     {/* HERO */}
+<section className="et-hero">
+  <div className="et-hero-left">
+    <span className="et-badge">
+      Selamat Datang di Masa Depan Pembelajaran
+    </span>
 
-      {/* ════════════════ HERO ════════════════ */}
-      <section className="et-hero">
-        <div className="et-hero-left">
-          <span className="et-badge">Selamat Datang di Masa Depan Pembelajaran</span>
+    <h1>
+      Tempat <span>Belajar</span>
+      <br />
+       Menyatu Dengan Alam.
+    </h1>
 
-          <h1>
-            Tempat <span>Belajar</span>
-            <br />
-            Menyatu Dengan Alam.
-          </h1>
-
-          <p>
+    <p>
             Jelajahi berbagai pameran interaktif dan keajaiban luar ruangan yang dirancang khusus 
             untuk memuaskan rasa ingin tahu Anda. Pesan kunjungan Anda hari ini dan rasakan perpaduan 
             sempurna antara edukasi yang seru di taman hijau kami yang asri.
-          </p>
+    </p>
 
-          <div className="et-hero-buttons">
-            <button
-              className="et-buy-btn"
-              onClick={() => navigate("/tickets-online")}
-            >
-              <FaTicketAlt />
-              Beli Tiket Online
-            </button>
+    <div className="et-hero-buttons">
+      <button
+        className="et-buy-btn"
+        onClick={() => navigate("/tickets-online")}
+      >
+        <FaTicketAlt />
+        Beli Tiket Online
+      </button>
 
-            <button
-              className="et-view-btn"
-              onClick={() => navigate("/attractions")}
-            >
-              Lihat Wahana Wisata
-            </button>
-          </div>
-        </div>
+      <button
+        className="et-view-btn"
+        onClick={() => navigate("/attractions")}
+      >
+         Lihat Wahana Wisata
+      </button>
+    </div>
+  </div>
 
-        <div className="et-hero-right">
-          <div className="et-image-wrapper">
-            <img
-              src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop"
-              alt="Hutan Edupark"
-            />
-            <div className="et-floating-card">
-              <div className="et-avatars">
-                <span />
-                <span />
-                <span />
-              </div>
-              <p>Bergabunglah bersama 1.000+ pelajar yang berkunjung minggu ini!</p>
-            </div>
-          </div>
-        </div>
-      </section>
+  <div className="et-hero-right">
+    <div className="et-image-wrapper">
+      <img
+        src={HeroTicket}
+        alt="Edupark"
+      />
+    </div>
+  </div>
+</section>
 
       {/* ════════════════ EDUCATIONAL PACKAGES ════════════════ */}
       <section className="et-packages">

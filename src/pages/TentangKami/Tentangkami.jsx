@@ -1,5 +1,5 @@
 import "./Tentangkami.css";
-import HeroBg from "../../assets/images/hero.jpg";
+import HeroBg from "../../assets/images/pemandangan sekolah.png";
 import JourneyImg from "../../assets/images/cerita.png";
 import { GraduationCap } from "lucide-react";
 import { UsersRound } from "lucide-react";
