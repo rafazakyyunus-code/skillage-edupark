@@ -9,12 +9,12 @@ export default function Attractions() {
 
   const [attractions, setAttractions] = useState([]);
   const [loading, setLoading]         = useState(true);
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [activeFilter, setActiveFilter] = useState("Semua");
   const [page, setPage]               = useState(1);
 
   /*
    * 8 item per halaman  → 2 baris × 4 kolom (desktop)
-   *                      → 4 baris × 2 kolom (tablet)
+   * → 4 baris × 2 kolom (tablet)
    * Tidak ada lagi card "yatim" di baris terakhir halaman 1
    */
   const itemsPerPage = 8;
@@ -29,12 +29,12 @@ export default function Attractions() {
 
   /* Kategori dinamis dari data yang ada di Firebase */
   const categories = [
-    "All",
+    "Semua",
     ...Array.from(new Set(attractions.map((a) => a.category).filter(Boolean))),
   ];
 
   const filteredData =
-    activeFilter === "All"
+    activeFilter === "Semua"
       ? attractions
       : attractions.filter((item) => item.category === activeFilter);
 
@@ -53,7 +53,7 @@ export default function Attractions() {
       <div className="attractions-page" style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"60vh" }}>
         <div style={{ textAlign:"center", color:"#667085" }}>
           <div className="at-spinner" />
-          <p style={{ marginTop:16, fontSize:15 }}>Loading attractions...</p>
+          <p style={{ marginTop:16, fontSize:15 }}>Memuat wahana wisata...</p>
         </div>
       </div>
     );
@@ -65,7 +65,7 @@ export default function Attractions() {
       <div className="attractions-page" style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"60vh" }}>
         <div style={{ textAlign:"center", color:"#667085" }}>
           <FaLeaf style={{ fontSize:48, color:"#22c55e", marginBottom:16 }} />
-          <p style={{ fontSize:18, fontWeight:700, color:"#08112b" }}>Belum ada attraction</p>
+          <p style={{ fontSize:18, fontWeight:700, color:"#08112b" }}>Belum ada wahana wisata</p>
           <p style={{ marginTop:8 }}>Silakan tambahkan data melalui halaman Admin.</p>
         </div>
       </div>
@@ -83,28 +83,31 @@ export default function Attractions() {
         />
         <div className="at-overlay" />
         <div className="at-hero-content">
-          <span className="at-badge">ADVENTURE AWAITS</span>
+          <span className="at-badge">PETUALANGAN MENANTI</span>
           <h1>
-            Discover the Wonder of
+            Temukan Keajaiban
             <br />
-            Learning
+            Dalam Belajar
           </h1>
           <p>
-            Explore interactive workshops, hidden nature trails, and majestic
-            wildlife at Edupark Skillage.
+            Jelajahi lokakarya interaktif, jalur alam tersembunyi, dan satwa liar 
+            yang memukau di Edupark Skillage.
           </p>
           <div className="at-buttons">
-            <button className="at-primary">Start Exploring</button>
-            <button className="at-secondary">View Map</button>
+            <button className="at-primary" onClick={() => {
+              const el = document.getElementById("explore-section");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }}>Mulai Menjelajah</button>
+            <button className="at-secondary">Lihat Peta</button>
           </div>
         </div>
       </section>
 
       {/* HEADER + FILTER */}
-      <div className="at-header">
+      <div className="at-header" id="explore-section">
         <div>
-          <h2>Explore Our Attractions</h2>
-          <p>Curated educational experiences for all ages.</p>
+          <h2>Jelajahi Wahana Kami</h2>
+          <p>Pengalaman edukasi pilihan terbaik untuk segala usia.</p>
         </div>
 
         <div className="at-filters">
@@ -114,7 +117,7 @@ export default function Attractions() {
               className={activeFilter === label ? "active" : ""}
               onClick={() => handleFilter(label)}
             >
-              {label === "All" && <FaGlobe />}
+              {label === "Semua" && <FaGlobe />}
               {label}
             </button>
           ))}
@@ -153,7 +156,7 @@ export default function Attractions() {
                   {item.location}
                 </span>
                 <button onClick={() => navigate(`/attractions/${item.id}`)}>
-                  Explore More →
+                  Jelajahi Selengkapnya →
                 </button>
               </div>
             </div>

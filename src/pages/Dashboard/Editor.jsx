@@ -1975,8 +1975,10 @@ const TICKET_BLANK = {
   featured: false,
   iconName: "FaSwimmingPool",
   features: ["", "", "", "", "", ""],
+  priceCategories: [],
 };
 
+const PRICE_CAT_BLANK = { key: "", label: "", weekday: "", weekend: "" };
 const TICKET_ICON_OPTIONS = [
   { value: "FaSwimmingPool", label: "Kolam Renang" },
   { value: "FaTree",         label: "Alam / Pohon" },
@@ -2048,28 +2050,53 @@ function TicketsOnlineView() {
   /* ── save ── */
   const handleSave = async () => {
     if (!form.title.trim()) return showToast("✗ Nama paket wajib diisi.");
-    if (!form.weekday || isNaN(Number(String(form.weekday).replace(/\D/g,"")))) return showToast("✗ Harga weekday harus angka.");
-    if (!form.weekend || isNaN(Number(String(form.weekend).replace(/\D/g,"")))) return showToast("✗ Harga weekend harus angka.");
     if (!form.image.trim()) return showToast("✗ Upload foto terlebih dahulu.");
+
+    const validCats = (form.priceCategories || []).filter(c => c.label.trim());
+    for (const cat of validCats) {
+      if (!cat.weekday || isNaN(Number(String(cat.weekday).replace(/\D/g,"")))) return showToast(`✗ Harga weekday untuk "${cat.label}" harus angka.`);
+      if (!cat.weekend || isNaN(Number(String(cat.weekend).replace(/\D/g,"")))) return showToast(`✗ Harga weekend untuk "${cat.label}" harus angka.`);
+    }
+    if (validCats.length === 0) {
+      if (!form.weekday || isNaN(Number(String(form.weekday).replace(/\D/g,"")))) return showToast("✗ Harga weekday harus angka, atau tambah minimal 1 kategori harga.");
+      if (!form.weekend || isNaN(Number(String(form.weekend).replace(/\D/g,"")))) return showToast("✗ Harga weekend harus angka, atau tambah minimal 1 kategori harga.");
+    }
 
     setSaving(true);
     try {
-      // Store prices as formatted string "Rp X.XXX.XXX"
       const fmtPrice = (val) => {
         const num = parseInt(String(val).replace(/\D/g,""), 10) || 0;
         return "Rp " + num.toLocaleString("id-ID");
       };
+
+      let pricesObj = null;
+      if (validCats.length > 0) {
+        pricesObj = {};
+        validCats.forEach((cat, idx) => {
+          const slug = cat.key.trim()
+            || cat.label.trim().toLowerCase().replace(/[^a-z0-9]/g, "_").slice(0, 20)
+            || `kategori_${idx + 1}`;
+          pricesObj[slug] = {
+            label:   cat.label.trim(),
+            weekday: fmtPrice(cat.weekday),
+            weekend: fmtPrice(cat.weekend),
+          };
+        });
+      }
+
       const payload = {
         title:     form.title.trim(),
         category:  form.category.trim() || "Paket Wisata",
         image:     form.image.trim(),
-        weekday:   fmtPrice(form.weekday),
-        weekend:   fmtPrice(form.weekend),
+        weekday:   validCats.length === 0 ? fmtPrice(form.weekday) : (form.weekday ? fmtPrice(form.weekday) : ""),
+        weekend:   validCats.length === 0 ? fmtPrice(form.weekend) : (form.weekend ? fmtPrice(form.weekend) : ""),
         featured:  !!form.featured,
         iconName:  form.iconName || "FaTicketAlt",
         features:  (form.features || []).map(f => f.trim()).filter(Boolean),
         updatedAt: new Date().toISOString(),
       };
+      if (pricesObj) payload.prices = pricesObj;
+
       if (editId) {
         await update(ref(db, `ticketsOnline/${editId}`), payload);
         showToast("✓ Paket berhasil diperbarui!");
@@ -2088,19 +2115,30 @@ function TicketsOnlineView() {
   const resetForm = () => { setForm(TICKET_BLANK); setEditId(null); setImagePreview(""); };
 
   const handleEdit = (item) => {
-    // Strip "Rp " prefix and dots for editing
     const rawPrice = (str) => str ? str.replace(/[^\d]/g, "") : "";
+
+    let priceCategories = [];
+    if (item.prices && typeof item.prices === "object") {
+      priceCategories = Object.entries(item.prices).map(([key, val]) => ({
+        key:     key,
+        label:   val.label || "",
+        weekday: rawPrice(val.weekday),
+        weekend: rawPrice(val.weekend),
+      }));
+    }
+
     setForm({
-      title:    item.title || "",
-      category: item.category || "Paket Wisata",
-      image:    item.image || "",
-      weekday:  rawPrice(item.weekday),
-      weekend:  rawPrice(item.weekend),
-      featured: !!item.featured,
-      iconName: item.iconName || "FaTicketAlt",
-      features: Array.isArray(item.features)
+      title:           item.title || "",
+      category:        item.category || "Paket Wisata",
+      image:           item.image || "",
+      weekday:         rawPrice(item.weekday),
+      weekend:         rawPrice(item.weekend),
+      featured:        !!item.featured,
+      iconName:        item.iconName || "FaTicketAlt",
+      features:        Array.isArray(item.features)
         ? [...item.features, "", "", "", "", "", ""].slice(0, 6)
         : ["", "", "", "", "", ""],
+      priceCategories,
     });
     setEditId(item.firebaseId);
     setImagePreview(item.image || "");
@@ -2259,6 +2297,137 @@ function TicketsOnlineView() {
             </div>
           </div>
 
+          {/* ── Harga per Kategori ── */}
+          <div style={card}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:4 }}>
+              <label style={{ ...sectionLabel, margin:0 }}>
+                Harga per Kategori
+                <span style={{ fontWeight:400, color:"#9CA3AF", fontSize:12, marginLeft:6 }}>
+                  (opsional — jika diisi, menggantikan harga global)
+                </span>
+              </label>
+              <button
+                onClick={() => setForm(f => ({
+                  ...f,
+                  priceCategories: [...(f.priceCategories || []), { ...PRICE_CAT_BLANK }],
+                }))}
+                style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 13px",
+                  background:"#1B3A2A", color:"#fff", border:"none", borderRadius:8,
+                  fontSize:12, fontWeight:700, cursor:"pointer", flexShrink:0 }}>
+                + Tambah Kategori
+              </button>
+            </div>
+            <p style={{ fontSize:12, color:"#9CA3AF", margin:"6px 0 14px" }}>
+              Contoh: Anak-Anak, Dewasa, Rombongan Pelajar. Setiap kategori punya harga weekday & weekend sendiri.
+            </p>
+
+            {(!form.priceCategories || form.priceCategories.length === 0) ? (
+              <div style={{ border:"1.5px dashed #E5E7EB", borderRadius:10, padding:"20px 16px",
+                textAlign:"center", color:"#9CA3AF", fontSize:13 }}>
+                Belum ada kategori harga. Klik "+ Tambah Kategori" atau biarkan kosong untuk pakai harga global.
+              </div>
+            ) : (
+              <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                {form.priceCategories.map((cat, idx) => (
+                  <div key={idx} style={{ background:"#F9FAFB", border:"1px solid #E5E7EB",
+                    borderRadius:10, padding:"12px 14px", position:"relative" }}>
+
+                    {/* Row 1: Nama + Key */}
+                    <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr", gap:10, marginBottom:10 }}>
+                      <div>
+                        <label style={fieldLabel}>Nama Kategori *</label>
+                        <input
+                          placeholder="cth. Anak-Anak (2–12 thn)"
+                          value={cat.label}
+                          onChange={e => {
+                            const updated = [...form.priceCategories];
+                            updated[idx] = { ...updated[idx], label: e.target.value };
+                            setForm(f => ({ ...f, priceCategories: updated }));
+                          }}
+                          style={input} />
+                      </div>
+                      <div>
+                        <label style={fieldLabel}>Key / Slug</label>
+                        <input
+                          placeholder="cth. anak (auto)"
+                          value={cat.key}
+                          onChange={e => {
+                            const updated = [...form.priceCategories];
+                            updated[idx] = { ...updated[idx], key: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g,"") };
+                            setForm(f => ({ ...f, priceCategories: updated }));
+                          }}
+                          style={{ ...input, color:"#6B7280" }} />
+                      </div>
+                    </div>
+
+                    {/* Row 2: Harga */}
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+                      <div>
+                        <label style={fieldLabel}>Harga Weekday (Rp) *</label>
+                        <input
+                          type="number" min="0"
+                          placeholder="cth. 25000"
+                          value={cat.weekday}
+                          onChange={e => {
+                            const updated = [...form.priceCategories];
+                            updated[idx] = { ...updated[idx], weekday: e.target.value };
+                            setForm(f => ({ ...f, priceCategories: updated }));
+                          }}
+                          style={input} />
+                        {cat.weekday && <p style={{ fontSize:11, color:"#16a34a", margin:"3px 0 0" }}>{fmtRp(cat.weekday)}</p>}
+                      </div>
+                      <div>
+                        <label style={fieldLabel}>Harga Weekend (Rp) *</label>
+                        <input
+                          type="number" min="0"
+                          placeholder="cth. 35000"
+                          value={cat.weekend}
+                          onChange={e => {
+                            const updated = [...form.priceCategories];
+                            updated[idx] = { ...updated[idx], weekend: e.target.value };
+                            setForm(f => ({ ...f, priceCategories: updated }));
+                          }}
+                          style={input} />
+                        {cat.weekend && <p style={{ fontSize:11, color:"#d97706", margin:"3px 0 0" }}>{fmtRp(cat.weekend)}</p>}
+                      </div>
+                    </div>
+
+                    {/* Preview pills */}
+                    {(cat.weekday || cat.weekend) && (
+                      <div style={{ display:"flex", gap:8, marginTop:10 }}>
+                        {cat.weekday && (
+                          <span style={{ background:"#E3F2FD", color:"#1565C0", fontSize:11,
+                            fontWeight:700, padding:"3px 10px", borderRadius:6 }}>
+                            Weekday: {fmtRp(cat.weekday)}
+                          </span>
+                        )}
+                        {cat.weekend && (
+                          <span style={{ background:"#FFF3E0", color:"#E65100", fontSize:11,
+                            fontWeight:700, padding:"3px 10px", borderRadius:6 }}>
+                            Weekend: {fmtRp(cat.weekend)}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Hapus button */}
+                    <button
+                      onClick={() => setForm(f => ({
+                        ...f,
+                        priceCategories: f.priceCategories.filter((_, i) => i !== idx),
+                      }))}
+                      style={{ position:"absolute", top:10, right:10, background:"#FEF2F2",
+                        border:"none", borderRadius:6, padding:"4px 8px", cursor:"pointer",
+                        color:"#DC2626", fontSize:11, fontWeight:700,
+                        display:"flex", alignItems:"center", gap:4 }}>
+                      ✕ Hapus
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Detail Paket / Features */}
           <div style={card}>
             <label style={sectionLabel}>
@@ -2317,14 +2486,38 @@ function TicketsOnlineView() {
               </div>
                 <div style={{ fontSize:15, fontWeight:700, color:"#1e3b25", marginBottom:10 }}>{form.title || "Nama Paket"}</div>
                 <div style={{ display:"flex", gap:8 }}>
-                  <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
-                    <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKDAY</div>
-                    <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{form.weekday ? fmtRp(form.weekday) : "—"}</div>
-                  </div>
-                  <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
-                    <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKEND</div>
-                    <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{form.weekend ? fmtRp(form.weekend) : "—"}</div>
-                  </div>
+                  {(form.priceCategories && form.priceCategories.length > 0) ? (
+                    <div style={{ flex:1 }}>
+                      {form.priceCategories.filter(c => c.label).slice(0, 3).map((cat, i) => (
+                        <div key={i} style={{ background:"#f6f8f5", borderRadius:8, padding:"6px 10px", marginBottom:4 }}>
+                          <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>{cat.label}</div>
+                          <div style={{ fontSize:12, color:"#2f6f3e", fontWeight:700 }}>
+                            {cat.weekday ? fmtRp(cat.weekday) : "—"}
+                            <span style={{ color:"#9CA3AF", fontSize:10, fontWeight:400, marginLeft:4 }}>wd</span>
+                            {" / "}
+                            {cat.weekend ? fmtRp(cat.weekend) : "—"}
+                            <span style={{ color:"#9CA3AF", fontSize:10, fontWeight:400, marginLeft:4 }}>we</span>
+                          </div>
+                        </div>
+                      ))}
+                      {form.priceCategories.length > 3 && (
+                        <div style={{ fontSize:11, color:"#9CA3AF", padding:"2px 10px" }}>
+                          +{form.priceCategories.length - 3} lainnya
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
+                        <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKDAY</div>
+                        <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{form.weekday ? fmtRp(form.weekday) : "—"}</div>
+                      </div>
+                      <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
+                        <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKEND</div>
+                        <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{form.weekend ? fmtRp(form.weekend) : "—"}</div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -2419,14 +2612,29 @@ function TicketsOnlineView() {
             </div>
               <div style={{ fontSize:16, fontWeight:700, color:"#111827", marginBottom:10, lineHeight:1.3 }}>{item.title}</div>
               <div style={{ display:"flex", gap:8 }}>
-                <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
-                  <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600, marginBottom:2 }}>WEEKDAY</div>
-                  <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{item.weekday}</div>
-                </div>
-                <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
-                  <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600, marginBottom:2 }}>WEEKEND</div>
-                  <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{item.weekend}</div>
-                </div>
+                {item.prices && typeof item.prices === "object" && Object.keys(item.prices).length > 0 ? (
+                  <div style={{ flex:1, background:"#F0FDF4", borderRadius:8, padding:"8px 10px",
+                    border:"1px solid #BBF7D0" }}>
+                    <div style={{ fontSize:10, color:"#16a34a", fontWeight:700, marginBottom:2 }}>
+                      {Object.keys(item.prices).length} KATEGORI HARGA
+                    </div>
+                    <div style={{ fontSize:11, color:"#166534", fontWeight:600, lineHeight:1.4 }}>
+                      {Object.values(item.prices).map(p => p.label).slice(0,2).join(", ")}
+                      {Object.keys(item.prices).length > 2 && " ..."}
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
+                      <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600, marginBottom:2 }}>WEEKDAY</div>
+                      <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{item.weekday}</div>
+                    </div>
+                    <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
+                      <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600, marginBottom:2 }}>WEEKEND</div>
+                      <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{item.weekend}</div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 

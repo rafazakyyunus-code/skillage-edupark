@@ -1,90 +1,65 @@
 /* ===== ProgramPage.css ===== */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap');
 
 .program-page {
   overflow-x: hidden;
 }
 
 /* ==========================================================================
-   HERO — tinggi & layout seragam untuk SEMUA halaman program
+   CONTAINER
    ========================================================================== */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
 
+/* ==========================================================================
+   HERO — Tata Letak & Struktur Utama
+   ========================================================================== */
 .program-page .program-hero {
-  /* ✅ Tinggi FIXED — seragam di semua halaman program */
+  position: relative;
   width: 100%;
   height: 600px;
-
   margin-top: 0;
-  position: relative;
-  overflow: hidden;
-
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-
-  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
 }
 
-/* Dekorasi lingkaran di sudut (opsional) */
+/* Dekorasi lingkaran di sudut */
 .program-page .program-hero::before {
   content: "";
   position: absolute;
-  width: 500px;
-  height: 500px;
-  background: rgba(255,255,255,0.04);
-  border-radius: 50%;
   top: -100px;
   right: -100px;
+  width: 500px;
+  height: 500px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 50%;
   z-index: 1;
   pointer-events: none;
 }
 
-/* ==========================================================================
-   HERO — background per halaman
-   Gambar di-set dari inline style JSX; kelas ini hanya mengatur overlay warna
-   ========================================================================== */
-
-/* Hydroponic */
-.hydroponic-hero {
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  color: white;
-}
-
-/* Venue Workshop */
-.workshop-hero {
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  color: white;
-}
-
-/* Peternakan */
-.peternakan-hero {
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  color: white;
-}
-
-/* Venue Alam */
+/* Background per halaman (Digabung karena kodenya sama semua) */
+.hydroponic-hero,
+.workshop-hero,
+.peternakan-hero,
 .venuealam-hero {
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
-  color: white;
+  color: #fff;
 }
 
-/* ==========================================================================
-   HERO OVERLAY — gelap merata di atas gambar
-   ========================================================================== */
+/* Hero Overlay — Gelap merata di atas gambar */
 .hero-overlay {
   position: absolute;
   inset: 0;
-  /* gradient: transparan di atas → gelap di bawah */
   background: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0.30) 0%,
@@ -94,52 +69,50 @@
   z-index: 1;
 }
 
-/* ==========================================================================
-   HERO CONTENT
-   ========================================================================== */
+/* Hero Content */
 .program-page .hero-content {
   position: relative;
-  z-index: 2;
   max-width: 720px;
   width: 100%;
-  padding: 0 24px;
   margin: 0 auto;
+  padding: 0 24px;
+  color: #fff;
+  z-index: 2;
   animation: fadeUp 0.8s ease both;
-  color: white;
 }
 
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255,255,255,0.18);
-  backdrop-filter: blur(10px);
+  margin-bottom: 22px;
   padding: 7px 20px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.30);
   border-radius: 50px;
+  color: #fff;
   font-size: 13px;
   font-weight: 600;
-  margin-bottom: 22px;
-  border: 1px solid rgba(255,255,255,0.30);
-  color: white;
   letter-spacing: 0.3px;
 }
 
 .program-page .hero-content h1 {
   font-size: clamp(2.8rem, 6vw, 5.2rem);
   font-weight: 800;
-  margin: 0 0 18px;
   line-height: 1.05;
   letter-spacing: -1.5px;
-  color: white;
+  margin: 0 0 18px;
+  color: #fff;
 }
 
 .program-page .hero-content p {
-  font-size: 1.1rem;
-  opacity: 0.92;
-  margin: 0 auto 36px;
-  line-height: 1.65;
   max-width: 520px;
-  color: rgba(255,255,255,0.92);
+  margin: 0 auto 36px;
+  font-size: 1.1rem;
+  line-height: 1.65;
+  opacity: 0.92;
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .program-page .hero-btns {
@@ -153,72 +126,45 @@
    BUTTONS
    ========================================================================== */
 .btn-primary {
-  background: #16c35b;
-  color: white;
-  padding: 14px 30px;
-  border-radius: 10px;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 15px;
-  transition: all 0.3s;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  padding: 14px 30px;
+  background: #16c35b;
+  border-radius: 10px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
   background: #0fa64b;
   transform: translateY(-3px) scale(1.04);
-  box-shadow: 0 12px 30px rgba(22,195,91,0.45);
+  box-shadow: 0 12px 30px rgba(22, 195, 91, 0.45);
 }
 
 .btn-outline {
-  background: transparent;
-  color: white;
+  display: inline-block;
   padding: 14px 30px;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.60);
   border-radius: 10px;
+  color: #fff;
   text-decoration: none;
   font-weight: 600;
   font-size: 15px;
-  border: 2px solid rgba(255,255,255,0.60);
-  transition: all 0.3s;
-  display: inline-block;
+  transition: all 0.3s ease;
 }
 
 .btn-outline:hover {
-  background: rgba(255,255,255,0.15);
-  border-color: white;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #fff;
 }
 
 /* ==========================================================================
-   ANIMATIONS
-   ========================================================================== */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(28px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-10px); }
-}
-
-@keyframes scrollPlants {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-/* ==========================================================================
-   CONTAINER
-   ========================================================================== */
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-/* ==========================================================================
-   ABOUT
+   ABOUT SECTION
    ========================================================================== */
 .program-page .program-about {
   padding: 90px 0;
@@ -234,27 +180,23 @@
 
 .tag {
   display: inline-block;
+  margin-bottom: 12px;
   color: #16c35b;
   font-weight: 700;
   font-size: 13px;
   letter-spacing: 2px;
-  margin-bottom: 12px;
   text-transform: uppercase;
 }
 
 .program-page .about-text {
   min-width: 0;
-  font-weight: 800;
-  color: #1a1a1a;
   margin-bottom: 20px;
-  background: white;
   padding: 30px;
+  background: #fff;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-}
-
-.program-page .about-visual {
-  display: block;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  color: #1a1a1a;
+  font-weight: 800;
 }
 
 .program-page .about-text h2 .green {
@@ -262,12 +204,13 @@
 }
 
 .program-page .about-text p {
+  margin-bottom: 16px;
   color: #555;
   line-height: 1.8;
-  margin-bottom: 16px;
   font-weight: 400;
 }
 
+/* Stats Row */
 .stats-row {
   display: flex;
   gap: 30px;
@@ -289,13 +232,18 @@
   color: #888;
 }
 
+/* About Visual */
+.program-page .about-visual {
+  display: block;
+}
+
 .program-page .visual-card {
   width: 100%;
+  max-width: 100%;
   background: none;
   padding: 0;
   border-radius: 24px;
   text-align: center;
-  max-width: 100%;
   transition: all 0.3s ease;
 }
 
@@ -306,11 +254,11 @@
 .program-page .visual-image {
   width: 100%;
   height: 320px;
+  margin: 0;
   border-radius: 20px;
   overflow: hidden;
-  margin: 0;
-  transition: 0.4s;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  transition: 0.4s ease;
 }
 
 .program-page .visual-image img {
@@ -331,7 +279,7 @@
 }
 
 /* ==========================================================================
-   FEATURES
+   FEATURES SECTION
    ========================================================================== */
 .program-page .program-features {
   padding: 90px 0;
@@ -353,33 +301,37 @@
 }
 
 .program-page .feature-card {
-  background: white;
-  border-radius: 20px;
+  position: relative;
   padding: 36px 28px;
-  text-align: center;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  background: #fff;
   border: 1px solid #f0f0f0;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
 }
 
 .program-page .feature-card:hover {
   transform: translateY(-10px) scale(1.04);
-  box-shadow: 0 20px 40px rgba(22,195,91,0.20);
+  box-shadow: 0 20px 40px rgba(22, 195, 91, 0.20);
   border-color: #16c35b;
 }
 
 .program-page .feature-card::before {
   content: "";
   display: block;
-  height: 4px;
   width: 50px;
-  background: linear-gradient(90deg, #16c35b, transparent);
+  height: 4px;
   margin: 0 auto 18px;
+  background: linear-gradient(90deg, #16c35b, transparent);
   border-radius: 4px;
 }
 
+/* Disesuaikan untuk wadah Icon SVG komponen baru */
 .program-page .feature-icon {
-  font-size: 2.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 14px;
 }
 
@@ -397,77 +349,77 @@
 }
 
 /* ==========================================================================
-   PLANTS (Hydroponic)
+   PLANTS SECTION (Marquee Slider)
    ========================================================================== */
 .program-page .program-plants {
   padding: 80px 0;
-  background: white;
+  background: #fff;
   text-align: center;
   overflow: hidden;
 }
 
 .program-page .plants-wrapper {
   width: 100%;
+  margin-top: 10px;
   overflow: hidden;
   position: relative;
-  margin-top: 10px;
 }
 
 .program-page .plants-track {
   display: flex;
   gap: 20px;
   width: max-content;
-  animation: scrollPlants 18s linear infinite;
   padding: 12px 20px;
+  animation: scrollPlants 18s linear infinite;
 }
 
 .program-page .plant-chip {
-  background: #e6f7ee;
-  color: #16c35b;
   padding: 10px 22px;
+  background: #e6f7ee;
+  border: 1px solid #b2e5c7;
   border-radius: 50px;
+  color: #16c35b;
   font-weight: 600;
   font-size: 14px;
-  border: 1px solid #b2e5c7;
-  transition: 0.3s;
   white-space: nowrap;
   cursor: default;
+  transition: 0.3s ease;
 }
 
 .program-page .plant-chip:hover {
   background: #16c35b;
-  color: white;
+  color: #fff;
   transform: translateY(-4px);
 }
 
 /* ==========================================================================
-   CTA
+   CTA SECTION
    ========================================================================== */
 .program-page .program-cta {
-  background: linear-gradient(135deg, #0a3d1f, #16c35b);
-  padding: 120px 20px;
-  text-align: center;
-  color: white;
   position: relative;
+  padding: 120px 20px;
+  background: linear-gradient(135deg, #0a3d1f, #16c35b);
+  text-align: center;
+  color: #fff;
   overflow: hidden;
 }
 
 .program-page .program-cta::before {
   content: "";
   position: absolute;
-  width: 400px;
-  height: 400px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 50%;
   top: -100px;
   left: -100px;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
   pointer-events: none;
 }
 
 .program-cta .container {
+  position: relative;
   max-width: 700px;
   margin: 0 auto;
-  position: relative;
   z-index: 1;
 }
 
@@ -476,14 +428,14 @@
   font-weight: 800;
   margin-bottom: 16px;
   line-height: 1.2;
-  color: white;
+  color: #fff;
 }
 
 .program-page .program-cta p {
+  margin-bottom: 40px;
   font-size: 1.1rem;
   opacity: 0.9;
-  margin-bottom: 40px;
-  color: rgba(255,255,255,0.9);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .program-page .cta-btns {
@@ -495,15 +447,32 @@
 
 .program-page .cta-btns a {
   min-width: 200px;
-  text-align: center;
   justify-content: center;
+  text-align: center;
+}
+
+/* ==========================================================================
+   ANIMATIONS KEYFRAMES
+   ========================================================================== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+@keyframes scrollPlants {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 /* ==========================================================================
    RESPONSIVE — Tablet (≤ 992px)
    ========================================================================== */
 @media (max-width: 992px) {
-
   .program-page .program-hero {
     height: 520px;
   }
@@ -540,7 +509,6 @@
    RESPONSIVE — Mobile (≤ 768px)
    ========================================================================== */
 @media (max-width: 768px) {
-
   .program-page .program-hero {
     height: 460px;
     border-bottom-left-radius: 24px;
@@ -556,13 +524,15 @@
     font-size: 1rem;
   }
 
-  .program-page .hero-btns {
+  .program-page .hero-btns,
+  .program-page .cta-btns {
     flex-direction: column;
     align-items: center;
   }
 
   .btn-primary,
-  .btn-outline {
+  .btn-outline,
+  .program-page .cta-btns a {
     width: 100%;
     max-width: 280px;
   }
@@ -615,22 +585,15 @@
   .program-page .program-cta p {
     font-size: 1rem;
   }
-
-  .program-page .cta-btns {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .program-page .cta-btns a {
-    width: 100%;
-    max-width: 300px;
-  }
 }
 
 /* ==========================================================================
    RESPONSIVE — Small Mobile (≤ 480px)
    ========================================================================== */
 @media (max-width: 480px) {
+  .container {
+    padding: 0 18px;
+  }
 
   .program-page .program-hero {
     height: 420px;
@@ -667,9 +630,5 @@
 
   .program-cta h2 {
     font-size: 1.75rem;
-  }
-
-  .container {
-    padding: 0 18px;
   }
 }

@@ -60,6 +60,24 @@ export default function ProdukDetail() {
     product.feature3 || "Mendapatkan dukungan penuh dari tim ahli kami.",
   ];
 
+  /* ── Handler untuk Tombol Beli via WhatsApp Dinamis ── */
+  const handleBuyClick = () => {
+    const namaProduk = product.name || "Produk Edupark";
+    const hargaFormat = Number(product.price).toLocaleString("id-ID");
+    
+    // Menyusun teks otomatis (Menggunakan asteris '*' untuk format bold di WA)
+    const textMessage = `Halo Admin Skillage Edupark, saya tertarik dan ingin membeli produk berikut:\n\n` +
+                        `*Nama Produk:* ${namaProduk}\n` +
+                        `*Harga:* Rp ${hargaFormat}\n\n` +
+                        `Bagaimana prosedur pembayaran dan metode pengirimannya? Terima kasih.`;
+
+    // Mengubah string pesan teks menjadi format URL-Safe (encode)
+    const encodedText = encodeURIComponent(textMessage);
+    
+    // Membuka link chat WhatsApp di tab baru
+    window.open(`https://wa.me/6285219801259?text=${encodedText}`, "_blank");
+  };
+
   return (
     <div className="pd-root">
       <div className="pd-container">
@@ -125,30 +143,35 @@ export default function ProdukDetail() {
             {features.filter(Boolean).map((f, i) => (
               <li key={i}>
                 <span className="pd-check">✓</span> {f}
-              </li>
+              </li> // <-- Ubah menjadi </li>
             ))}
           </ul>
 
           <div className="pd-actions">
-            <button className="pd-buy" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-            {/* Ikon Keranjang Belanja (Shopping Cart) */}
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="18" 
-              height="18" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
+            {/* 🔥 Menambahkan event onClick ke fungsi handleBuyClick */}
+            <button 
+              className="pd-buy" 
+              onClick={handleBuyClick}
+              style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
             >
-              <circle cx="8" cy="21" r="1" />
-              <circle cx="19" cy="21" r="1" />
-              <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
-            </svg>
-            <span>Beli Sekarang</span>
-          </button>
+              {/* Ikon Keranjang Belanja (Shopping Cart) */}
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="18" 
+                height="18" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <circle cx="8" cy="21" r="1" />
+                <circle cx="19" cy="21" r="1" />
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+              </svg>
+              <span>Beli Sekarang</span>
+            </button>
             <button className="pd-back" onClick={() => navigate("/produk")}>
               ← Kembali ke Katalog
             </button>

@@ -36,14 +36,14 @@ export default function CTA() {
     return () => observer.disconnect();
   }, []);
 
-  /* 3 attraction terbaru berdasarkan createdAt */
+  /* 3 wahana terbaru berdasarkan createdAt */
   const latestAttractions = [...attractions]
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 3);
 
   return (
     <section className="artikel" ref={sectionRef}>
-      <h2>Attraction Terbaru</h2>
+      <h2>Wahana Terbaru</h2>
       <p className="subtitle">
         Jelajahi pengalaman edukatif terbaru yang siap menanti kamu di Edupark Skillage.
       </p>
@@ -51,10 +51,10 @@ export default function CTA() {
       {loading ? (
         <div className="cta-loading">
           <div className="cta-spinner" />
-          <p>Memuat attraction...</p>
+          <p>Memuat wahana...</p>
         </div>
       ) : latestAttractions.length === 0 ? (
-        <p className="cta-empty">Belum ada attraction yang tersedia.</p>
+        <p className="cta-empty">Belum ada wahana yang tersedia.</p>
       ) : (
         <>
           <div className="artikel-container">
@@ -93,7 +93,7 @@ export default function CTA() {
                     className="read-btn"
                     onClick={() => navigate(`/attractions/${item.id}`)}
                   >
-                    Explore More ↗
+                    Jelajahi Lebih Lanjut ↗
                   </button>
                 </div>
               </div>
@@ -103,7 +103,7 @@ export default function CTA() {
           {/* Tombol lihat semua */}
           <div className="cta-see-all">
             <button className="see-all-btn" onClick={() => navigate("/attractions")}>
-              Lihat Semua Attraction →
+              Lihat Semua Wahana →
             </button>
           </div>
         </>

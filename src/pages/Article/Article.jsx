@@ -5,7 +5,7 @@ import { CalendarDays, Clock3, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function ArticlePage({ articles = [] }) {
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [currentPage, setCurrentPage] = useState(1);
   const articlesPerPage = 6;
 
@@ -13,11 +13,11 @@ export default function ArticlePage({ articles = [] }) {
   const publishedArticles = articles.filter((art) => art.status === "published");
 
   // Ambil daftar kategori unik dari artikel yang sudah terbit untuk tombol filter
-  const categories = ["All", ...new Set(publishedArticles.map((a) => a.category).filter(Boolean))];
+  const categories = ["Semua", ...new Set(publishedArticles.map((a) => a.category).filter(Boolean))];
 
   // Filter artikel berdasarkan kategori yang dipilih
   const filteredArticles =
-    selectedCategory === "All"
+    selectedCategory === "Semua"
       ? publishedArticles
       : publishedArticles.filter((a) => a.category === selectedCategory);
 
@@ -39,10 +39,10 @@ export default function ArticlePage({ articles = [] }) {
     <div className="article-page">
       {/* HERO SECTION */}
       <section className="article-hero">
-        <h1>Latest Articles</h1>
+        <h1>Artikel Terbaru</h1>
         <p className="article-hero-sub">
-          Stay ahead with expert insights on pedagogical shifts, educational technology,
-          and student success strategies in the 21st century.
+          Tetap terdepan dengan wawasan ahli seputar perkembangan pedagogi, teknologi pendidikan,
+          serta strategi keberhasilan siswa.
         </p>
       </section>
 
@@ -63,7 +63,7 @@ export default function ArticlePage({ articles = [] }) {
           ))}
         </div>
         <span className="filter-count">
-          Showing {Math.min(indexOfLastArticle, filteredArticles.length)} of {filteredArticles.length} articles
+          Menampilkan {Math.min(indexOfLastArticle, filteredArticles.length)} dari {filteredArticles.length} artikel
         </span>
       </div>
 
@@ -84,7 +84,7 @@ export default function ArticlePage({ articles = [] }) {
                     e.target.src = "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800";
                   }}
                 />
-                <span className="card-category">{article.category || "General"}</span>
+                <span className="card-category">{article.category || "Umum"}</span>
               </div>
               <div className="card-content">
                 <div className="card-meta">
@@ -101,7 +101,7 @@ export default function ArticlePage({ articles = [] }) {
                   className="read-more" 
                   onClick={() => navigate(`/article/${article.id}`)}
                 >
-                  Read More →
+                  Baca Selengkapnya →
                 </button>
               </div>
             </div>

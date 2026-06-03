@@ -63,8 +63,8 @@ export default function GallerySection() {
 
       {/* HEADER — di atas foto */}
       <div className="gallery-header">
-        <h2>Moment Edupark</h2>
-        <p>Glimpses into the daily life and discovery at Edupark through our students' eyes.</p>
+        <h2>Momen Edupark</h2>
+        <p>Sekilas tentang kehidupan sehari-hari dan penemuan di Edupark melalui sudut pandang siswa kami.</p>
       </div>
 
       {/* LOADING SKELETON */}
@@ -125,7 +125,7 @@ export default function GallerySection() {
           className="gallery-footer-btn"
           onClick={() => navigate("/gallery")}
         >
-          View Full Gallery
+          Lihat Galeri Selengkapnya
         </button>
       </div>
 

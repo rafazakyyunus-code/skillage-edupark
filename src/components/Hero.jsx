@@ -1,47 +1,25 @@
 import "./Hero.css";
 
-
-
 export default function Hero() {
-
   return (
-
     <section className="hero">
-
       <div className="hero-content">
-
         <h1>
-
-          Edupark: Nurturing <br />
-
-          <span>Nature</span> & Knowledge
-
+          Edupark: Menumbuhkan <br />
+          <span>Alam</span> & Pengetahuan
         </h1>
 
-
-
         <p>
-
-          Empowering the next generation through sustainable outdoor learning
-
-          environments that bridge the gap between classroom theory and natural world applications.
-
+          Memberdayakan generasi berikutnya melalui lingkungan pembelajaran luar
+          ruangan yang berkelanjutan, menjembatani kesenjangan antara teori kelas
+          dan penerapan di dunia nyata.
         </p>
 
-
-
-        <div className="hero-buttonss">
-
+        <div className="hero-buttons">
           <button className="btn-primary">Tentang Kami</button>
-
           <button className="btn-outline">Selengkapnya</button>
-
         </div>
-
       </div>
-
     </section>
-
   );
-
 }

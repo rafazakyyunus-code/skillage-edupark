@@ -1,57 +1,174 @@
 // src/pages/Etiket/ETicket.jsx
 
 import "./ETicket.css";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { getDatabase, ref, onValue } from "firebase/database";
+import TicketDetailModal from "./TicketDetailModal";
 
 import {
   FaTicketAlt,
-  FaUsers,
-  FaTree,
   FaCheckCircle,
   FaShoppingCart,
-  FaSearch,
   FaCalendarAlt,
+  FaArrowRight,
 } from "react-icons/fa";
 
+/* ─────────────────────────────────────────
+   HELPER: harga weekday terendah dari objek `prices`
+───────────────────────────────────────── */
+function getLowestWeekdayPrice(item) {
+  if (item.prices && typeof item.prices === "object") {
+    const values = Object.values(item.prices)
+      .map((e) => parseInt(String(e.weekday || "0").replace(/[^\d]/g, ""), 10))
+      .filter((n) => n > 0);
+    if (values.length === 0) return null;
+    return Math.min(...values);
+  }
+  if (item.weekday) {
+    const parsed = parseInt(String(item.weekday).replace(/[^\d]/g, ""), 10);
+    return isNaN(parsed) ? null : parsed;
+  }
+  return null;
+}
+
+function formatRupiah(number) {
+  if (!number) return "—";
+  return "Rp " + number.toLocaleString("id-ID");
+}
+
+/* ═══════════════════════════════════════════
+   KOMPONEN UTAMA
+═══════════════════════════════════════════ */
 export default function ETicket() {
   const navigate = useNavigate();
 
+  const [allPackages, setAllPackages]         = useState([]);
+  const [loading, setLoading]                 = useState(true);
+  const [selectedPackage, setSelectedPackage] = useState(null);
+  const [initialView, setInitialView]         = useState("detail");
+
+  /* ── Fetch realtime dari Firebase ── */
+  useEffect(() => {
+    const db      = getDatabase();
+    const tickRef = ref(db, "ticketsOnline");
+
+    const unsub = onValue(tickRef, (snap) => {
+      const data = snap.val();
+      if (data) {
+        const list = Object.entries(data)
+          .map(([key, val]) => ({ ...val, firebaseId: key }))
+          .sort((a, b) => {
+            const aSales = a.salesCount || 0;
+            const bSales = b.salesCount || 0;
+            if (bSales !== aSales) return bSales - aSales;
+            return (a.order || 99) - (b.order || 99);
+          });
+        setAllPackages(list);
+      } else {
+        setAllPackages([]);
+      }
+      setLoading(false);
+    });
+
+    return () => unsub();
+  }, []);
+
+  /* ── Filter Top 3 Packages ── */
+  const topPackages = useMemo(() => {
+    if (allPackages.length === 0) return [];
+
+    const hasSales = allPackages.some((p) => typeof p.salesCount === "number" && p.salesCount > 0);
+    if (hasSales) return allPackages.slice(0, 3);
+
+    const featured    = allPackages.filter((p) => p.featured === true);
+    const nonFeatured = allPackages.filter((p) => p.featured !== true);
+    const merged      = [...featured, ...nonFeatured];
+    return merged.slice(0, 3);
+  }, [allPackages]);
+
+  /* ── Best Value ID ── */
+  const bestValueId = useMemo(() => {
+    if (topPackages.length === 0) return null;
+    const withSales = topPackages.filter(
+      (p) => typeof p.salesCount === "number" && p.salesCount > 0
+    );
+    if (withSales.length > 0) {
+      return withSales.reduce((best, cur) =>
+        cur.salesCount > best.salesCount ? cur : best
+      ).firebaseId;
+    }
+    const feat = topPackages.find((p) => p.featured === true);
+    return feat ? feat.firebaseId : null;
+  }, [topPackages]);
+
+  /* ── Handlers ── */
+  function openDetail(item) {
+    setInitialView("detail");
+    setSelectedPackage(item);
+  }
+
+  function openForm(item) {
+    setInitialView("form");
+    setSelectedPackage(item);
+  }
+
+  const handleHeroBeliTiketClick = () => {
+    const textMessage = "Halo Admin Skillage Edupark, saya ingin bertanya tentang pemesanan tiket online untuk berkunjung ke Edupark. Boleh dibantu info kuota terdekat?";
+    window.open(`https://wa.me/6285219801259?text=${encodeURIComponent(textMessage)}`, "_blank");
+  };
+
+  const handlePesanKunjunganKelompok = () => {
+    const textMessage = "Halo Admin Skillage Edupark, saya berencana melakukan pemesanan tiket rombongan / kunjungan kelompok (lebih dari 20 orang). Boleh minta informasi penawaran harga spesial dan prosedurnya?";
+    window.open(`https://wa.me/6285219801259?text=${encodeURIComponent(textMessage)}`, "_blank");
+  };
+
+  /* ── 3 skeleton kartu saat loading ── */
+  function renderSkeletons() {
+    return Array.from({ length: 3 }).map((_, i) => (
+      <div className="et-card" key={i} style={{ opacity: 0.4, pointerEvents: "none" }}>
+        <div style={{ height: 220, background: "#dde5dd", borderRadius: 22, marginBottom: 22 }} />
+        <div style={{ height: 26, width: "65%", background: "#dde5dd", borderRadius: 8, marginBottom: 14 }} />
+        <div style={{ height: 14, width: "85%", background: "#dde5dd", borderRadius: 6, marginBottom: 8 }} />
+        <div style={{ height: 14, width: "55%", background: "#dde5dd", borderRadius: 6 }} />
+      </div>
+    ));
+  }
+
   return (
     <div className="eticket-page">
-      {/* HERO */}
+
+      {/* ════════════════ HERO ════════════════ */}
       <section className="et-hero">
         <div className="et-hero-left">
-          <span className="et-badge">
-            Welcome to the Future of Learning
-          </span>
+          <span className="et-badge">Selamat Datang di Masa Depan Pembelajaran</span>
 
           <h1>
-            Where <span>Learning</span>
+            Tempat <span>Belajar</span>
             <br />
-            Meets Nature.
+            Menyatu Dengan Alam.
           </h1>
 
           <p>
-            Explore interactive exhibits and outdoor wonders designed for
-            curious minds. Book your visit today and experience the perfect
-            blend of education and excitement in our lush green parks.
+            Jelajahi berbagai pameran interaktif dan keajaiban luar ruangan yang dirancang khusus 
+            untuk memuaskan rasa ingin tahu Anda. Pesan kunjungan Anda hari ini dan rasakan perpaduan 
+            sempurna antara edukasi yang seru di taman hijau kami yang asri.
           </p>
 
           <div className="et-hero-buttons">
             <button
-  className="et-buy-btn"
-  onClick={() => navigate("/tickets-online")}
->
-  <FaTicketAlt />
-  Buy Tickets Online
-</button>
-
+              className="et-buy-btn"
+              onClick={() => navigate("/tickets-online")}
+            >
+              <FaTicketAlt />
+              Beli Tiket Online
+            </button>
 
             <button
               className="et-view-btn"
               onClick={() => navigate("/attractions")}
             >
-              View Attractions
+              Lihat Wahana Wisata
             </button>
           </div>
         </div>
@@ -60,199 +177,165 @@ export default function ETicket() {
           <div className="et-image-wrapper">
             <img
               src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop"
-              alt="Forest"
+              alt="Hutan Edupark"
             />
-
             <div className="et-floating-card">
               <div className="et-avatars">
                 <span />
                 <span />
                 <span />
               </div>
-
-              <p>Join 1,000+ students visiting this week!</p>
+              <p>Bergabunglah bersama 1.000+ pelajar yang berkunjung minggu ini!</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* EDUCATIONAL PACKAGES */}
+      {/* ════════════════ EDUCATIONAL PACKAGES ════════════════ */}
       <section className="et-packages">
         <div className="et-title">
-          <h2>Educational Packages</h2>
-
+          <h2>Paket Edukasi</h2>
           <p>
-            Choose the perfect experience for your visit. From individual
-            explorers to large school groups, we have a package tailored for
-            you.
+            Pilih pengalaman terbaik untuk kunjungan Anda. Mulai dari penjelajah individu 
+            hingga rombongan sekolah besar, kami menyediakan paket yang dirancang khusus untuk Anda.
           </p>
         </div>
 
         <div className="et-package-grid">
-          {/* School Group */}
-          <div className="et-card">
-            <div className="et-icon">
-              <FaUsers />
-            </div>
 
-            <h3>Grup Sekolah</h3>
+          {loading && renderSkeletons()}
 
-            <p className="et-desc">
-              Structured tours and workshops designed specifically for
-              classroom learning.
+          {!loading && allPackages.length === 0 && (
+            <p style={{ gridColumn: "1/-1", textAlign: "center", color: "#687180", padding: "40px 0" }}>
+              Belum ada paket tiket yang tersedia saat ini.
             </p>
+          )}
 
-            <h1>
-              20k<span>/student</span>
-            </h1>
+          {!loading && topPackages.map((item) => {
+            const isBest      = item.firebaseId === bestValueId;
+            const lowestPrice = getLowestWeekdayPrice(item);
 
-            <ul>
-              <li>
-                <FaCheckCircle />
-                Guided Educational Tour
-              </li>
-              <li>
-                <FaCheckCircle />
-                Hands-on Workshop
-              </li>
-              <li>
-                <FaCheckCircle />
-                Resource Teacher Pack
-              </li>
-            </ul>
+            const features = Array.isArray(item.features)
+              ? item.features.slice(0, 3)
+              : ["Tiket Masuk Termasuk", "Pemandu Wisata", "Akses Semua Area"];
 
-            <button>Book Group Visit</button>
-          </div>
+            const subtitle = Array.isArray(item.features) && item.features.length > 0
+              ? item.features[0]
+              : item.category || "Paket Wisata";
 
-          {/* Family Package */}
-          <div className="et-card et-active">
-            <span className="et-best">BEST VALUE</span>
+            return (
+              <div
+                className={`et-card ${isBest ? "et-active" : ""}`}
+                key={item.firebaseId}
+              >
+                {isBest && <span className="et-best">PILIHAN TERBAIK</span>}
 
-            <div className="et-icon">
-              <FaUsers />
-            </div>
+                {item.image && (
+                  <div className="et-image-top">
+                    <img src={item.image} alt={item.title} />
+                  </div>
+                )}
 
-            <h3>Hiburan Keluarga</h3>
+                <h3>{item.title}</h3>
+                <p className="et-desc">{subtitle}</p>
 
-            <p className="et-desc">
-              All-access pass for parents and kids. A full day of adventure and
-              bonding.
-            </p>
+                <h1>
+                  {lowestPrice ? formatRupiah(lowestPrice) : "—"}
+                  <span>/orang</span>
+                </h1>
 
-            <h1>
-              50k<span>/keluarga</span>
-            </h1>
+                <ul>
+                  {features.map((feat, idx) => (
+                    <li key={idx}>
+                      <FaCheckCircle />
+                      {feat}
+                    </li>
+                  ))}
+                </ul>
 
-            <ul>
-              <li>
-                <FaCheckCircle />
-                Admission for 4 (2+2)
-              </li>
-              <li>
-                <FaCheckCircle />
-                Lunch Vouchers Included
-              </li>
-              <li>
-                <FaCheckCircle />
-                Interactive App Access
-              </li>
-            </ul>
+                <div style={{ display: "flex", gap: 10, marginTop: "auto" }}>
+                  <button
+                    style={{ flex: 1 }}
+                    className={isBest ? "et-active-btn" : ""}
+                    onClick={() => openForm(item)}
+                  >
+                    Pesan Sekarang
+                  </button>
 
-            <button className="et-active-btn">
-              Pilih Paket
-            </button>
-          </div>
-
-          {/* Nature Exploration */}
-          <div className="et-card">
-            <div className="et-image-top">
-              <img
-                src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1200&auto=format&fit=crop"
-                alt="Nature"
-              />
-
-              <div className="et-floating-icon">
-                <FaTree />
+                  <button
+                    style={{
+                      flex: 1,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 8,
+                      background: "transparent",
+                      color: "#22c55e",
+                      border: "none",
+                      cursor: "pointer"
+                    }}
+                    onClick={() => openDetail(item)}
+                  >
+                    Selengkapnya <FaArrowRight />
+                  </button>
+                </div>
               </div>
-            </div>
+            );
+          })}
 
-            <h3>Menjelajah Alam</h3>
-
-            <p className="et-desc">
-              Guided trail walks and wildlife encounters for the ultimate
-              outdoor enthusiast.
-            </p>
-
-            <h1>
-              15k<span>/orang</span>
-            </h1>
-
-            <ul>
-              <li>
-                <FaCheckCircle />
-                Expert Naturalist Guide
-              </li>
-              <li>
-                <FaCheckCircle />
-                Binocular Rental
-              </li>
-              <li>
-                <FaCheckCircle />
-                Trail Completion Medal
-              </li>
-            </ul>
-
-            <button>Book Trail</button>
-          </div>
         </div>
       </section>
 
-      {/* MANAGE VISIT */}
+      {/* ════════════════ MANAGE YOUR VISIT ════════════════ */}
       <section className="et-manage">
         <div className="et-title">
-          <h2>Manage Your Visit</h2>
+          <h2>Atur Kunjungan Anda</h2>
         </div>
 
         <div className="et-manage-grid">
-          {/* Buy Ticket */}
           <div className="et-manage-card">
             <div className="et-manage-icon">
               <FaShoppingCart />
             </div>
-
-            <h3>Instant Ticket</h3>
-
+            <h3>Tiket Instan</h3>
             <p>
-              Skip the queue and secure your spot today with our fast online
-              booking.
+              Lewati antrean dan amankan kuota kunjungan Anda hari ini dengan sistem pemesanan 
+              online kami yang cepat.
             </p>
-
             <button
               className="et-card-beli"
-              onClick={() => navigate("/buy-tickets")}
+              onClick={() => navigate("/tickets-online")}
             >
               Beli Tiket Secara Online
             </button>
           </div>
 
-
-          {/* Group Booking */}
           <div className="et-manage-card">
             <div className="et-manage-icon">
               <FaCalendarAlt />
             </div>
-
             <h3>Pesan Grup</h3>
-
             <p>
-              Merencanakan acara untuk lebih dari 20 orang? Dapatkan harga
+              Merencanakan acara kunjungan untuk lebih dari 20 orang? Dapatkan penawaran harga 
               spesial dan koordinator khusus.
             </p>
-
-            <button>Pesan Kunjungan Kelompok</button>
+            <button 
+              className="et-card-beli"
+              onClick={handlePesanKunjunganKelompok}
+            >
+              Pesan Kunjungan Kelompok
+            </button>
           </div>
         </div>
       </section>
+
+      {/* ════════════════ MODAL ════════════════ */}
+      <TicketDetailModal
+        selected={selectedPackage}
+        initialView={initialView}
+        onClose={() => setSelectedPackage(null)}
+      />
+
     </div>
   );
 }

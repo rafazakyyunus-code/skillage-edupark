@@ -33,7 +33,7 @@
 }
 
 /* =========================================
-   MODAL TOP BAR (branding header)
+   MODAL TOP BAR
 ========================================= */
 
 .td-topbar {
@@ -141,59 +141,89 @@
 }
 
 /* =========================================
-   PRICE CARDS
+   MULTI-CATEGORY PRICE TABLE  (Detail View)
 ========================================= */
 
-.td-prices {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  padding: 16px 16px 0;
+.td-prices-multi {
+  padding: 0 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.td-price-card {
-  background: #f4f8f4;
-  border-radius: 14px;
-  padding: 14px 16px;
+.td-price-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
+  background: #f4f8f4;
+  border-radius: 14px;
+  padding: 12px 16px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.td-price-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+.td-price-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
 
-.td-price-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: #1a5c2a;
+.td-price-row-label {
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 1rem;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a3322;
+  min-width: 0;
+}
+
+.td-price-row-icon {
+  color: #1a5c2a;
+  font-size: 0.85rem;
   flex-shrink: 0;
 }
 
-.td-price-card small {
-  display: block;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 3px;
+.td-price-row-values {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
-.td-price-card strong {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #1a3322;
+.td-price-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 6px 12px;
+  border-radius: 10px;
+  min-width: 100px;
 }
+
+.td-price-pill small {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.td-price-pill strong {
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.weekday-pill {
+  background: #e3f2fd;
+}
+
+.weekday-pill small  { color: #1565c0; }
+.weekday-pill strong { color: #0d47a1; }
+
+.weekend-pill {
+  background: #fff3e0;
+}
+
+.weekend-pill small  { color: #e65100; }
+.weekend-pill strong { color: #bf360c; }
 
 /* =========================================
    SECTION LABEL
@@ -256,73 +286,7 @@
 }
 
 /* =========================================
-   DESCRIPTION TEXT (detail view)
-========================================= */
-
-.td-desc {
-  padding: 0 16px;
-  font-size: 0.9rem;
-  color: #666;
-  line-height: 1.75;
-  margin-bottom: 4px;
-}
-
-/* =========================================
-   FOOTER (sticky bottom)
-========================================= */
-
-.td-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 14px 16px;
-  border-top: 1px solid #eff2ef;
-  background: #fff;
-  flex-shrink: 0;
-}
-
-.td-cancel {
-  padding: 11px 26px;
-  border-radius: 999px;
-  border: 1.5px solid #2a6b3c;
-  background: #fff;
-  color: #2a6b3c;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.td-cancel:hover {
-  background: #f1f8f2;
-}
-
-.td-book {
-  padding: 11px 28px;
-  border-radius: 999px;
-  border: none;
-  background: #1a5c2a;
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-
-.td-book:hover {
-  background: #145022;
-  transform: translateY(-2px);
-}
-
-.td-book svg {
-  font-size: 1rem;
-}
-
-/* =========================================
-   FORM VIEW — HEADER
+   FORM HEADER
 ========================================= */
 
 .td-form-header {
@@ -357,7 +321,7 @@
 }
 
 /* =========================================
-   FORM VIEW — FIELDS
+   FORM FIELDS
 ========================================= */
 
 .td-form-body {
@@ -437,21 +401,85 @@
 }
 
 /* =========================================
-   FORM VIEW — QTY STEPPER
+   MULTI-CATEGORY QTY LIST  (Form View)
+========================================= */
+
+.td-category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.td-category-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #f8faf8;
+  border: 1.5px solid #dce8dc;
+  border-radius: 14px;
+  padding: 12px 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.td-category-row:focus-within {
+  border-color: #2e9e4f;
+  box-shadow: 0 0 0 3px rgba(46, 158, 79, 0.10);
+}
+
+.td-category-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.td-category-label {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1a3322;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.td-category-price {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #2e9e4f;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.td-price-placeholder {
+  color: #aaa;
+  font-style: italic;
+}
+
+.td-price-day-tag {
+  font-size: 0.72rem;
+  color: #999;
+  font-weight: 500;
+}
+
+/* =========================================
+   QTY STEPPER
 ========================================= */
 
 .td-qty-row {
   display: flex;
   align-items: center;
   width: fit-content;
+  flex-shrink: 0;
 }
 
 .td-qty-btn {
-  width: 42px;
-  height: 46px;
+  width: 36px;
+  height: 40px;
   background: #f4f8f4;
   border: 1.5px solid #dce8dc;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-weight: 500;
   color: #2a6b3c;
   cursor: pointer;
@@ -460,12 +488,12 @@
 }
 
 .td-qty-btn:first-child {
-  border-radius: 12px 0 0 12px;
+  border-radius: 10px 0 0 10px;
   border-right: none;
 }
 
 .td-qty-btn:last-child {
-  border-radius: 0 12px 12px 0;
+  border-radius: 0 10px 10px 0;
   border-left: none;
 }
 
@@ -474,12 +502,12 @@
 }
 
 .td-qty-row input[type="number"] {
-  width: 68px;
-  height: 46px;
+  width: 56px;
+  height: 40px;
   border: 1.5px solid #dce8dc;
   border-radius: 0;
   text-align: center;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: #1a3322;
   background: #fff;
@@ -494,13 +522,32 @@
 }
 
 /* =========================================
-   FORM VIEW — TOTAL BOX
+   TOTAL / SUMMARY BOX
 ========================================= */
 
 .td-total-box {
   background: #f4f8f4;
   border-radius: 14px;
   padding: 16px 18px;
+}
+
+.td-total-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1a3322;
+}
+
+.td-total-empty {
+  font-size: 0.85rem;
+  color: #aaa;
+  font-style: italic;
+  text-align: center;
+  padding: 6px 0 10px;
+  margin: 0;
 }
 
 .td-total-row {
@@ -517,6 +564,14 @@
   font-size: 0.92rem;
 }
 
+.td-qty-inline {
+  font-style: normal;
+  font-size: 0.78rem;
+  color: #2e9e4f;
+  font-weight: 700;
+  margin-left: 4px;
+}
+
 .td-total-divider {
   height: 1px;
   background: #d8e8d8;
@@ -529,12 +584,12 @@
 }
 
 .td-total-row.total strong {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   color: #1a5c2a;
 }
 
 /* =========================================
-   BACK BUTTON (form view)
+   BACK BUTTON
 ========================================= */
 
 .td-back {
@@ -556,13 +611,89 @@
 }
 
 /* =========================================
+   FOOTER
+========================================= */
+
+.td-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 14px 16px;
+  border-top: 1px solid #eff2ef;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.td-cancel {
+  padding: 11px 26px;
+  border-radius: 999px;
+  border: 1.5px solid #2a6b3c;
+  background: #fff;
+  color: #2a6b3c;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.td-cancel:hover {
+  background: #f1f8f2;
+}
+
+.td-book {
+  padding: 11px 28px;
+  border-radius: 999px;
+  border: none;
+  background: #1a5c2a;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.td-book:hover {
+  background: #145022;
+  transform: translateY(-2px);
+}
+
+.td-book svg {
+  font-size: 1rem;
+}
+
+/* =========================================
    RESPONSIVE
 ========================================= */
 
 @media (max-width: 520px) {
   .td-hero img { height: 210px; }
-  .td-prices { grid-template-columns: 1fr; }
+
+  .td-price-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .td-price-row-values {
+    width: 100%;
+  }
+
+  .td-price-pill {
+    flex: 1;
+    align-items: flex-start;
+    min-width: 0;
+  }
+
   .td-features { grid-template-columns: 1fr; }
+
+  .td-category-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
 
   .td-footer {
     flex-direction: column-reverse;

@@ -43,6 +43,7 @@ import {
   Upload,
   MapPin,
   Ticket,
+  Settings,
 } from "lucide-react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -237,6 +238,17 @@ function Sidebar({ activeNav, setActiveNav, currentUser, pendingCount, myRevisio
         ))}
       </nav>
 
+      {/* Settings at bottom – same pattern as Editor & CreateArticle */}
+      <div className="ad-sidebar__settings">
+        <button
+          onClick={() => setActiveNav("settings")}
+          className={`ad-nav-btn${activeNav === "settings" ? " ad-nav-btn--active" : ""}`}>
+          {activeNav === "settings" && <span className="ad-nav-indicator" />}
+          <Settings size={16} />
+          <span className="ad-nav-label">Settings</span>
+        </button>
+      </div>
+
       <div className="ad-sidebar__user">
         <div className="ad-avatar">{initials}</div>
         <div className="ad-user-info">
@@ -259,6 +271,7 @@ function Topbar({ activeNav, onLogout, pendingCount }) {
     "review-articles": "Review Articles", "writer-directory": "Writer Directory",
     produk: "Produk", gallery: "Gallery",
     "manage-users": "Manage Users", "add-role": "Add / Edit Role",
+    settings: "Settings",
   };
   return (
     <header className="ad-topbar">
@@ -269,7 +282,6 @@ function Topbar({ activeNav, onLogout, pendingCount }) {
       </div>
       <div className="ad-topbar__actions">
         <div style={{ fontSize:11, background:"#FEE2E2", color:"#991B1B", borderRadius:20, padding:"3px 10px", fontWeight:700, letterSpacing:"0.04em" }}>ADMIN</div>
-        <button className="ad-logout-btn" onClick={onLogout}><LogOut size={14} /> Logout</button>
       </div>
     </header>
   );
@@ -1769,7 +1781,7 @@ function AttractionsView() {
           <div style={card}>
             <label style={sectionLabel}>Foto Attraction</label>
             <div onClick={() => document.getElementById("adm-att-file-input").click()}
-              style={{ border:"2px dashed #D1D5DB", borderRadius:12, cursor:"pointer", overflow:"hidden", transition:"border-color 0.2s", minHeight:imagePreview?"auto":160, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}
+              style={{ border:"2px dashed #D1D5DB", borderRadius:12, cursor:"pointer", overflow:"hidden", transition:"border-color 0.2s", height: imagePreview ? "auto" : 200, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}
               onMouseEnter={e => e.currentTarget.style.borderColor="#16c35b"}
               onMouseLeave={e => e.currentTarget.style.borderColor="#D1D5DB"}>
               {imagePreview ? (
@@ -1781,9 +1793,9 @@ function AttractionsView() {
                   </div>
                 </div>
               ) : (
-                <div style={{ padding:"40px 20px", textAlign:"center" }}>
-                  <Upload size={36} color="#D1D5DB" style={{ marginBottom:10 }} />
-                  <p style={{ fontSize:15, fontWeight:600, color:"#374151", margin:"0 0 6px" }}>{uploading ? "Mengupload..." : "Klik untuk pilih foto"}</p>
+                <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:8, textAlign:"center", padding:"0 20px" }}>
+                  <Upload size={36} color="#D1D5DB" />
+                  <p style={{ fontSize:15, fontWeight:600, color:"#374151", margin:0 }}>{uploading ? "Mengupload..." : "Klik untuk pilih foto"}</p>
                   <span style={{ fontSize:12, color:"#9CA3AF" }}>JPG, PNG, WEBP • Maks 10MB</span>
                 </div>
               )}
@@ -1994,7 +2006,13 @@ const TICKET_BLANK = {
   featured: false,
   iconName: "FaSwimmingPool",
   features: ["", "", "", "", "", ""],
+  // prices: array of { key, label, weekday, weekend }
+  // key  = slug unik (anak, dewasa, pelajar, dll)
+  // dikonversi ke object saat disimpan ke Firebase
+  priceCategories: [],
 };
+
+const PRICE_CAT_BLANK = { key: "", label: "", weekday: "", weekend: "" };
 
 const TICKET_ICON_OPTIONS = [
   { value: "FaSwimmingPool", label: "Kolam Renang" },
@@ -2077,9 +2095,20 @@ function TicketsOnlineAdminView() {
   /* ── save ── */
   const handleSave = async () => {
     if (!form.title.trim()) return showToast("✗ Nama paket wajib diisi.");
-    if (!form.weekday || isNaN(Number(String(form.weekday).replace(/\D/g,"")))) return showToast("✗ Harga weekday harus angka.");
-    if (!form.weekend || isNaN(Number(String(form.weekend).replace(/\D/g,"")))) return showToast("✗ Harga weekend harus angka.");
     if (!form.image.trim()) return showToast("✗ Upload foto terlebih dahulu.");
+
+    // Validasi price categories jika ada
+    const validCats = (form.priceCategories || []).filter(c => c.label.trim());
+    for (const cat of validCats) {
+      if (!cat.weekday || isNaN(Number(String(cat.weekday).replace(/\D/g,"")))) return showToast(`✗ Harga weekday untuk "${cat.label}" harus angka.`);
+      if (!cat.weekend || isNaN(Number(String(cat.weekend).replace(/\D/g,"")))) return showToast(`✗ Harga weekend untuk "${cat.label}" harus angka.`);
+    }
+
+    // Jika tidak ada price categories, validasi field weekday/weekend lama
+    if (validCats.length === 0) {
+      if (!form.weekday || isNaN(Number(String(form.weekday).replace(/\D/g,"")))) return showToast("✗ Harga weekday harus angka, atau tambah minimal 1 kategori harga.");
+      if (!form.weekend || isNaN(Number(String(form.weekend).replace(/\D/g,"")))) return showToast("✗ Harga weekend harus angka, atau tambah minimal 1 kategori harga.");
+    }
 
     setSaving(true);
     try {
@@ -2087,17 +2116,39 @@ function TicketsOnlineAdminView() {
         const num = parseInt(String(val).replace(/\D/g,""), 10) || 0;
         return "Rp " + num.toLocaleString("id-ID");
       };
+
+      // Bangun objek prices dari priceCategories
+      let pricesObj = null;
+      if (validCats.length > 0) {
+        pricesObj = {};
+        validCats.forEach((cat, idx) => {
+          // Gunakan key custom atau generate dari label
+          const slug = cat.key.trim()
+            || cat.label.trim().toLowerCase().replace(/[^a-z0-9]/g, "_").slice(0, 20)
+            || `kategori_${idx + 1}`;
+          pricesObj[slug] = {
+            label:   cat.label.trim(),
+            weekday: fmtPrice(cat.weekday),
+            weekend: fmtPrice(cat.weekend),
+          };
+        });
+      }
+
       const payload = {
         title:     form.title.trim(),
         category:  form.category.trim() || "Paket Wisata",
         image:     form.image.trim(),
-        weekday:   fmtPrice(form.weekday),
-        weekend:   fmtPrice(form.weekend),
+        weekday:   validCats.length === 0 ? fmtPrice(form.weekday) : (form.weekday ? fmtPrice(form.weekday) : ""),
+        weekend:   validCats.length === 0 ? fmtPrice(form.weekend) : (form.weekend ? fmtPrice(form.weekend) : ""),
         featured:  !!form.featured,
         iconName:  form.iconName || "FaTicketAlt",
         features:  (form.features || []).map(f => f.trim()).filter(Boolean),
         updatedAt: new Date().toISOString(),
       };
+
+      // Tambahkan prices hanya jika ada kategori
+      if (pricesObj) payload.prices = pricesObj;
+
       if (editId) {
         await update(ref(db, `ticketsOnline/${editId}`), payload);
         showToast("✓ Paket berhasil diperbarui!");
@@ -2117,17 +2168,30 @@ function TicketsOnlineAdminView() {
 
   const handleEdit = (item) => {
     const rawPrice = (str) => str ? str.replace(/[^\d]/g, "") : "";
+
+    // Konversi object prices dari Firebase → array priceCategories
+    let priceCategories = [];
+    if (item.prices && typeof item.prices === "object") {
+      priceCategories = Object.entries(item.prices).map(([key, val]) => ({
+        key:     key,
+        label:   val.label || "",
+        weekday: rawPrice(val.weekday),
+        weekend: rawPrice(val.weekend),
+      }));
+    }
+
     setForm({
-      title:    item.title || "",
-      category: item.category || "Paket Wisata",
-      image:    item.image || "",
-      weekday:  rawPrice(item.weekday),
-      weekend:  rawPrice(item.weekend),
-      featured: !!item.featured,
-      iconName: item.iconName || "FaTicketAlt",
-      features: Array.isArray(item.features)
+      title:           item.title || "",
+      category:        item.category || "Paket Wisata",
+      image:           item.image || "",
+      weekday:         rawPrice(item.weekday),
+      weekend:         rawPrice(item.weekend),
+      featured:        !!item.featured,
+      iconName:        item.iconName || "FaTicketAlt",
+      features:        Array.isArray(item.features)
         ? [...item.features, "", "", "", "", "", ""].slice(0, 6)
         : ["", "", "", "", "", ""],
+      priceCategories,
     });
     setEditId(item.firebaseId);
     setImagePreview(safeImg(item.image || ""));
@@ -2169,7 +2233,7 @@ function TicketsOnlineAdminView() {
             <label style={sectionLabel}>Foto Paket</label>
             <div onClick={() => document.getElementById("adm-ticket-file-input").click()}
               style={{ border:"2px dashed #D1D5DB", borderRadius:12, cursor:"pointer", overflow:"hidden",
-                transition:"border-color 0.2s", minHeight: imagePreview ? "auto" : 160,
+                transition:"border-color 0.2s", height: imagePreview ? "auto" : 200,
                 display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}
               onMouseEnter={e => e.currentTarget.style.borderColor="#16c35b"}
               onMouseLeave={e => e.currentTarget.style.borderColor="#D1D5DB"}>
@@ -2182,9 +2246,9 @@ function TicketsOnlineAdminView() {
                   </div>
                 </div>
               ) : (
-                <div style={{ padding:"40px 20px", textAlign:"center" }}>
-                  <Upload size={36} color="#D1D5DB" style={{ marginBottom:10 }} />
-                  <p style={{ fontSize:15, fontWeight:600, color:"#374151", margin:"0 0 6px" }}>{uploading ? "Mengupload..." : "Klik untuk upload foto paket"}</p>
+                <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:8, textAlign:"center", padding:"0 20px" }}>
+                  <Upload size={36} color="#D1D5DB" />
+                  <p style={{ fontSize:15, fontWeight:600, color:"#374151", margin:0 }}>{uploading ? "Mengupload..." : "Klik untuk upload foto paket"}</p>
                   <span style={{ fontSize:12, color:"#9CA3AF" }}>PNG, JPG, WEBP</span>
                 </div>
               )}
@@ -2246,6 +2310,132 @@ function TicketsOnlineAdminView() {
             </div>
           </div>
 
+          {/* ── Harga per Kategori ── */}
+          <div style={card}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:4 }}>
+              <label style={{ ...sectionLabel, margin:0 }}>
+                Harga per Kategori
+                <span style={{ fontWeight:400, color:"#9CA3AF", fontSize:12, marginLeft:6 }}>
+                  (opsional — jika diisi, menggantikan harga global)
+                </span>
+              </label>
+              <button
+                onClick={() => setForm(f => ({
+                  ...f,
+                  priceCategories: [...(f.priceCategories || []), { ...PRICE_CAT_BLANK }],
+                }))}
+                style={{ display:"flex", alignItems:"center", gap:6, padding:"6px 14px",
+                  background:"#1B3A2A", color:"#fff", border:"none", borderRadius:8,
+                  fontSize:12, fontWeight:700, cursor:"pointer", flexShrink:0 }}>
+                <Plus size={13} /> Tambah Kategori
+              </button>
+            </div>
+            <p style={{ fontSize:12, color:"#9CA3AF", margin:"0 0 14px" }}>
+              Contoh: Anak-Anak, Dewasa, Rombongan Pelajar. Setiap kategori punya harga weekday & weekend sendiri.
+            </p>
+
+            {(!form.priceCategories || form.priceCategories.length === 0) ? (
+              <div style={{ border:"1.5px dashed #E5E7EB", borderRadius:10, padding:"22px 16px",
+                textAlign:"center", color:"#9CA3AF", fontSize:13 }}>
+                Belum ada kategori. Klik "+ Tambah Kategori" atau biarkan kosong untuk pakai harga global.
+              </div>
+            ) : (
+              <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                {form.priceCategories.map((cat, idx) => (
+                  <div key={idx} style={{ background:"#F9FAFB", border:"1px solid #E5E7EB",
+                    borderRadius:10, padding:"12px 14px", position:"relative" }}>
+                    {/* Row 1: Label + Key */}
+                    <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr", gap:10, marginBottom:10 }}>
+                      <div>
+                        <label style={fieldLabel}>Nama Kategori *</label>
+                        <input
+                          placeholder="cth. Anak-Anak (2–12 thn)"
+                          value={cat.label}
+                          onChange={e => {
+                            const updated = [...form.priceCategories];
+                            updated[idx] = { ...updated[idx], label: e.target.value };
+                            setForm(f => ({ ...f, priceCategories: updated }));
+                          }}
+                          style={iStyle} />
+                      </div>
+                      <div>
+                        <label style={fieldLabel}>Key / Slug</label>
+                        <input
+                          placeholder="cth. anak (auto)"
+                          value={cat.key}
+                          onChange={e => {
+                            const updated = [...form.priceCategories];
+                            updated[idx] = { ...updated[idx], key: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g,"") };
+                            setForm(f => ({ ...f, priceCategories: updated }));
+                          }}
+                          style={{ ...iStyle, color:"#6B7280" }} />
+                      </div>
+                    </div>
+                    {/* Row 2: Harga */}
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+                      <div>
+                        <label style={fieldLabel}>Harga Weekday (Rp) *</label>
+                        <input
+                          type="number" min="0"
+                          placeholder="cth. 25000"
+                          value={cat.weekday}
+                          onChange={e => {
+                            const updated = [...form.priceCategories];
+                            updated[idx] = { ...updated[idx], weekday: e.target.value };
+                            setForm(f => ({ ...f, priceCategories: updated }));
+                          }}
+                          style={iStyle} />
+                      </div>
+                      <div>
+                        <label style={fieldLabel}>Harga Weekend (Rp) *</label>
+                        <input
+                          type="number" min="0"
+                          placeholder="cth. 35000"
+                          value={cat.weekend}
+                          onChange={e => {
+                            const updated = [...form.priceCategories];
+                            updated[idx] = { ...updated[idx], weekend: e.target.value };
+                            setForm(f => ({ ...f, priceCategories: updated }));
+                          }}
+                          style={iStyle} />
+                      </div>
+                    </div>
+                    {/* Preview harga */}
+                    {(cat.weekday || cat.weekend) && (
+                      <div style={{ display:"flex", gap:8, marginTop:10 }}>
+                        {cat.weekday && (
+                          <span style={{ background:"#E3F2FD", color:"#1565C0", fontSize:11, fontWeight:700,
+                            padding:"3px 10px", borderRadius:6 }}>
+                            Weekday: {fmtRp(cat.weekday)}
+                          </span>
+                        )}
+                        {cat.weekend && (
+                          <span style={{ background:"#FFF3E0", color:"#E65100", fontSize:11, fontWeight:700,
+                            padding:"3px 10px", borderRadius:6 }}>
+                            Weekend: {fmtRp(cat.weekend)}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {/* Hapus kategori */}
+                    <button
+                      onClick={() => {
+                        const updated = form.priceCategories.filter((_, i) => i !== idx);
+                        setForm(f => ({ ...f, priceCategories: updated }));
+                      }}
+                      title="Hapus kategori ini"
+                      style={{ position:"absolute", top:10, right:10, background:"#FEF2F2",
+                        border:"none", borderRadius:6, padding:"4px 8px", cursor:"pointer",
+                        color:"#DC2626", fontSize:11, fontWeight:700,
+                        display:"flex", alignItems:"center", gap:4 }}>
+                      <X size={11} /> Hapus
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Detail Paket / Features */}
           <div style={card}>
             <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:4 }}>
@@ -2293,14 +2483,35 @@ function TicketsOnlineAdminView() {
                 </div>
                 <div style={{ fontSize:15, fontWeight:700, color:"#1e3b25", marginBottom:10 }}>{form.title || "Nama Paket"}</div>
                 <div style={{ display:"flex", gap:8 }}>
-                  <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
-                    <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKDAY</div>
-                    <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{form.weekday ? fmtRp(form.weekday) : "—"}</div>
-                  </div>
-                  <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
-                    <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKEND</div>
-                    <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{form.weekend ? fmtRp(form.weekend) : "—"}</div>
-                  </div>
+                  {(form.priceCategories && form.priceCategories.length > 0) ? (
+                    <div style={{ flex:1 }}>
+                      {form.priceCategories.filter(c => c.label).slice(0, 3).map((cat, i) => (
+                        <div key={i} style={{ background:"#f6f8f5", borderRadius:8, padding:"6px 10px", marginBottom:4 }}>
+                          <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>{cat.label || "Kategori"}</div>
+                          <div style={{ fontSize:12, color:"#2f6f3e", fontWeight:700 }}>
+                            {cat.weekday ? fmtRp(cat.weekday) : "—"}
+                            <span style={{ color:"#9CA3AF", fontSize:10, fontWeight:400, marginLeft:4 }}>weekday</span>
+                          </div>
+                        </div>
+                      ))}
+                      {form.priceCategories.length > 3 && (
+                        <div style={{ fontSize:11, color:"#9CA3AF", padding:"4px 10px" }}>
+                          +{form.priceCategories.length - 3} kategori lainnya
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
+                        <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKDAY</div>
+                        <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{form.weekday ? fmtRp(form.weekday) : "—"}</div>
+                      </div>
+                      <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
+                        <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKEND</div>
+                        <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{form.weekend ? fmtRp(form.weekend) : "—"}</div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -2381,14 +2592,32 @@ function TicketsOnlineAdminView() {
             <div style={{ padding:"14px 16px", flex:1 }}>
               <div style={{ fontSize:15, fontWeight:700, color:"#111827", marginBottom:8 }}>{item.title}</div>
               <div style={{ display:"flex", gap:8 }}>
-                <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
-                  <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKDAY</div>
-                  <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{item.weekday || "—"}</div>
-                </div>
-                <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
-                  <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKEND</div>
-                  <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{item.weekend || "—"}</div>
-                </div>
+                {item.prices && typeof item.prices === "object" && Object.keys(item.prices).length > 0 ? (
+                  <div style={{ flex:1, background:"#F0FDF4", borderRadius:8, padding:"8px 10px",
+                    border:"1px solid #BBF7D0", display:"flex", alignItems:"center", gap:6 }}>
+                    <Ticket size={13} color="#16a34a" />
+                    <div>
+                      <div style={{ fontSize:10, color:"#16a34a", fontWeight:700 }}>
+                        {Object.keys(item.prices).length} KATEGORI HARGA
+                      </div>
+                      <div style={{ fontSize:11, color:"#166534", fontWeight:600 }}>
+                        {Object.values(item.prices).map(p => p.label).slice(0,2).join(", ")}
+                        {Object.keys(item.prices).length > 2 && " ..."}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
+                      <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKDAY</div>
+                      <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{item.weekday || "—"}</div>
+                    </div>
+                    <div style={{ flex:1, background:"#f6f8f5", borderRadius:8, padding:"8px 10px" }}>
+                      <div style={{ fontSize:10, color:"#8a9e8a", fontWeight:600 }}>WEEKEND</div>
+                      <div style={{ fontSize:13, color:"#2f6f3e", fontWeight:700 }}>{item.weekend || "—"}</div>
+                    </div>
+                  </>
+                )}
               </div>
               {Array.isArray(item.features) && item.features.length > 0 && (
                 <div style={{ marginTop:10 }}>
@@ -3116,6 +3345,96 @@ function MyArticlesAdminView({ articles, currentUser, setActiveNav }) {
 }
 
 /* ─────────────────────────────────────────────
+   ADMIN SETTINGS VIEW
+───────────────────────────────────────────── */
+function AdminSettingsView({ currentUser, onLogout }) {
+  const [name,   setName]   = useState(currentUser?.displayName || "");
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState(null);
+  const [errMsg, setErrMsg] = useState("");
+
+  const inputSt = {
+    width:"100%", padding:"9px 12px", borderRadius:8,
+    border:"1px solid #D1D5DB", fontSize:14, boxSizing:"border-box",
+    fontFamily:"inherit", color:"#111827", outline:"none",
+  };
+
+  const handleSave = async () => {
+    if (!name.trim()) { setErrMsg("Nama tidak boleh kosong."); setStatus("error"); return; }
+    setSaving(true); setStatus(null); setErrMsg("");
+    try {
+      const { getAuth, updateProfile } = await import("firebase/auth");
+      const auth = getAuth();
+      if (auth.currentUser) {
+        await updateProfile(auth.currentUser, { displayName: name.trim() });
+        const { ref: dbRef, update: dbUpdate } = await import("firebase/database");
+        await dbUpdate(dbRef(db, `users/${auth.currentUser.uid}`), { displayName: name.trim() });
+      }
+      setStatus("success");
+      setTimeout(() => setStatus(null), 3000);
+    } catch (err) {
+      setErrMsg(err.message || "Gagal menyimpan.");
+      setStatus("error");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div>
+      <div style={{ marginBottom:24 }}>
+        <h1 style={{ fontSize:22, fontWeight:700, color:"#111827", margin:0 }}>Settings</h1>
+        <p style={{ color:"#6B7280", fontSize:14, marginTop:4 }}>Kelola profil dan preferensi akun administrator</p>
+      </div>
+
+      <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:12, padding:24, marginBottom:16 }}>
+        <h3 style={{ fontSize:15, fontWeight:700, color:"#111827", margin:"0 0 16px" }}>Informasi Profil</h3>
+        <div style={{ marginBottom:12 }}>
+          <label style={{ display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 }}>Nama Lengkap</label>
+          <input
+            value={name}
+            onChange={e => setName(e.target.value)}
+            placeholder="Nama lengkap Anda"
+            style={inputSt}
+            onFocus={e => e.target.style.borderColor="#1B3A2A"}
+            onBlur={e => e.target.style.borderColor="#D1D5DB"}
+          />
+        </div>
+        <div style={{ marginBottom:20 }}>
+          <label style={{ display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 }}>Email</label>
+          <input
+            type="email"
+            value={currentUser?.email || ""}
+            disabled
+            style={{ ...inputSt, background:"#F9FAFB", color:"#9CA3AF", cursor:"not-allowed" }}
+          />
+          <p style={{ fontSize:11, color:"#9CA3AF", marginTop:4 }}>Email tidak dapat diubah dari sini.</p>
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            style={{ padding:"9px 20px", background:saving?"#6B7280":"#1B3A2A", color:"#fff", border:"none", borderRadius:8, fontSize:14, fontWeight:600, cursor:saving?"not-allowed":"pointer", display:"flex", alignItems:"center", gap:7 }}>
+            {saving ? "Menyimpan..." : "Simpan Perubahan"}
+          </button>
+          {status === "success" && <span style={{ fontSize:13, color:"#16a34a" }}>✓ Perubahan berhasil disimpan!</span>}
+          {status === "error"   && <span style={{ fontSize:13, color:"#dc2626" }}>✗ {errMsg}</span>}
+        </div>
+      </div>
+
+      <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:12, padding:24 }}>
+        <h3 style={{ fontSize:15, fontWeight:700, color:"#111827", margin:"0 0 8px" }}>Akun</h3>
+        <p style={{ fontSize:13, color:"#6B7280", marginBottom:16 }}>Keluar dari sesi admin portal Anda.</p>
+        <button onClick={onLogout}
+          style={{ padding:"9px 20px", background:"#dc2626", color:"#fff", border:"none", borderRadius:8, fontSize:14, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", gap:8 }}>
+          <LogOut size={16} /> Logout
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
    MAIN EXPORT
 ───────────────────────────────────────────── */
 export default function AdminDashboard() {
@@ -3201,6 +3520,8 @@ export default function AdminDashboard() {
         return <ManageUsersView users={users} />;
       case "add-role":
         return <AddRoleView users={users} />;
+      case "settings":
+        return <AdminSettingsView currentUser={user} onLogout={handleLogout} />;
       default:
         return null;
     }

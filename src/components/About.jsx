@@ -22,7 +22,7 @@ export default function About() {
 
           <div className="experience">
             <h2>15+</h2>
-            <span>YEARS OF EXCELLENCE</span>
+            <span>TAHUN PENGALAMAN</span>
           </div>
         </motion.div>
 
@@ -34,7 +34,7 @@ export default function About() {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <span className="tag">ABOUT OUR EDUPARK</span>
+          <span className="tag">TENTANG EDUPARK KAMI</span>
 
           <h2>
             Harmoni Alam untuk <br />
@@ -51,21 +51,21 @@ export default function About() {
 
             <motion.div className="feature" whileHover={{ y: -6 }}>
               <div className="icon">
-                <Leaf size={24} className="text-green-600" /> {/* Ganti emoji dengan komponen ikon */}
+                <Leaf size={24} className="text-green-600" />
               </div>
               <div>
-                <h4>Eco-Certified</h4>
-                <p>Sustainable facilities and practices.</p>
+                <h4>Tersertifikasi Eko</h4>
+                <p>Fasilitas dan praktik yang berkelanjutan.</p>
               </div>
             </motion.div>
 
             <motion.div className="feature" whileHover={{ y: -6 }}>
               <div className="icon">
-                <Target size={24} className="text-blue-600" /> {/* Mengganti 🎯 dengan ikon Target */}
+                <Target size={24} className="text-blue-600" />
               </div>
               <div>
-                <h4>Active Learning</h4>
-                <p>Engaging hands-on curriculum.</p>
+                <h4>Pembelajaran Aktif</h4>
+                <p>Kurikulum praktik langsung yang menarik.</p>
               </div>
             </motion.div>
 

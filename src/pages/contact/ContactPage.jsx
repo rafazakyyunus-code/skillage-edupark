@@ -53,12 +53,17 @@ export default function ContactPage() {
           </p>
 
           <div className="hero-buttons">
-            <a href="#contact-card" className="hero-btn primary">
+            <a
+              href="https://wa.me/6285219801259?text=Halo%20Admin%20Skillage%20Edupark%2C%20saya%20ingin%20bertanya%20mengenai%20informasi%20program%2C%20kunjungan%20sekolah%2C%20atau%20wisata%20edukasi%20di%20Edupark.%20Boleh%20dibantu%20penjelasan%20lebih%20lanjut%3F"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hero-btn primary"
+            >
               Hubungi Sekarang
             </a>
 
             <a
-              href="https://maps.google.com"
+              href="https://maps.app.goo.gl/uLQJPTZXPhtBB8Az8"
               target="_blank"
               rel="noreferrer"
               className="hero-btn secondary"
@@ -126,7 +131,7 @@ export default function ContactPage() {
   <div className="contact-container">
 
     <div className="section-header">
-      <h2>Explore Edupark</h2>
+      <h2>Jelajahi Edupark</h2>
       <div className="line"></div>
     </div>
 

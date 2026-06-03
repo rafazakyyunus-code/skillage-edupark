@@ -34,8 +34,8 @@ export default function ProgramSection() {
       >
         <h2>Program Kami</h2>
         <p>
-          Discover our diverse range of interactive programs designed to inspire
-          environmental leadership.
+          Temukan beragam program interaktif kami yang dirancang untuk menginspirasi
+          kepemimpinan di bidang lingkungan.
         </p>
       </motion.div>
 
