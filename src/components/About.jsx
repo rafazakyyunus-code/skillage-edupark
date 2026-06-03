@@ -43,8 +43,9 @@ export default function About() {
           </h2>
 
           <p>
-            Edupark lahir dari sebuah visi besar untuk menghadirkan ruang belajar
-            berbasis alam yang inklusif, menyenangkan, dan penuh makna.
+            Edupark lahir dari sebuah visi besar untuk menjawab dua tantangan nyata 
+            di masyarakat kita saat ini: kebutuhan ruang terapi inklusif bagi anak-anak
+            berkebutuhan khusus dan kerinduan warga urban akan ruang terbuka hijau yang edukatif.
           </p>
 
           <div className="features">

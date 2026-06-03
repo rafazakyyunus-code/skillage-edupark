@@ -6,19 +6,15 @@
 /* ===================================================
    HERO
 =================================================== */
-
 .tk-hero {
   position: relative;
   min-height: 100vh;
   width: 100%;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   padding-top: 80px;
   overflow: hidden;
-
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -28,39 +24,23 @@
   content: "";
   position: absolute;
   inset: 0;
-
-  background:
-    radial-gradient(
-      circle at top right,
-      rgba(34, 197, 94, 0.15),
-      transparent 35%
-    );
+  background: radial-gradient(circle at top right, rgba(34, 197, 94, 0.15), transparent 35%);
 }
 
 .tk-hero-overlay {
   position: absolute;
   inset: 0;
-
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.55),
-      rgba(0, 30, 18, 0.78)
-    );
-
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), rgba(0, 30, 18, 0.78));
   backdrop-filter: blur(2px);
 }
 
 .tk-hero-content {
   position: relative;
   z-index: 2;
-
   max-width: 850px;
   padding: 0 24px;
-
   text-align: center;
   color: white;
-
   animation: heroFade 1s ease;
 }
 
@@ -69,7 +49,6 @@
     opacity: 0;
     transform: translateY(35px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -78,16 +57,12 @@
 
 .tk-hero-tag {
   display: inline-block;
-
   margin-bottom: 20px;
   padding: 10px 18px;
-
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.15);
-
   background: rgba(255,255,255,0.08);
   backdrop-filter: blur(10px);
-
   color: #7dffb3;
   font-size: 13px;
   font-weight: 700;
@@ -97,17 +72,19 @@
 .tk-hero-content h1 {
   margin-bottom: 24px;
 
+
   font-size: 76px;
+
+  font-size: clamp(3rem, 8vw, 6rem);
+
   font-weight: 800;
   line-height: 1.1;
-
   text-shadow: 0 10px 30px rgba(0,0,0,0.35);
 }
 
 .tk-hero-content p {
   max-width: 700px;
   margin: auto;
-
   color: #f1f5f9;
   font-size: clamp(16px, 2vw, 20px);
   line-height: 1.9;
@@ -116,13 +93,10 @@
 /* ===================================================
    GLOBAL TAG
 =================================================== */
-
 .section-tag,
 .tk-section-tag {
   display: block;
-
   margin-bottom: 12px;
-
   color: #22c55e;
   font-size: 14px;
   font-weight: 700;
@@ -137,56 +111,43 @@
 /* ===================================================
    JOURNEY
 =================================================== */
-
 .tk-journey {
   padding: 110px 24px;
-
-  background:
-    linear-gradient(
-      to bottom,
-      #ffffff,
-      #f8faf9
-    );
+  background: linear-gradient(to bottom, #ffffff, #f8faf9);
 }
 
 .tk-journey-container {
   max-width: 1200px;
   margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+}
 
+.tk-journey-upper {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 80px;
-
-  align-items: center;
+  align-items: flex-start;
 }
 
-/* IMAGE */
+.tk-journey-img-wrapper {
+  position: sticky;
+  top: 100px;
+}
 
 .tk-journey img {
   width: 100%;
   border-radius: 30px;
-
-  transition:
-    transform 0.6s ease,
-    box-shadow 0.6s ease,
-    filter 0.6s ease;
-
-  box-shadow:
-    0 20px 40px rgba(0,0,0,0.10),
-    0 8px 20px rgba(34,197,94,0.06);
+  transition: transform 0.6s ease, box-shadow 0.6s ease, filter 0.6s ease;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.10), 0 8px 20px rgba(34,197,94,0.06);
 }
 
 .tk-journey img:hover {
   transform: scale(1.02);
-
   filter: brightness(1.02);
-
-  box-shadow:
-    0 30px 60px rgba(0,0,0,0.14),
-    0 12px 24px rgba(34,197,94,0.10);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.14), 0 12px 24px rgba(34,197,94,0.10);
 }
-
-/* TEXT */
 
 .tk-journey-text {
   animation: fadeUp 1s ease forwards;
@@ -197,78 +158,123 @@
     opacity: 0;
     transform: translateY(45px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.tk-journey-text h2 {
-  margin-bottom: 28px;
+.tk-journey-lead {
+  font-size: 19px !important;
+  font-weight: 600;
+  color: #1e293b !important;
+  line-height: 1.8 !important;
+  margin-bottom: 30px !important;
+}
 
+.tk-journey h2 {
+  margin-bottom: 24px;
   color: #0f172a;
   font-size: clamp(2.5rem, 5vw, 4rem);
   font-weight: 800;
   line-height: 1.2;
 }
 
-.tk-journey-text h4 {
+.tk-journey h4 {
   position: relative;
-
-  margin-top: 30px;
-  margin-bottom: 12px;
+  margin-top: 35px;
+  margin-bottom: 14px;
   padding-left: 18px;
-
-  color: #1e293b;
-  font-size: 22px;
+  color: #0f172a;
+  font-size: 24px;
   font-weight: 700;
 }
 
-.tk-journey-text h4::before {
+.tk-journey h4::before {
   content: "";
-
   position: absolute;
   left: 0;
   top: 6px;
-
   width: 5px;
-  height: 20px;
-
+  height: 22px;
   border-radius: 10px;
-
-  background:
-    linear-gradient(
-      to bottom,
-      #22c55e,
-      #15803d
-    );
+  background: linear-gradient(to bottom, #22c55e, #15803d);
 }
 
-.tk-journey-text p {
+.tk-journey p {
   margin-bottom: 22px;
-
   color: #475569;
   font-size: 17px;
   line-height: 2;
   text-align: justify;
 }
 
+.tk-journey-lower {
+  width: 100%;
+  animation: fadeUp 1.2s ease forwards;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 40px;
+}
+
+.tk-journey-list {
+  list-style: none;
+  padding: 0;
+  margin: 24px 0 35px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tk-journey-list li {
+  position: relative;
+  padding-left: 28px;
+  font-size: 17px;
+  line-height: 1.9;
+  color: #475569;
+  text-align: justify;
+}
+
+.tk-journey-list li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #22c55e;
+  font-weight: 900;
+  font-size: 18px;
+}
+
+.tk-journey-list li strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.tk-journey-quote {
+  position: relative;
+  margin: 50px 0 20px 0;
+  padding: 30px 40px;
+  border-left: 4px solid #22c55e;
+  background: #f0fdf4;
+  border-radius: 0 20px 20px 0;
+  font-size: 20px;
+  font-style: italic;
+  font-weight: 600;
+  color: #166534;
+  line-height: 1.8;
+  text-align: center;
+}
+
 /* ===================================================
    REASON
 =================================================== */
-
 .tk-reason {
   padding: 110px 24px;
-
   text-align: center;
-
   background: #f8fafc;
 }
 
 .tk-reason h2 {
   margin-bottom: 60px;
-
   color: #0f172a;
   font-size: clamp(2.3rem, 5vw, 4rem);
   font-weight: 800;
@@ -277,7 +283,6 @@
 .tk-reason-grid {
   max-width: 1200px;
   margin: auto;
-
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 30px;
@@ -286,45 +291,21 @@
 .reason-card {
   position: relative;
   overflow: hidden;
-
   padding: 40px 28px;
-
   border-radius: 28px;
   border: 1px solid rgba(255,255,255,0.55);
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,0.92),
-      rgba(255,255,255,0.78)
-    );
-
+  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.78));
   backdrop-filter: blur(20px);
-
   text-align: center;
-
-  transition:
-    transform 0.45s ease,
-    box-shadow 0.45s ease,
-    border-color 0.45s ease;
-
-  box-shadow:
-    0 10px 30px rgba(15,23,42,0.06);
+  transition: transform 0.45s ease, box-shadow 0.45s ease, border-color 0.45s ease;
+  box-shadow: 0 10px 30px rgba(15,23,42,0.06);
 }
 
 .reason-card::after {
   content: "";
-
   position: absolute;
   inset: 0;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(34,197,94,0.08),
-      transparent
-    );
-
+  background: linear-gradient(135deg, rgba(34,197,94,0.08), transparent);
   opacity: 0;
   transition: opacity 0.4s ease;
 }
@@ -335,51 +316,30 @@
 
 .reason-card:hover {
   transform: translateY(-8px);
-
   border-color: rgba(34,197,94,0.15);
-
-  box-shadow:
-    0 25px 50px rgba(15,23,42,0.10),
-    0 12px 24px rgba(34,197,94,0.10);
+  box-shadow: 0 25px 50px rgba(15,23,42,0.10), 0 12px 24px rgba(34,197,94,0.10);
 }
-
-/* ICON */
 
 .icon {
   width: 85px;
   height: 85px;
-
   margin: auto;
   margin-bottom: 22px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-radius: 50%;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(34,197,94,0.12),
-      rgba(34,197,94,0.04)
-    );
-
-  transition:
-    transform 0.4s ease,
-    box-shadow 0.4s ease;
+  background: linear-gradient(135deg, rgba(34,197,94,0.12), rgba(34,197,94,0.04));
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
 .reason-card:hover .icon {
   transform: scale(1.08);
-
-  box-shadow:
-    0 10px 20px rgba(34,197,94,0.15);
+  box-shadow: 0 10px 20px rgba(34,197,94,0.15);
 }
 
 .reason-card h4 {
   margin-bottom: 14px;
-
   color: #0f172a;
   font-size: 24px;
   font-weight: 700;
@@ -394,52 +354,35 @@
 /* ===================================================
    TESTIMONIAL
 =================================================== */
-
 .tk-testimonial {
   position: relative;
   overflow: hidden;
-
   padding: 110px 24px;
-
   text-align: center;
   color: white;
-
-  background:
-    linear-gradient(
-      135deg,
-      #052e16,
-      #14532d,
-      #166534
-    );
+  background: linear-gradient(135deg, #052e16, #14532d, #166534);
 }
 
 .tk-testimonial::before {
   content: "";
-
   position: absolute;
   top: -200px;
   right: -150px;
-
   width: 500px;
   height: 500px;
-
   border-radius: 50%;
-
   background: rgba(34,197,94,0.08);
-
   filter: blur(20px);
 }
 
 .tk-testimonial-header {
   position: relative;
   z-index: 2;
-
   margin-bottom: 60px;
 }
 
 .tk-testimonial-header h2 {
   margin-top: 16px;
-
   font-size: clamp(2.5rem, 5vw, 4rem);
   font-weight: 800;
 }
@@ -447,10 +390,8 @@
 .tk-testimonial-grid {
   position: relative;
   z-index: 2;
-
   max-width: 1200px;
   margin: auto;
-
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 30px;
@@ -459,41 +400,20 @@
 .tk-testimonial-card {
   position: relative;
   overflow: hidden;
-
   padding: 35px;
-
   border-radius: 28px;
   border: 1px solid rgba(255,255,255,0.08);
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,0.10),
-      rgba(255,255,255,0.05)
-    );
-
+  background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
   backdrop-filter: blur(16px);
-
   text-align: left;
-
-  transition:
-    transform 0.45s ease,
-    box-shadow 0.45s ease;
+  transition: transform 0.45s ease, box-shadow 0.45s ease;
 }
 
 .tk-testimonial-card::before {
   content: "";
-
   position: absolute;
   inset: 0;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255,255,255,0.10),
-      transparent
-    );
-
+  background: linear-gradient(135deg, rgba(255,255,255,0.10), transparent);
   opacity: 0;
   transition: opacity 0.4s ease;
 }
@@ -504,15 +424,11 @@
 
 .tk-testimonial-card:hover {
   transform: translateY(-8px);
-
-  box-shadow:
-    0 25px 50px rgba(0,0,0,0.25),
-    0 10px 20px rgba(34,197,94,0.10);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.25), 0 10px 20px rgba(34,197,94,0.10);
 }
 
 .tk-testimonial-card h4 {
   margin-bottom: 18px;
-
   font-size: 22px;
   font-weight: 700;
 }
@@ -525,9 +441,7 @@
 
 .stars {
   display: block;
-
   margin-top: 18px;
-
   color: #7dffb3;
   font-size: 18px;
   letter-spacing: 3px;
@@ -536,23 +450,14 @@
 /* ===================================================
    CTA
 =================================================== */
-
 .tk-cta {
   padding: 120px 24px;
-
   text-align: center;
-
-  background:
-    linear-gradient(
-      to bottom,
-      #ffffff,
-      #f8faf9
-    );
+  background: linear-gradient(to bottom, #ffffff, #f8faf9);
 }
 
 .tk-cta h2 {
   margin-bottom: 20px;
-
   color: #0f172a;
   font-size: clamp(2.5rem, 5vw, 4rem);
   font-weight: 800;
@@ -561,114 +466,55 @@
 .tk-cta p {
   max-width: 700px;
   margin: auto;
-
   color: #64748b;
   font-size: 18px;
   line-height: 1.9;
-}
-
-.tk-cta button {
-  position: relative;
-  overflow: hidden;
-
-  margin-top: 38px;
-  padding: 18px 38px;
-
-  border: none;
-  border-radius: 999px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #22c55e,
-      #15803d
-    );
-
-  color: white;
-  font-size: 17px;
-  font-weight: 700;
-
-  cursor: pointer;
-
-  transition:
-    transform 0.4s ease,
-    box-shadow 0.4s ease;
-
-  box-shadow:
-    0 12px 24px rgba(34,197,94,0.20);
-}
-
-.tk-cta button::before {
-  content: "";
-
-  position: absolute;
-  inset: 0;
-
-  background:
-    linear-gradient(
-      120deg,
-      transparent,
-      rgba(255,255,255,0.35),
-      transparent
-    );
-
-  transform: translateX(-100%);
-}
-
-.tk-cta button:hover::before {
-  transform: translateX(200%);
-  transition: 0.8s ease;
-}
-
-.tk-cta button:hover {
-  transform: translateY(-4px);
-
-  box-shadow:
-    0 20px 40px rgba(34,197,94,0.28);
 }
 
 .tk-cta-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-   margin-top: 28px;
-
-  padding: 16px 32px;
+  margin-top: 38px;
+  padding: 18px 38px;
   border-radius: 999px;
-
-  background: #16a34a;
+  background: linear-gradient(135deg, #22c55e, #15803d);
   color: white;
-
   text-decoration: none;
-  font-weight: 600;
-
-  transition: all 0.3s ease;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.3s ease;
+  box-shadow: 0 12px 24px rgba(34,197,94,0.20);
 }
 
 .tk-cta-btn:hover {
-  transform: translateY(-3px);
-  background: #15803d;
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(34,197,94,0.28);
 }
 
 /* ===================================================
    RESPONSIVE
 =================================================== */
-
 @media (max-width: 900px) {
-  .tk-journey-container {
+  .tk-journey-upper {
     grid-template-columns: 1fr;
-    gap: 50px;
+    gap: 40px;
   }
-
+  .tk-journey-img-wrapper {
+    position: relative;
+    top: 0;
+  }
+  .tk-journey-quote {
+    padding: 24px 20px;
+    font-size: 18px;
+  }
   .tk-reason-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-
   .tk-testimonial-grid {
     grid-template-columns: 1fr;
   }
-
   .tk-hero-content h1 {
     line-height: 1.2;
   }
@@ -678,20 +524,291 @@
   .tk-reason-grid {
     grid-template-columns: 1fr;
   }
-
   .tk-hero {
     min-height: 90vh;
   }
-
   .tk-journey,
   .tk-reason,
   .tk-testimonial,
   .tk-cta {
     padding: 80px 20px;
   }
-
   .reason-card,
   .tk-testimonial-card {
     border-radius: 22px;
+  }
+}
+/* ===================================================
+   TESTIMONIAL — FIREBASE LIVE SECTION
+=================================================== */
+.tk-testimonial-sub {
+  margin-top: 12px;
+  color: rgba(255,255,255,0.65);
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.tk-review-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 28px;
+  padding: 14px 30px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(125,255,179,0.4);
+  background: rgba(255,255,255,0.08);
+  color: #7dffb3;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.tk-review-toggle-btn:hover {
+  background: rgba(125,255,179,0.12);
+  border-color: rgba(125,255,179,0.65);
+  transform: translateY(-2px);
+}
+
+/* ── Review Form ── */
+.tk-review-form-wrapper {
+  position: relative;
+  z-index: 2;
+  max-width: 680px;
+  margin: 40px auto 20px;
+  padding: 40px 44px;
+  border-radius: 28px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(20px);
+  text-align: left;
+}
+
+.tk-review-form h3 {
+  margin-bottom: 28px;
+  color: white;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.tk-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.tk-form-group label {
+  color: rgba(255,255,255,0.75);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.tk-form-group input,
+.tk-form-group textarea {
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-size: 15px;
+  font-family: inherit;
+  transition: border-color 0.3s ease, background 0.3s ease;
+  resize: vertical;
+  outline: none;
+}
+
+.tk-form-group input::placeholder,
+.tk-form-group textarea::placeholder {
+  color: rgba(255,255,255,0.35);
+}
+
+.tk-form-group input:focus,
+.tk-form-group textarea:focus {
+  border-color: rgba(125,255,179,0.55);
+  background: rgba(255,255,255,0.12);
+}
+
+.tk-char-count {
+  align-self: flex-end;
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+}
+
+.tk-form-error {
+  margin-bottom: 14px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(239,68,68,0.18);
+  border: 1px solid rgba(239,68,68,0.35);
+  color: #fca5a5;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.tk-form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.tk-form-cancel {
+  padding: 12px 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.3s, color 0.3s;
+}
+
+.tk-form-cancel:hover {
+  border-color: rgba(255,255,255,0.45);
+  color: white;
+}
+
+.tk-form-submit {
+  padding: 12px 28px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #22c55e, #15803d);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.2s;
+  box-shadow: 0 8px 20px rgba(34,197,94,0.25);
+}
+
+.tk-form-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(34,197,94,0.35);
+}
+
+.tk-form-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Star Picker ── */
+.tk-star-picker {
+  display: flex;
+  gap: 6px;
+}
+
+.tk-star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 32px;
+  color: rgba(255,255,255,0.25);
+  transition: color 0.2s ease, transform 0.2s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.tk-star-btn.active,
+.tk-star-btn:hover {
+  color: #7dffb3;
+  transform: scale(1.15);
+}
+
+/* ── Status notice ── */
+.tk-submit-notice {
+  position: relative;
+  z-index: 2;
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 16px 24px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.tk-submit-notice.success {
+  background: rgba(34,197,94,0.15);
+  border: 1px solid rgba(34,197,94,0.35);
+  color: #86efac;
+}
+
+.tk-submit-notice.error {
+  background: rgba(239,68,68,0.15);
+  border: 1px solid rgba(239,68,68,0.35);
+  color: #fca5a5;
+}
+
+/* ── Loading & Empty ── */
+.tk-testimonial-loading,
+.tk-testimonial-empty {
+  position: relative;
+  z-index: 2;
+  margin-top: 50px;
+  text-align: center;
+  color: rgba(255,255,255,0.5);
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.tk-spinner {
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(125,255,179,0.2);
+  border-top-color: #7dffb3;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Testimonial card avatar ── */
+.tk-testimonial-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e, #15803d);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+
+/* ── Stars display ── */
+.tk-stars-row {
+  display: block;
+  margin-top: 14px;
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.star-filled { color: #7dffb3; }
+.star-empty  { color: rgba(255,255,255,0.18); }
+
+/* ── Responsive form ── */
+@media (max-width: 600px) {
+  .tk-review-form-wrapper {
+    padding: 28px 22px;
+  }
+  .tk-form-actions {
+    flex-direction: column;
+  }
+  .tk-form-cancel,
+  .tk-form-submit {
+    width: 100%;
+    text-align: center;
   }
 }
