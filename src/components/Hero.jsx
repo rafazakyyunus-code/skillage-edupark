@@ -15,7 +15,7 @@ export default function Hero() {
           dan penerapan di dunia nyata.
         </p>
 
-        <div className="hero-buttons">
+        <div className="hero-buttonss">
           <button className="btn-primary">Tentang Kami</button>
           <button className="btn-outline">Selengkapnya</button>
         </div>
