@@ -3394,17 +3394,21 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
       <aside style={{ width: 220, background: "linear-gradient(180deg, #1a3828 0%, #0f2318 100%)", height: "100vh", position: "fixed", display: "flex", flexDirection: "column", zIndex: 100, boxShadow: "4px 0 24px rgba(0,0,0,0.18)" }}>
         {/* Brand */}
         <div style={{ padding: "20px 18px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ background: "linear-gradient(135deg, #2d6a4f, #16c35b)", width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 2px 10px rgba(22,195,91,0.3)" }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-            </svg>
-          </div>
-          <div>
-            <div style={{ fontWeight: 800, color: "#fff", fontSize: 15, fontFamily: "Georgia, serif", lineHeight: 1.2, letterSpacing: "-0.01em" }}>Edupark</div>
-            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 1 }}>Editor Portal</div>
-          </div>
+        {/* Container untuk Logo */}
+        <div style={{ background: "linear-gradient(135deg, #2d6a4f, #16c35b)", width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 2px 10px rgba(22,195,91,0.3)", overflow: "hidden" }}>
+          <img 
+            src="/skillage-edupark.png" 
+            alt="Edupark Logo" 
+            style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+          />
         </div>
+        
+        {/* Teks Edupark & Editor Portal */}
+        <div>
+          <div style={{ fontWeight: 800, color: "#fff", fontSize: 15, fontFamily: "Georgia, serif", lineHeight: 1.2, letterSpacing: "-0.01em" }}>Edupark</div>
+          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 1 }}>Editor Portal</div>
+        </div>
+      </div>
 
         {/* Section label */}
         <div style={{ padding: "14px 18px 6px", fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.12em" }}>Menu</div>

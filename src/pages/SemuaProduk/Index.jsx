@@ -1,6 +1,8 @@
 // src/pages/SemuaProduk/Index.jsx
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { ref, onValue } from "firebase/database";
+import { db } from "../../firebase";
 import ProductCard from "./ProdukCard";
 
 import {
@@ -23,6 +25,34 @@ export default function SemuaProduk() {
   const [search,      setSearch]      = useState("");
   const [sort,        setSort]        = useState("terbaru");
   const [currentPage, setCurrentPage] = useState(1);
+  const [promoData,   setPromoData]   = useState(null); // 🔥 real-time promo dari Firebase
+
+  /* ── Fetch promo aktif terbaru dari Firebase ── */
+  useEffect(() => {
+    const unsub = onValue(ref(db, "promos"), (snap) => {
+      const data = snap.val();
+      if (!data) { setPromoData(null); return; }
+
+      const now = Date.now();
+      const aktif = Object.entries(data)
+        .map(([id, v]) => ({ ...v, firebaseId: id }))
+        .filter(
+          (p) =>
+            p.active &&
+            (!p.endDate || new Date(p.endDate).getTime() > now)
+        )
+        .sort((a, b) => {
+          // Utamakan featured, lalu yang paling dekat expired
+          if (b.featured !== a.featured) return b.featured ? 1 : -1;
+          if (a.endDate && b.endDate)
+            return new Date(a.endDate) - new Date(b.endDate);
+          return (b.createdAt || 0) - (a.createdAt || 0);
+        });
+
+      setPromoData(aktif.length > 0 ? aktif[0] : null);
+    });
+    return () => unsub();
+  }, []);
 
   /* ── Derive active category dari URL ── */
   const activeCategory = useMemo(() => {
@@ -139,9 +169,28 @@ export default function SemuaProduk() {
           </ul>
 
           <div className="sp-promo-box">
-            <span className="sp-promo-label">PROMO MINGGU INI</span>
-            <p className="sp-promo-text">Dapatkan diskon 20% untuk semua merchandise!</p>
-            <a href="/promo" className="sp-promo-link">Lihat Promo</a>
+            {promoData ? (
+              <>
+                <span className="sp-promo-label">
+                  {promoData.badgeLabel || "PROMO MINGGU INI"}
+                </span>
+                <p className="sp-promo-text">
+                  {promoData.subtitle || promoData.description}
+                </p>
+                {promoData.endDate && (
+                  <p className="sp-promo-expire">
+                    s/d {promoData.endDate}
+                  </p>
+                )}
+                <a href="/promo" className="sp-promo-link">Lihat Promo</a>
+              </>
+            ) : (
+              <>
+                <span className="sp-promo-label">PROMO</span>
+                <p className="sp-promo-text">Pantau terus untuk penawaran terbaru!</p>
+                <a href="/promo" className="sp-promo-link">Lihat Promo</a>
+              </>
+            )}
           </div>
         </aside>
 

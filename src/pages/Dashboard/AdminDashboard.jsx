@@ -215,17 +215,21 @@ function Sidebar({ activeNav, setActiveNav, currentUser, pendingCount, myRevisio
   return (
     <aside className="ad-sidebar">
       <div className="ad-sidebar__brand">
-        <div className="ad-sidebar__logo">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-            <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/>
-          </svg>
-        </div>
-        <div>
-          <div className="ad-sidebar__brand-name">Edupark</div>
-          <div className="ad-sidebar__brand-sub">Admin Portal</div>
-        </div>
+      {/* Container untuk Logo */}
+      <div className="ad-sidebar__logo" style={{ overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <img 
+          src="/skillage-edupark.png" 
+          alt="Edupark Logo" 
+          style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+        />
       </div>
+      
+      {/* Teks Edupark & Admin Portal */}
+      <div>
+        <div className="ad-sidebar__brand-name">Edupark</div>
+        <div className="ad-sidebar__brand-sub">Admin Portal</div>
+      </div>
+    </div>
 
       <nav className="ad-sidebar__nav">
         {navBtn("dashboard", "Dashboard", LayoutDashboard, 0)}
