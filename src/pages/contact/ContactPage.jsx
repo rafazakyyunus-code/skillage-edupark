@@ -1,17 +1,113 @@
 import "./ContactPage.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   MapPin,
   Phone,
   Mail,
   Clock,
   ChevronDown,
-  Star,
   Leaf
 } from "lucide-react";
 
+const FIREBASE_URL = "https://skillage-edupark-default-rtdb.firebaseio.com";
+
+function StarRating({ value, onChange }) {
+  const [hovered, setHovered] = useState(0);
+  return (
+    <div className="cp-star-picker" aria-label="Pilih bintang">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          className={`cp-star-btn ${star <= (hovered || value) ? "active" : ""}`}
+          onMouseEnter={() => setHovered(star)}
+          onMouseLeave={() => setHovered(0)}
+          onClick={() => onChange(star)}
+          aria-label={`${star} bintang`}
+        >
+          ★
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function ContactPage() {
   const [openFaq, setOpenFaq] = useState(null);
+
+  // ── Testimonial state ──
+  const [testimonials, setTestimonials] = useState([]);
+  const [loadingTestimonials, setLoadingTestimonials] = useState(true);
+  const [form, setForm] = useState({ name: "", message: "", rating: 0 });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
+  const [formError, setFormError] = useState("");
+  const [showForm, setShowForm] = useState(false);
+
+  /* ── Fetch testimonials dari Firebase ── */
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const res = await fetch(`${FIREBASE_URL}/testimonials.json`);
+        const data = await res.json();
+        if (data) {
+          const list = Object.entries(data)
+            .map(([id, val]) => ({ id, ...val }))
+            .sort((a, b) => b.timestamp - a.timestamp);
+          setTestimonials(list);
+        } else {
+          setTestimonials([]);
+        }
+      } catch {
+        setTestimonials([]);
+      } finally {
+        setLoadingTestimonials(false);
+      }
+    };
+    fetchTestimonials();
+  }, []);
+
+  /* ── Submit testimoni baru ── */
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.name.trim()) return setFormError("Nama tidak boleh kosong.");
+    if (!form.message.trim()) return setFormError("Pesan tidak boleh kosong.");
+    if (form.rating === 0) return setFormError("Pilih setidaknya 1 bintang.");
+
+    setFormError("");
+    setSubmitting(true);
+    try {
+      const payload = {
+        name: form.name.trim(),
+        message: form.message.trim(),
+        rating: form.rating,
+        timestamp: Date.now(),
+      };
+      const res = await fetch(`${FIREBASE_URL}/testimonials.json`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error();
+      const { name: id } = await res.json();
+      setTestimonials((prev) => [{ id, ...payload }, ...prev]);
+      setForm({ name: "", message: "", rating: 0 });
+      setSubmitStatus("success");
+      setShowForm(false);
+    } catch {
+      setSubmitStatus("error");
+    } finally {
+      setSubmitting(false);
+      setTimeout(() => setSubmitStatus(null), 4000);
+    }
+  };
+
+  const renderStars = (count) =>
+    Array.from({ length: 5 }, (_, i) => (
+      <span key={i} className={i < count ? "cp-star-filled" : "cp-star-empty"}>
+        ★
+      </span>
+    ));
 
   const faqData = [
     {
@@ -196,92 +292,136 @@ export default function ContactPage() {
 
           <div className="section-header">
             <h2>Apa Kata Mereka</h2>
-            <div className="line"></div>
+            <p className="cp-testimonial-sub">
+              Ceritakan pengalamanmu bersama Edupark dan bantu pengunjung lain mengenal kami lebih baik.
+            </p>
+
+            {/* Tombol buka form */}
+            {!showForm && (
+              <button
+                className="cp-review-toggle-btn"
+                onClick={() => setShowForm(true)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 20h9"></path>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+                Tulis Testimoni
+              </button>
+            )}
           </div>
 
-          <div className="testimonial-grid">
+          {/* ── FORM TESTIMONI ── */}
+          {showForm && (
+            <div className="cp-review-form-wrapper">
+              <form className="cp-review-form" onSubmit={handleSubmit} noValidate>
+                <h3>Bagikan Pengalamanmu</h3>
 
-            <div className="testimonial-card">
-              <div className="stars">
-                <Star fill="currentColor" />
-                <Star fill="currentColor" />
-                <Star fill="currentColor" />
-                <Star fill="currentColor" />
-                <Star fill="currentColor" />
-              </div>
-
-              <p>
-                "Edupark memberikan pengalaman belajar yang luar biasa
-                dengan suasana alam yang sangat nyaman."
-              </p>
-
-              <div className="testimonial-user">
-                <img
-                  src="https://i.pravatar.cc/100?img=12"
-                  alt=""
-                />
-
-                <div>
-                  <strong>Siti Rahma</strong>
-                  <span>Guru SD</span>
+                <div className="cp-form-group">
+                  <label htmlFor="cp-name">Nama</label>
+                  <input
+                    id="cp-name"
+                    type="text"
+                    placeholder="Nama lengkap kamu"
+                    value={form.name}
+                    onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                    maxLength={60}
+                  />
                 </div>
-              </div>
-            </div>
 
-            <div className="testimonial-card">
-              <div className="stars">
-                <Star fill="currentColor" />
-                <Star fill="currentColor" />
-                <Star fill="currentColor" />
-                <Star fill="currentColor" />
-                <Star fill="currentColor" />
-              </div>
-
-              <p>
-                "Tempatnya adem, hijau, bersih, dan sangat cocok
-                untuk wisata keluarga."
-              </p>
-
-              <div className="testimonial-user">
-                <img
-                  src="https://i.pravatar.cc/100?img=15"
-                  alt=""
-                />
-
-                <div>
-                  <strong>Andi Wijaya</strong>
-                  <span>Orang Tua Murid</span>
+                <div className="cp-form-group">
+                  <label>Rating</label>
+                  <StarRating
+                    value={form.rating}
+                    onChange={(r) => setForm((f) => ({ ...f, rating: r }))}
+                  />
                 </div>
-              </div>
-            </div>
 
-            <div className="testimonial-card">
-              <div className="stars">
-                <Star fill="currentColor" />
-                <Star fill="currentColor" />
-                <Star fill="currentColor" />
-                <Star fill="currentColor" />
-                <Star fill="currentColor" />
-              </div>
-
-              <p>
-                "Staff sangat ramah dan area edukasinya keren banget!"
-              </p>
-
-              <div className="testimonial-user">
-                <img
-                  src="https://i.pravatar.cc/100?img=18"
-                  alt=""
-                />
-
-                <div>
-                  <strong>Budi Santoso</strong>
-                  <span>Tour Organizer</span>
+                <div className="cp-form-group">
+                  <label htmlFor="cp-message">Pesan</label>
+                  <textarea
+                    id="cp-message"
+                    placeholder="Ceritakan pengalamanmu di Edupark..."
+                    rows={4}
+                    value={form.message}
+                    onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
+                    maxLength={400}
+                  />
+                  <span className="cp-char-count">{form.message.length}/400</span>
                 </div>
-              </div>
-            </div>
 
-          </div>
+                {formError && <p className="cp-form-error">{formError}</p>}
+
+                <div className="cp-form-actions">
+                  <button
+                    type="button"
+                    className="cp-form-cancel"
+                    onClick={() => { setShowForm(false); setFormError(""); }}
+                  >
+                    Batal
+                  </button>
+                  <button type="submit" className="cp-form-submit" disabled={submitting}>
+                    {submitting ? "Mengirim..." : "Kirim Testimoni"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* ── STATUS NOTIF ── */}
+          {submitStatus === "success" && (
+            <div className="cp-submit-notice success">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11"></polyline>
+              </svg>
+              Terima kasih! Testimonimu telah berhasil dikirim.
+            </div>
+          )}
+
+          {submitStatus === "error" && (
+            <div className="cp-submit-notice error">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+              </svg>
+              Gagal mengirim. Coba lagi beberapa saat.
+            </div>
+          )}
+
+          {/* ── DAFTAR TESTIMONI ── */}
+          {loadingTestimonials ? (
+            <div className="cp-testimonial-loading">
+              <span className="cp-spinner"></span>
+              <p>Memuat testimoni...</p>
+            </div>
+          ) : testimonials.length === 0 ? (
+            <div className="cp-testimonial-empty">
+              <p>Belum ada testimoni. Jadilah yang pertama! 🌱</p>
+            </div>
+          ) : (
+            <div className="testimonial-grid">
+              {testimonials.map((t) => (
+                <div key={t.id} className="testimonial-card">
+                  <h4 className="cp-testimonial-name">{t.name}</h4>
+                  <p>"{t.message}"</p>
+                  <span className="cp-stars-row">{renderStars(t.rating)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
         </div>
       </section>
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { MoreVertical, LogOut, LogIn } from "lucide-react";
 import { getDatabase, ref, onValue } from "firebase/database";
+import logoEdupark from '../../public/logo.png';
 import "./Navbar.css";
 
 export default function Navbar() {
@@ -120,8 +121,9 @@ export default function Navbar() {
 
           {/* ================= LOGO ================= */}
           <div className="logo">
-            <span className="leaf"></span>
-            <span>Edupark</span>
+            <NavLink to="/" onClick={closeMenu}>
+            <img src="../../public/logo.png" alt="Edupark Logo" className="logo-img" />
+            </NavLink>
           </div>
 
           {/* ================= MENU ================= */}

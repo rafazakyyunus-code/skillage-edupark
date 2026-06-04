@@ -342,9 +342,6 @@ export default function TentangKami() {
           <div className="tk-testimonial-grid">
             {testimonials.map((t) => (
               <div key={t.id} className="tk-testimonial-card">
-                <div className="tk-testimonial-avatar">
-                  {t.name.charAt(0).toUpperCase()}
-                </div>
                 <h4>{t.name}</h4>
                 <p>"{t.message}"</p>
                 <span className="stars tk-stars-row">{renderStars(t.rating)}</span>

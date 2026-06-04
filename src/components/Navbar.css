@@ -79,15 +79,13 @@ body {
 
 /* ================= LOGO ================= */
 
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 23px;
-  font-weight: 700;
-  color: #16c35b;
+.logo-img {
+  height: 48px;
+  margin-top: 20px;
+  width: auto;
+  object-fit: contain;
   cursor: pointer;
-  user-select: none;
+  transform: translateX(45px);
 }
 
 .leaf {
