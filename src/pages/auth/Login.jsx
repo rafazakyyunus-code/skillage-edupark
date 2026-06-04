@@ -634,15 +634,7 @@ function Login() {
           {/* ── LOGIN FORM ── */}
           <div className={`lp-form-login ${isLogin ? '' : 'is-signup-mode'}`}>
             <div className="lp-form-inner" key={`login-${mode}`}>
-              <svg className="lp-logo" viewBox="0 0 54 54" fill="none">
-                <rect x="4" y="4" width="20" height="20" rx="4" stroke="#2FA084" strokeWidth="2.2" fill="none"/>
-                <rect x="30" y="4" width="20" height="20" rx="4" stroke="#2FA084" strokeWidth="2.2" fill="none"/>
-                <rect x="4" y="30" width="20" height="20" rx="4" stroke="#2FA084" strokeWidth="2.2" fill="none"/>
-                <rect x="30" y="30" width="20" height="20" rx="4" stroke="#6FCF97" strokeWidth="2.2" fill="none"/>
-                <rect x="17" y="17" width="20" height="20" rx="4" fill="#2FA084" opacity="0.15"/>
-                <rect x="20" y="20" width="14" height="14" rx="3" fill="#2FA084" opacity="0.6"/>
-              </svg>
-              <h1 className="lp-title">LOGIN</h1>
+              <img src="../../public/skillage-edupark1.png" alt="logo login" style={{ height: '100px', marginBottom: '10px' }} />
               <p className="lp-sub" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 Selamat datang kembali
                 {/* Ikon Tangan Melambai (Wave) */}
@@ -705,24 +697,7 @@ function Login() {
           {/* ── SIGN UP FORM ── */}
           <div className={`lp-form-signup ${isLogin ? 'is-login-mode' : 'is-signup-mode'}`}>
             <div className="lp-form-inner" key={`signup-${mode}`}>
-              <svg className="lp-logo" viewBox="0 0 54 54" fill="none">
-                <rect x="4" y="4" width="20" height="20" rx="4" stroke="#2FA084" strokeWidth="2.2" fill="none"/>
-                <rect x="30" y="4" width="20" height="20" rx="4" stroke="#2FA084" strokeWidth="2.2" fill="none"/>
-                <rect x="4" y="30" width="20" height="20" rx="4" stroke="#2FA084" strokeWidth="2.2" fill="none"/>
-                <rect x="30" y="30" width="20" height="20" rx="4" stroke="#6FCF97" strokeWidth="2.2" fill="none"/>
-                <rect x="17" y="17" width="20" height="20" rx="4" fill="#2FA084" opacity="0.15"/>
-                <rect x="20" y="20" width="14" height="14" rx="3" fill="#2FA084" opacity="0.6"/>
-              </svg>
-              <h1 className="lp-title">SIGN UP</h1>
-              <p className="lp-sub" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                Buat akun baru
-                {/* Ikon Sparkles / Kilauan */}
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#eab308' }}>
-                  <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/>
-                  <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5Z"/>
-                  <path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1Z"/>
-                </svg>
-              </p>
+              <img src="../../public/skillage-edupark1.png" alt="logo login" style={{ height: '100px', marginBottom: '10px' }} />
 
               <div className="lp-field">
                 <span className="lp-field-icon"><UserIcon /></span>
