@@ -1,8 +1,5 @@
 // src/pages/promo/Promo.jsx
 // Route: /promo
-// Tambahkan di App.jsx:
-//   import Promo from "./pages/promo/Promo";
-//   <Route path="/promo" element={<AnimatedPage><Promo /></AnimatedPage>} />
 
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
@@ -26,6 +23,9 @@ import {
   Sparkles,
 } from "lucide-react";
 import "./Promo.css";
+
+/* ─── konstanta ─── */
+const WA_NUMBER = "6285219801259"; // 0852-1980-1259
 
 /* ─── helpers ─── */
 const safeImg = (url) => {
@@ -56,6 +56,23 @@ function getDiscountLabel(p) {
   if (p.type === "discount_fixed")
     return formatRp(p.discountValue);
   return null;
+}
+
+/* buat link WA dengan teks otomatis sesuai promo */
+function makeWaLink(promo) {
+  const discInfo = promo.discountValue
+    ? `\nDiskon: ${
+        promo.type === "discount_percent" || promo.type === "cashback"
+          ? promo.discountValue + "%"
+          : "Rp " + Number(promo.discountValue).toLocaleString("id-ID")
+      }`
+    : "";
+  const msg = encodeURIComponent(
+    `Halo Edupark! 👋\n\nSaya tertarik dengan promo *${promo.title}*${
+      promo.subtitle ? ` (${promo.subtitle})` : ""
+    }.${discInfo}\n\nBoleh saya mendapat info lebih lanjut? 🙏`
+  );
+  return `https://wa.me/${WA_NUMBER}?text=${msg}`;
 }
 
 /* ─── Countdown hook ─── */
@@ -115,9 +132,10 @@ function HeroCountdown({ promos }) {
 
 /* ─── Promo Card ─── */
 function PromoCard({ promo, index }) {
-  const t = useCountdown(promo.endDate);
+  const t         = useCountdown(promo.endDate);
   const discLabel = getDiscountLabel(promo);
   const isExpired = promo.endDate && new Date(promo.endDate).getTime() < Date.now();
+  const waLink    = makeWaLink(promo);
 
   return (
     <div
@@ -130,7 +148,6 @@ function PromoCard({ promo, index }) {
           ? <img src={safeImg(promo.image)} alt={promo.title} className="promo-card__img" />
           : <div className="promo-card__img-placeholder"><Tag size={40} /></div>
         }
-        {/* Badges */}
         {promo.badgeLabel && !isExpired && (
           <span className="promo-card__badge promo-card__badge--active">
             {promo.badgeLabel}
@@ -146,7 +163,6 @@ function PromoCard({ promo, index }) {
             <Star size={10} style={{ display: "inline", verticalAlign: "middle" }} /> Unggulan
           </span>
         )}
-        {/* Discount pill */}
         {discLabel && !isExpired && (
           <div className="promo-card__discount">
             {discLabel}
@@ -181,7 +197,7 @@ function PromoCard({ promo, index }) {
           )}
         </div>
 
-        {/* Countdown */}
+        {/* Countdown — tampil hanya jika < 7 hari lagi */}
         {promo.endDate && !isExpired && !t.expired && t.d !== undefined && t.d < 7 && (
           <div className="promo-card__countdown">
             <Clock size={12} />
@@ -192,14 +208,21 @@ function PromoCard({ promo, index }) {
         )}
 
         {/* CTA */}
-        <Link
-          to={isExpired ? "#" : (promo.productLink || "/produk")}
-          className={`promo-card__cta${isExpired ? " promo-card__cta--disabled" : ""}`}
-          onClick={isExpired ? (e) => e.preventDefault() : undefined}
-        >
-          {isExpired ? "Promo Berakhir" : (promo.ctaLabel || "Belanja Sekarang")}
-          {!isExpired && <ArrowRight size={14} />}
-        </Link>
+        {isExpired ? (
+          <span className="promo-card__cta promo-card__cta--disabled">
+            Promo Berakhir
+          </span>
+        ) : (
+          <a
+            href={waLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="promo-card__cta"
+          >
+            {promo.ctaLabel || "Hubungi via WhatsApp"}
+            <ArrowRight size={14} />
+          </a>
+        )}
       </div>
     </div>
   );
@@ -211,7 +234,7 @@ function PromoCard({ promo, index }) {
 export default function Promo() {
   const [promos,  setPromos]  = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter,  setFilter]  = useState("semua"); // semua | aktif | unggulan
+  const [filter,  setFilter]  = useState("semua");
 
   useEffect(() => {
     const unsub = onValue(ref(db, "promos"), (snap) => {
@@ -220,9 +243,8 @@ export default function Promo() {
         data
           ? Object.entries(data)
               .map(([id, v]) => ({ ...v, firebaseId: id }))
-              .filter((p) => p.active) // only active promos for public
+              .filter((p) => p.active)
               .sort((a, b) => {
-                // Featured first, then by createdAt
                 if (b.featured !== a.featured) return b.featured ? 1 : -1;
                 return (b.createdAt || 0) - (a.createdAt || 0);
               })
@@ -236,19 +258,26 @@ export default function Promo() {
   const isExpired = (p) =>
     p.endDate && new Date(p.endDate).getTime() < Date.now();
 
+  /* stats — semua dihitung real-time dari Firebase */
   const activeCount   = promos.filter((p) => !isExpired(p)).length;
   const featuredCount = promos.filter((p) => p.featured && !isExpired(p)).length;
   const maxDiscount   = promos.reduce((max, p) => {
-    if (p.type === "discount_percent" && p.discountValue > max)
-      return p.discountValue;
+    if (
+      !isExpired(p) &&
+      (p.type === "discount_percent") &&
+      Number(p.discountValue) > max
+    ) return Number(p.discountValue);
     return max;
   }, 0);
-
-  const expiringSoon = promos.filter(
+  const expiringSoon  = promos.filter(
     (p) =>
       !isExpired(p) &&
       p.endDate &&
       new Date(p.endDate).getTime() - Date.now() < 7 * 86400000
+  ).length;
+
+  const activeDiscountCount = promos.filter(
+    (p) => !isExpired(p) && p.type === "discount_percent"
   ).length;
 
   const displayed = promos.filter((p) => {
@@ -283,18 +312,41 @@ export default function Promo() {
           </Link>
         </div>
         <div className="promo-hero__right">
-          {/* Stats */}
+          {/* Stats — real-time */}
           <div className="promo-hero__stats">
             {[
-              { icon: <Tag size={18} />,     label: "Total Promo Aktif",      value: `${activeCount} Promo`,   sub: "Update per hari ini" },
-              { icon: <Percent size={18} />, label: "Diskon Tertinggi",       value: `${maxDiscount}% OFF`,    sub: "Untuk produk kursus pilihan" },
-              { icon: <Clock size={18} />,   label: "Promo Berakhir Minggu Ini", value: `${expiringSoon} Promo`, sub: "Segera manfaatkan penawarannya", accent: true },
+              {
+                icon: <Tag size={18} />,
+                label: "Total Promo Aktif",
+                value: `${activeCount} Promo`,
+                sub: "Update per hari ini",
+              },
+              {
+                icon: <Percent size={18} />,
+                label: "Diskon Tertinggi",
+                value: maxDiscount > 0 ? `${maxDiscount}% OFF` : "–",
+                sub: maxDiscount > 0
+                  ? `Dari ${activeDiscountCount} promo diskon aktif`
+                  : "Belum ada promo diskon",
+              },
+              {
+                icon: <Clock size={18} />,
+                label: "Promo Berakhir Minggu Ini",
+                value: `${expiringSoon} Promo`,
+                sub: "Segera manfaatkan penawarannya",
+                accent: true,
+              },
             ].map(({ icon, label, value, sub, accent }) => (
-              <div key={label} className={`promo-stat-card${accent ? " promo-stat-card--accent" : ""}`}>
+              <div
+                key={label}
+                className={`promo-stat-card${accent ? " promo-stat-card--accent" : ""}`}
+              >
                 <div className="promo-stat-card__icon">{icon}</div>
                 <div>
                   <div className="promo-stat-card__label">{label}</div>
-                  <div className={`promo-stat-card__value${accent ? " promo-stat-card__value--accent" : ""}`}>{value}</div>
+                  <div className={`promo-stat-card__value${accent ? " promo-stat-card__value--accent" : ""}`}>
+                    {value}
+                  </div>
                   <div className="promo-stat-card__sub">{sub}</div>
                 </div>
               </div>
@@ -366,7 +418,7 @@ export default function Promo() {
           <ul className="promo-tnc__list">
             {[
               "Promo tidak dapat digabung dengan promo atau voucher lainnya kecuali disebutkan sebaliknya.",
-              "Selama persediaan masih tersedia pada saat transaksi dilakukan.",
+              "Berlaku selama persediaan masih tersedia pada saat transaksi dilakukan.",
               "Berlaku sesuai periode promo yang tercantum pada masing-masing penawaran.",
               "Edupark berhak mengubah syarat dan ketentuan tanpa pemberitahuan sebelumnya.",
             ].map((item, i) => (
@@ -384,11 +436,16 @@ export default function Promo() {
         <div className="promo-cta__inner">
           <h2 className="promo-cta__title">Jangan Lewatkan Promo Menarik Edupark!</h2>
           <p className="promo-cta__desc">
-            Belanja sekarang dan dapatkan produk edukasi serta hasil alam terbaik dengan harga paling hemat minggu ini.
+            Hubungi kami sekarang dan dapatkan produk edukasi serta hasil alam terbaik dengan harga paling hemat minggu ini.
           </p>
-          <Link to="/produk" className="promo-cta__btn">
-            Belanja Sekarang
-          </Link>
+          <a
+            href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent("Halo Edupark! 👋 Saya ingin tahu lebih lanjut tentang promo yang tersedia. 🙏")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="promo-cta__btn"
+          >
+            Hubungi via WhatsApp
+          </a>
         </div>
       </section>
     </div>

@@ -2813,8 +2813,13 @@ function WriterDirectoryView({ articles }) {
    MAIN EDITOR PORTAL
 ───────────────────────────────────────────── */
 /* ─────────────────────────────────────────────
-   PROMO MANAGEMENT VIEW (EDITOR)
+   PROMO MANAGEMENT VIEW  —  Editor.jsx
+   Ganti seluruh blok mulai dari komentar
+   "PROMO MANAGEMENT VIEW (EDITOR)" s/d
+   penutup fungsi EditorPromoManagementView
 ───────────────────────────────────────────── */
+
+/* ── Constants (ganti yang lama) ── */
 const EDITOR_PROMO_TYPES = [
   { value:"discount_percent", label:"Diskon Persen" },
   { value:"discount_fixed",   label:"Potongan Harga" },
@@ -2822,30 +2827,113 @@ const EDITOR_PROMO_TYPES = [
   { value:"free_shipping",    label:"Gratis Ongkir" },
   { value:"bundle",           label:"Bundle Promo" },
 ];
-const EDITOR_PROMO_BADGES = ["HOT","NEW","LIMITED","FLASH SALE","SPECIAL"];
+const EDITOR_PROMO_BADGES = ["","HOT","NEW","LIMITED","FLASH SALE","SPECIAL"];
+const EDITOR_WA_NUMBER = "6285219801259";
+const IMGBB_KEY_ED_PROMO = "6604bf748a40b7eaf83a5d4792bff01e";
 const PROMO_BLANK_ED = {
   title:"", subtitle:"", description:"", image:"",
   type:"discount_percent", discountValue:"", minPurchase:"",
   badgeLabel:"HOT", featured:false, active:true,
-  productLink:"/produk", ctaLabel:"Belanja Sekarang",
+  ctaLabel:"Hubungi via WhatsApp",
   startDate:"", endDate:"",
 };
 
+/* ── helper PromoTypeIcon for Editor (uses SVG inline) ── */
+function EditorPromoTypeIcon({ type, size=15 }) {
+  const color = "#6B7280";
+  const s     = { display:"inline-block", flexShrink:0 };
+  switch(type) {
+    case "discount_percent":
+      return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" style={s}><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>;
+    case "discount_fixed":
+      return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" style={s}><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>;
+    case "bundle":
+      return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" style={s}><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>;
+    case "free_shipping":
+      return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" style={s}><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>;
+    case "cashback":
+      return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" style={s}><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>;
+    default:
+      return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" style={s}><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>;
+  }
+}
+
+/* ── mini preview card (Editor version — no lucide dependency) ── */
+function EditorPromoCardPreview({ form }) {
+  const formatRp = n => "Rp " + Number(n||0).toLocaleString("id-ID");
+  const safeI = url => {
+    if (!url) return "";
+    let u = url.replace(/^http:\/\//i,"https://");
+    if (/i\.ibb\.co/i.test(u)) return "https://images.weserv.nl/?url="+encodeURIComponent(u);
+    return u;
+  };
+  const discLabel = () => {
+    if (!form.discountValue) return null;
+    if (form.type==="discount_percent"||form.type==="cashback") return `${form.discountValue}% OFF`;
+    if (form.type==="discount_fixed") return formatRp(form.discountValue);
+    return null;
+  };
+  const disc = discLabel();
+
+  return (
+    <div style={{
+      border: form.featured?"2px solid #16c35b":"1px solid #E5E7EB",
+      borderRadius:14, overflow:"hidden", background:"#fff",
+      boxShadow:"0 4px 18px rgba(0,0,0,0.08)", fontSize:13,
+    }}>
+      <div style={{ position:"relative", height:140, background:"#F3F4F6", display:"flex", alignItems:"center", justifyContent:"center" }}>
+        {form.image
+          ? <img src={safeI(form.image)} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}/>
+          : <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="1.5"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+        }
+        {form.badgeLabel && (
+          <span style={{ position:"absolute", top:8, left:8, background:"#DC2626", color:"#fff", fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:5 }}>{form.badgeLabel}</span>
+        )}
+        {form.featured && (
+          <span style={{ position:"absolute", top:8, right:8, background:"#7C3AED", color:"#fff", fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:5 }}>★ Unggulan</span>
+        )}
+        {disc && (
+          <span style={{ position:"absolute", bottom:8, right:8, background:"#1B3A2A", color:"#16c35b", fontSize:11, fontWeight:800, padding:"3px 9px", borderRadius:20 }}>{disc}</span>
+        )}
+      </div>
+      <div style={{ padding:"12px 14px" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:5, color:"#9CA3AF", marginBottom:5 }}>
+          <EditorPromoTypeIcon type={form.type} size={12}/>
+          <span style={{ fontSize:11 }}>{EDITOR_PROMO_TYPES.find(t=>t.value===form.type)?.label}</span>
+        </div>
+        <div style={{ fontWeight:700, color:"#111827", fontSize:14, marginBottom:2 }}>{form.title||"Judul Promo"}</div>
+        {form.subtitle && <div style={{ fontSize:11, color:"#6B7280", marginBottom:3 }}>{form.subtitle}</div>}
+        {form.description && <div style={{ fontSize:11, color:"#6B7280", lineHeight:1.5, marginBottom:6 }}>{form.description.slice(0,70)}{form.description.length>70?"…":""}</div>}
+        {form.endDate && <div style={{ fontSize:10, color:"#9CA3AF", marginBottom:6 }}>s/d {form.endDate}</div>}
+        <div style={{ padding:"8px 12px", borderRadius:7, background:form.active?"#1B3A2A":"#9CA3AF", color:"#fff", fontSize:12, fontWeight:600, textAlign:"center" }}>
+          {form.ctaLabel||"Hubungi via WhatsApp"}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════
+   EDITOR PROMO MANAGEMENT VIEW — MAIN
+══════════════════════════════════════════════ */
 function EditorPromoManagementView({ currentUser }) {
-  const db2 = getDatabase();
-  const [promos, setPromos]       = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [showForm, setShowForm]   = useState(false);
-  const [editing, setEditing]     = useState(null);
-  const [form, setForm]           = useState(PROMO_BLANK_ED);
-  const [saving, setSaving]       = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState(null);
-  const [toastMsg, setToastMsg]   = useState("");
+  const db2            = getDatabase();
+  const [promos,      setPromos]       = useState([]);
+  const [loading,     setLoading]      = useState(true);
+  const [view,        setView]         = useState("list");
+  const [editing,     setEditing]      = useState(null);
+  const [form,        setForm]         = useState(PROMO_BLANK_ED);
+  const [saving,      setSaving]       = useState(false);
+  const [uploading,   setUploading]    = useState(false);
+  const [imagePreview,setImagePreview] = useState("");
+  const [deleteTarget,setDeleteTarget] = useState(null);
+  const [toastMsg,    setToastMsg]     = useState("");
+  const fileRef                        = useRef(null);
 
   const showToast = m => { setToastMsg(m); setTimeout(()=>setToastMsg(""), 3000); };
 
   useEffect(() => {
-    const unsub = onValue(ref(db2, "promos"), snap => {
+    const unsub = onValue(ref(db2,"promos"), snap => {
       const d = snap.val();
       setPromos(d ? Object.entries(d).map(([id,v])=>({...v,firebaseId:id})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)) : []);
       setLoading(false);
@@ -2853,25 +2941,48 @@ function EditorPromoManagementView({ currentUser }) {
     return () => unsub();
   }, []);
 
-  const isExpired = p => p.endDate && new Date(p.endDate).getTime() < Date.now();
+  const isExpired     = p => p.endDate && new Date(p.endDate).getTime() < Date.now();
   const activeCount   = promos.filter(p=>p.active&&!isExpired(p)).length;
   const featuredCount = promos.filter(p=>p.featured&&p.active&&!isExpired(p)).length;
   const expiringSoon  = promos.filter(p=>!isExpired(p)&&p.endDate&&new Date(p.endDate).getTime()-Date.now()<7*86400000).length;
+  const maxDiscount   = promos.reduce((max,p)=>{
+    if ((p.type==="discount_percent"||p.type==="cashback")&&Number(p.discountValue)>max) return Number(p.discountValue);
+    return max;
+  }, 0);
 
-  const openAdd  = () => { setForm(PROMO_BLANK_ED); setEditing(null); setShowForm(true); };
+  const openAdd = () => { setForm(PROMO_BLANK_ED); setEditing(null); setImagePreview(""); setView("form"); };
   const openEdit = p => {
-    setForm({ title:p.title||"", subtitle:p.subtitle||"", description:p.description||"", image:p.image||"", type:p.type||"discount_percent", discountValue:p.discountValue||"", minPurchase:p.minPurchase||"", badgeLabel:p.badgeLabel||"HOT", featured:!!p.featured, active:!!p.active, productLink:p.productLink||"/produk", ctaLabel:p.ctaLabel||"Belanja Sekarang", startDate:p.startDate||"", endDate:p.endDate||"" });
-    setEditing(p.firebaseId); setShowForm(true);
+    setForm({ title:p.title||"", subtitle:p.subtitle||"", description:p.description||"", image:p.image||"",
+      type:p.type||"discount_percent", discountValue:p.discountValue||"", minPurchase:p.minPurchase||"",
+      badgeLabel:p.badgeLabel||"HOT", featured:!!p.featured, active:!!p.active,
+      ctaLabel:p.ctaLabel||"Hubungi via WhatsApp", startDate:p.startDate||"", endDate:p.endDate||"" });
+    setEditing(p.firebaseId); setImagePreview(p.image||""); setView("form");
+  };
+
+  const handleFileChange = async e => {
+    const file = e.target.files[0]; if (!file) return;
+    setImagePreview(URL.createObjectURL(file));
+    setUploading(true);
+    try {
+      const fd = new FormData(); fd.append("image", file);
+      const res  = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY_ED_PROMO}`, { method:"POST", body:fd });
+      const json = await res.json();
+      if (!json.success) throw new Error("Upload gagal");
+      setForm(f=>({...f,image:json.data.url}));
+      setImagePreview(json.data.url);
+      showToast("✓ Foto berhasil diupload!");
+    } catch(err) { showToast("✗ Upload gagal: "+err.message); }
+    finally { setUploading(false); }
   };
 
   const handleSave = async () => {
     if (!form.title.trim()) { showToast("✗ Judul promo wajib diisi."); return; }
     setSaving(true);
     try {
-      const data = { ...form, discountValue:Number(form.discountValue)||0, minPurchase:Number(form.minPurchase)||0, createdBy: currentUser?.displayName||"Editor", updatedAt:Date.now() };
+      const data = { ...form, discountValue:Number(form.discountValue)||0, minPurchase:Number(form.minPurchase)||0, createdBy:currentUser?.displayName||"Editor", updatedAt:Date.now() };
       if (editing) { await update(ref(db2,`promos/${editing}`), data); showToast("✓ Promo diperbarui."); }
       else { await push(ref(db2,"promos"), {...data,createdAt:Date.now()}); showToast("✓ Promo ditambahkan."); }
-      setShowForm(false);
+      setView("list");
     } catch(e) { showToast("✗ Gagal: "+e.message); }
     finally { setSaving(false); }
   };
@@ -2880,20 +2991,206 @@ function EditorPromoManagementView({ currentUser }) {
   const handleToggleFeatured = async p => { await update(ref(db2,`promos/${p.firebaseId}`),{featured:!p.featured}); showToast(`✓ Featured ${!p.featured?"diaktifkan":"dinonaktifkan"}.`); };
   const handleDelete = async () => { await remove(ref(db2,`promos/${deleteTarget.firebaseId}`)); showToast("✓ Promo dihapus."); setDeleteTarget(null); };
 
-  const inp = { width:"100%", padding:"9px 12px", borderRadius:8, border:"1px solid #D1D5DB", fontSize:14, boxSizing:"border-box", fontFamily:"inherit", outline:"none" };
   const isErr = toastMsg.startsWith("✗");
+  const inp   = { width:"100%", padding:"9px 12px", borderRadius:8, border:"1px solid #D1D5DB", fontSize:14, boxSizing:"border-box", fontFamily:"inherit", outline:"none", color:"#111827" };
+  const lbl   = { display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 };
+  const cardSt= { background:"#fff", border:"1px solid #E5E7EB", borderRadius:12, padding:"20px 22px" };
 
+  /* Toast */
+  const ToastEl = toastMsg ? (
+    <div style={{ position:"fixed", top:24, right:24, zIndex:9999, padding:"12px 20px", borderRadius:10,
+      fontSize:14, fontWeight:600, background:isErr?"#DC2626":"#1B3A2A", color:"#fff",
+      boxShadow:"0 4px 20px rgba(0,0,0,0.2)", display:"flex", alignItems:"center", gap:8 }}>
+      {isErr
+        ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>}
+      {toastMsg.replace(/^[✓✗]\s*/,"")}
+    </div>
+  ) : null;
+
+  /* ══ FORM VIEW ══ */
+  if (view === "form") return (
+    <div>
+      {ToastEl}
+      <div style={{ marginBottom:24 }}>
+        <button onClick={()=>setView("list")} style={{ background:"none", border:"none", color:"#6B7280", fontSize:13, cursor:"pointer", marginBottom:4, fontWeight:500, padding:0 }}>
+          ← Kembali ke daftar
+        </button>
+        <h1 style={{ fontSize:22, fontWeight:700, color:"#111827", margin:0 }}>{editing?"Edit Promo":"Tambah Promo Baru"}</h1>
+        <p style={{ color:"#6B7280", fontSize:13, marginTop:4 }}>Promo yang {editing?"diperbarui":"ditambahkan"} akan langsung tampil di halaman /promo</p>
+      </div>
+
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 300px", gap:20, alignItems:"flex-start" }}>
+
+        {/* LEFT */}
+        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+
+          {/* Foto */}
+          <div style={cardSt}>
+            <p style={{ fontSize:13, fontWeight:700, color:"#374151", margin:"0 0 12px" }}>Foto Promo</p>
+            <div onClick={()=>fileRef.current?.click()}
+              style={{ border:"2px dashed #D1D5DB", borderRadius:12, cursor:"pointer", overflow:"hidden",
+                height:imagePreview?"auto":170, display:"flex", flexDirection:"column",
+                alignItems:"center", justifyContent:"center", transition:"border-color 0.2s" }}
+              onMouseEnter={e=>e.currentTarget.style.borderColor="#16c35b"}
+              onMouseLeave={e=>e.currentTarget.style.borderColor="#D1D5DB"}>
+              {imagePreview ? (
+                <div style={{ position:"relative", width:"100%" }}>
+                  <img src={imagePreview.replace(/^http:\/\//i,"https://")} alt="preview"
+                    style={{ width:"100%", height:200, objectFit:"cover", display:"block" }}/>
+                  <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.4)", display:"flex",
+                    alignItems:"center", justifyContent:"center", opacity:0, transition:"0.3s" }}
+                    onMouseEnter={e=>e.currentTarget.style.opacity=1}
+                    onMouseLeave={e=>e.currentTarget.style.opacity=0}>
+                    <span style={{ color:"#fff", fontWeight:600, fontSize:13 }}>Klik untuk ganti foto</span>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:8, padding:"0 20px", textAlign:"center" }}>
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="1.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+                  <p style={{ fontSize:14, fontWeight:600, color:"#374151", margin:0 }}>{uploading?"Mengupload...":"Klik untuk upload foto promo"}</p>
+                  <span style={{ fontSize:11, color:"#9CA3AF" }}>PNG, JPG, WEBP</span>
+                </div>
+              )}
+            </div>
+            <input ref={fileRef} type="file" accept="image/*" onChange={handleFileChange} style={{ display:"none" }}/>
+            {uploading && <p style={{ fontSize:12, color:"#16c35b", marginTop:8, fontWeight:600 }}>Sedang mengupload...</p>}
+            <div style={{ marginTop:10 }}>
+              <label style={lbl}>Atau masukkan URL foto</label>
+              <input value={form.image}
+                onChange={e=>{ setForm(f=>({...f,image:e.target.value})); setImagePreview(e.target.value); }}
+                placeholder="https://..." style={inp}/>
+            </div>
+          </div>
+
+          {/* Info */}
+          <div style={cardSt}>
+            <p style={{ fontSize:13, fontWeight:700, color:"#374151", margin:"0 0 14px" }}>Informasi Promo</p>
+            <div style={{ marginBottom:12 }}>
+              <label style={lbl}>Judul Promo *</label>
+              <input value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))}
+                placeholder="Misal: Diskon Edukasi 20%" style={inp}/>
+            </div>
+            <div style={{ marginBottom:12 }}>
+              <label style={lbl}>Subjudul</label>
+              <input value={form.subtitle} onChange={e=>setForm(f=>({...f,subtitle:e.target.value}))}
+                placeholder="Promo Minggu Ini" style={inp}/>
+            </div>
+            <div style={{ marginBottom:14 }}>
+              <label style={lbl}>Deskripsi</label>
+              <textarea value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))}
+                rows={3} style={{ ...inp, resize:"vertical" }}/>
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:12 }}>
+              <div>
+                <label style={lbl}>Jenis Promo</label>
+                <select value={form.type} onChange={e=>setForm(f=>({...f,type:e.target.value}))} style={inp}>
+                  {EDITOR_PROMO_TYPES.map(t=><option key={t.value} value={t.value}>{t.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={lbl}>Nilai Diskon</label>
+                <input type="number" value={form.discountValue}
+                  onChange={e=>setForm(f=>({...f,discountValue:e.target.value}))}
+                  placeholder="20" style={inp}/>
+              </div>
+              <div>
+                <label style={lbl}>Minimum Pembelian (Rp)</label>
+                <input type="number" value={form.minPurchase}
+                  onChange={e=>setForm(f=>({...f,minPurchase:e.target.value}))}
+                  placeholder="0" style={inp}/>
+              </div>
+              <div>
+                <label style={lbl}>Label Badge</label>
+                <select value={form.badgeLabel} onChange={e=>setForm(f=>({...f,badgeLabel:e.target.value}))} style={inp}>
+                  {EDITOR_PROMO_BADGES.map(b=><option key={b} value={b}>{b||"Tidak Ada"}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={lbl}>Tanggal Mulai</label>
+                <input type="date" value={form.startDate} onChange={e=>setForm(f=>({...f,startDate:e.target.value}))} style={inp}/>
+              </div>
+              <div>
+                <label style={lbl}>Tanggal Berakhir</label>
+                <input type="date" value={form.endDate} onChange={e=>setForm(f=>({...f,endDate:e.target.value}))} style={inp}/>
+              </div>
+            </div>
+            <div>
+              <label style={lbl}>Label Tombol CTA</label>
+              <input value={form.ctaLabel} onChange={e=>setForm(f=>({...f,ctaLabel:e.target.value}))}
+                placeholder="Hubungi via WhatsApp" style={inp}/>
+              <p style={{ fontSize:11, color:"#9CA3AF", marginTop:4 }}>
+                Tombol akan otomatis mengarahkan ke WhatsApp 0852-1980-1259 dengan pesan sesuai promo.
+              </p>
+            </div>
+          </div>
+
+          {/* Pengaturan */}
+          <div style={cardSt}>
+            <p style={{ fontSize:13, fontWeight:700, color:"#374151", margin:"0 0 12px" }}>Pengaturan Tampil</p>
+            <div style={{ display:"flex", gap:14, flexWrap:"wrap" }}>
+              {[
+                { key:"active",   label:"Promo Aktif",             desc:"Tampil di halaman publik",       color:"#065F46", bg:"#D1FAE5" },
+                { key:"featured", label:"Promo Unggulan",          desc:"Prioritas tampil di bagian atas", color:"#7C3AED", bg:"#EDE9FE" },
+              ].map(({ key, label, desc, color, bg }) => (
+                <label key={key} onClick={()=>setForm(f=>({...f,[key]:!f[key]}))}
+                  style={{ display:"flex", alignItems:"flex-start", gap:10, cursor:"pointer",
+                    padding:"10px 14px", background:form[key]?bg:"#F9FAFB",
+                    borderRadius:10, border:`1px solid ${form[key]?color+"40":"#E5E7EB"}`,
+                    flex:"1 1 200px" }}>
+                  <div style={{ width:36, height:21, borderRadius:11, background:form[key]?color:"#D1D5DB",
+                    position:"relative", transition:"background 0.2s", cursor:"pointer", flexShrink:0, marginTop:2 }}>
+                    <div style={{ position:"absolute", top:2.5, left:form[key]?17:2.5, width:16, height:16,
+                      borderRadius:"50%", background:"#fff", transition:"left 0.2s", boxShadow:"0 1px 3px rgba(0,0,0,0.2)" }}/>
+                  </div>
+                  <div>
+                    <div style={{ fontSize:13, fontWeight:700, color:form[key]?color:"#374151" }}>{label}</div>
+                    <div style={{ fontSize:11, color:"#9CA3AF", marginTop:1 }}>{desc}</div>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div style={{ display:"flex", justifyContent:"flex-end", gap:10 }}>
+            <button onClick={()=>setView("list")}
+              style={{ padding:"10px 22px", borderRadius:8, border:"1px solid #E5E7EB", background:"#fff", color:"#374151", fontSize:14, cursor:"pointer", fontWeight:600 }}>
+              Batal
+            </button>
+            <button onClick={handleSave} disabled={saving}
+              style={{ padding:"10px 24px", borderRadius:8, border:"none", background:saving?"#6B7280":"#1B3A2A",
+                color:"#fff", fontSize:14, cursor:saving?"not-allowed":"pointer", fontWeight:700,
+                display:"flex", alignItems:"center", gap:8 }}>
+              <IcoSave size={15}/>
+              {saving?"Menyimpan...":"Simpan Promo"}
+            </button>
+          </div>
+        </div>
+
+        {/* RIGHT: preview */}
+        <div style={{ position:"sticky", top:24 }}>
+          <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:12, padding:14, marginBottom:12 }}>
+            <p style={{ fontSize:12, fontWeight:700, color:"#374151", margin:"0 0 10px", display:"flex", alignItems:"center", gap:5 }}>
+              <IcoEye size={13}/> Preview Card
+            </p>
+            <EditorPromoCardPreview form={form}/>
+          </div>
+          <div style={{ background:"#EFF6FF", border:"1px solid #BFDBFE", borderRadius:10, padding:"10px 12px", fontSize:11, color:"#1E40AF", lineHeight:1.5 }}>
+            <strong>Info WhatsApp</strong>
+            <p style={{ margin:"4px 0 0" }}>
+              Pengunjung yang klik promo akan diarahkan ke <strong>WA 0852-1980-1259</strong> dengan pesan otomatis yang menyebutkan nama promo ini.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  /* ══ LIST VIEW ══ */
   return (
     <div>
-      {/* Toast */}
-      {toastMsg && (
-        <div style={{ position:"fixed", top:24, right:24, zIndex:9999, padding:"12px 20px", borderRadius:10, fontSize:14, fontWeight:600, background:isErr?"#DC2626":"#1B3A2A", color:"#fff", boxShadow:"0 4px 20px rgba(0,0,0,0.2)", display:"flex", alignItems:"center", gap:8 }}>
-          {isErr
-            ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-            : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>}
-          {toastMsg.replace(/^[✓✗]\s*/,"")}
-        </div>
-      )}
+      {ToastEl}
 
       {/* Delete confirm */}
       {deleteTarget && (
@@ -2921,17 +3218,18 @@ function EditorPromoManagementView({ currentUser }) {
         </button>
       </div>
 
-      {/* Stats */}
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14, marginBottom:24 }}>
+      {/* Stats — semua real-time */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:14, marginBottom:24 }}>
         {[
-          { label:"Total Promo",         value:promos.length, color:"#1B3A2A" },
-          { label:"Promo Aktif",         value:activeCount,   color:"#065F46" },
-          { label:"Featured Promo",      value:featuredCount, color:"#7C3AED" },
-          { label:"Berakhir Minggu Ini", value:expiringSoon,  color:"#E65100" },
+          { label:"Total Promo",         value:`${promos.length}`, color:"#1B3A2A" },
+          { label:"Promo Aktif",         value:`${activeCount}`,   color:"#065F46" },
+          { label:"Featured",            value:`${featuredCount}`, color:"#7C3AED" },
+          { label:"Berakhir Minggu Ini", value:`${expiringSoon}`,  color:"#E65100" },
+          { label:"Diskon Tertinggi",    value:`${maxDiscount}% OFF`, color:"#DC2626" },
         ].map(({ label, value, color }) => (
           <div key={label} style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:12, padding:"16px 18px" }}>
-            <div style={{ fontSize:26, fontWeight:800, color, lineHeight:1, marginBottom:4 }}>{value}</div>
-            <div style={{ fontSize:12, color:"#6B7280" }}>{label}</div>
+            <div style={{ fontSize:22, fontWeight:800, color, lineHeight:1, marginBottom:4 }}>{value}</div>
+            <div style={{ fontSize:11, color:"#6B7280" }}>{label}</div>
           </div>
         ))}
       </div>
@@ -2956,20 +3254,28 @@ function EditorPromoManagementView({ currentUser }) {
                 </tr>
               </thead>
               <tbody>
-                {promos.map((p,i)=>{
+                {promos.map((p,i) => {
                   const expired = isExpired(p);
                   return (
                     <tr key={p.firebaseId} style={{ borderBottom:i<promos.length-1?"1px solid #F3F4F6":"none", background:expired?"#FFFBF5":"#fff" }}>
                       <td style={{ padding:"10px 14px" }}>
                         <div style={{ width:44, height:44, borderRadius:8, overflow:"hidden", background:"#F3F4F6" }}>
-                          {p.image ? <img src={p.image.replace(/^http:\/\//i,"https://")} alt={p.title} style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center" }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/></svg></div>}
+                          {p.image
+                            ? <img src={p.image.replace(/^http:\/\//i,"https://")} alt={p.title} style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
+                            : <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center" }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/></svg></div>
+                          }
                         </div>
                       </td>
                       <td style={{ padding:"10px 14px", maxWidth:160 }}>
                         <div style={{ fontWeight:700, color:"#111827", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.title}</div>
                         {p.badgeLabel && <span style={{ fontSize:10, fontWeight:700, padding:"1px 6px", borderRadius:4, background:"#FEE2E2", color:"#DC2626", display:"inline-block", marginTop:3 }}>{p.badgeLabel}</span>}
                       </td>
-                      <td style={{ padding:"10px 14px", color:"#6B7280", fontSize:12 }}>{EDITOR_PROMO_TYPES.find(t=>t.value===p.type)?.label||p.type}</td>
+                      <td style={{ padding:"10px 14px" }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:5, color:"#6B7280" }}>
+                          <EditorPromoTypeIcon type={p.type}/>
+                          <span style={{ fontSize:12 }}>{EDITOR_PROMO_TYPES.find(t=>t.value===p.type)?.label||p.type}</span>
+                        </div>
+                      </td>
                       <td style={{ padding:"10px 14px", fontWeight:700, color:"#1B3A2A" }}>
                         {p.type==="discount_percent"||p.type==="cashback"?`${p.discountValue||0}%`:p.type==="discount_fixed"?`Rp ${Number(p.discountValue||0).toLocaleString("id-ID")}`:"-"}
                       </td>
@@ -2997,93 +3303,6 @@ function EditorPromoManagementView({ currentUser }) {
                 })}
               </tbody>
             </table>
-          </div>
-        </div>
-      )}
-
-      {/* Form Modal */}
-      {showForm && (
-        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.5)", display:"flex", alignItems:"flex-start", justifyContent:"center", zIndex:1000, overflowY:"auto", padding:"32px 16px" }}>
-          <div style={{ background:"#fff", borderRadius:16, width:"100%", maxWidth:640, padding:28, boxShadow:"0 20px 60px rgba(0,0,0,0.2)" }}>
-            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:22 }}>
-              <h2 style={{ fontSize:18, fontWeight:700, color:"#111827", margin:0 }}>{editing?"Edit Promo":"Tambah Promo Baru"}</h2>
-              <button onClick={()=>setShowForm(false)} style={{ background:"none", border:"none", cursor:"pointer", color:"#9CA3AF" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            </div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
-              <div style={{ gridColumn:"1/-1" }}>
-                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Judul Promo *</label>
-                <input value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="Misal: Diskon Merchandise 20%" style={inp}/>
-              </div>
-              <div style={{ gridColumn:"1/-1" }}>
-                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Subjudul</label>
-                <input value={form.subtitle} onChange={e=>setForm(f=>({...f,subtitle:e.target.value}))} placeholder="Promo Minggu Ini" style={inp}/>
-              </div>
-              <div style={{ gridColumn:"1/-1" }}>
-                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Deskripsi</label>
-                <textarea value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} rows={3} style={{ ...inp, resize:"vertical" }}/>
-              </div>
-              <div style={{ gridColumn:"1/-1" }}>
-                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>URL Gambar</label>
-                <input value={form.image} onChange={e=>setForm(f=>({...f,image:e.target.value}))} placeholder="https://..." style={inp}/>
-              </div>
-              <div>
-                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Jenis Promo</label>
-                <select value={form.type} onChange={e=>setForm(f=>({...f,type:e.target.value}))} style={inp}>
-                  {EDITOR_PROMO_TYPES.map(t=><option key={t.value} value={t.value}>{t.label}</option>)}
-                </select>
-              </div>
-              <div>
-                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Nilai Diskon</label>
-                <input type="number" value={form.discountValue} onChange={e=>setForm(f=>({...f,discountValue:e.target.value}))} placeholder="20" style={inp}/>
-              </div>
-              <div>
-                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Minimum Pembelian (Rp)</label>
-                <input type="number" value={form.minPurchase} onChange={e=>setForm(f=>({...f,minPurchase:e.target.value}))} placeholder="0" style={inp}/>
-              </div>
-              <div>
-                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Label Badge</label>
-                <select value={form.badgeLabel} onChange={e=>setForm(f=>({...f,badgeLabel:e.target.value}))} style={inp}>
-                  {EDITOR_PROMO_BADGES.map(b=><option key={b} value={b}>{b}</option>)}
-                </select>
-              </div>
-              <div>
-                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Tanggal Mulai</label>
-                <input type="date" value={form.startDate} onChange={e=>setForm(f=>({...f,startDate:e.target.value}))} style={inp}/>
-              </div>
-              <div>
-                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Tanggal Berakhir</label>
-                <input type="date" value={form.endDate} onChange={e=>setForm(f=>({...f,endDate:e.target.value}))} style={inp}/>
-              </div>
-              <div>
-                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Label CTA</label>
-                <input value={form.ctaLabel} onChange={e=>setForm(f=>({...f,ctaLabel:e.target.value}))} placeholder="Belanja Sekarang" style={inp}/>
-              </div>
-              <div>
-                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Link Produk</label>
-                <input value={form.productLink} onChange={e=>setForm(f=>({...f,productLink:e.target.value}))} placeholder="/produk" style={inp}/>
-              </div>
-              <div style={{ gridColumn:"1/-1", display:"flex", gap:16 }}>
-                {[
-                  { key:"active",   label:"Promo Aktif",             color:"#065F46", bg:"#D1FAE5" },
-                  { key:"featured", label:"Promo Unggulan (Featured)",color:"#7C3AED", bg:"#EDE9FE" },
-                ].map(({ key, label, color, bg }) => (
-                  <label key={key} style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer", padding:"10px 16px", background:form[key]?bg:"#F9FAFB", borderRadius:10, border:`1px solid ${form[key]?color+"40":"#E5E7EB"}`, flex:1 }}>
-                    <div onClick={()=>setForm(f=>({...f,[key]:!f[key]}))} style={{ width:38, height:22, borderRadius:11, background:form[key]?color:"#D1D5DB", position:"relative", transition:"background 0.2s", cursor:"pointer", flexShrink:0 }}>
-                      <div style={{ position:"absolute", top:3, left:form[key]?18:3, width:16, height:16, borderRadius:"50%", background:"#fff", transition:"left 0.2s", boxShadow:"0 1px 4px rgba(0,0,0,0.2)" }}/>
-                    </div>
-                    <span style={{ fontSize:13, fontWeight:600, color:form[key]?color:"#6B7280" }}>{label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-            <div style={{ display:"flex", justifyContent:"flex-end", gap:10, marginTop:22 }}>
-              <button onClick={()=>setShowForm(false)} style={{ padding:"10px 20px", borderRadius:8, border:"1px solid #E5E7EB", background:"#fff", color:"#374151", fontSize:14, cursor:"pointer", fontWeight:600 }}>Batal</button>
-              <button onClick={handleSave} disabled={saving} style={{ padding:"10px 22px", borderRadius:8, border:"none", background:saving?"#6B7280":"#1B3A2A", color:"#fff", fontSize:14, cursor:saving?"not-allowed":"pointer", fontWeight:700, display:"flex", alignItems:"center", gap:8 }}>
-                <IcoSave size={15}/> {saving?"Menyimpan...":"Simpan Promo"}
-              </button>
-            </div>
           </div>
         </div>
       )}
