@@ -44,6 +44,15 @@ import {
   MapPin,
   Ticket,
   Settings,
+  Gift,
+  Tag,
+  Percent,
+  Package,
+  Truck,
+  CreditCard,
+  ToggleLeft,
+  ToggleRight,
+  Star,
 } from "lucide-react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -155,6 +164,7 @@ const NAV = [
       )
     },
       { id: "tiket-online",    label: "Tiket Online",       Icon: Ticket },
+      { id: "promo",           label: "Manajemen Promo",    Icon: Gift },
     ],
   },
   {
@@ -342,7 +352,7 @@ function DeleteModal({ name, onConfirm, onCancel }) {
 /* ─────────────────────────────────────────────
    DASHBOARD VIEW
 ───────────────────────────────────────────── */
-function DashboardView({ articles, users, products, gallery, attractions, ticketsOnline, setActiveNav, currentUser }) {
+function DashboardView({ articles, users, products, gallery, attractions, ticketsOnline, promos = [], setActiveNav, currentUser }) {
   const published      = articles.filter(a => a.status === "published").length;
   const pending        = articles.filter(a => a.status === "pending").length;
   const totalViews     = articles.reduce((s, a) => s + (a.views || 0), 0);
@@ -352,6 +362,8 @@ function DashboardView({ articles, users, products, gallery, attractions, ticket
   const writerCount    = users.filter(u => u.role === "writer").length;
   const recentArts     = [...articles].sort((a,b)=>(b.date||"").localeCompare(a.date||"")).slice(0,5);
   const featuredTickets = (ticketsOnline||[]).filter(t => t.featured).length;
+  const activePromos    = promos.filter(p => p.active && (!p.endDate || new Date(p.endDate).getTime() > Date.now())).length;
+  const nearestPromo    = [...promos].filter(p => p.active && p.endDate && new Date(p.endDate).getTime() > Date.now()).sort((a,b)=>new Date(a.endDate)-new Date(b.endDate))[0];
 
   // Admin's own articles
   const myArticles  = articles.filter(a => a.authorUid === currentUser?.uid);
@@ -369,6 +381,7 @@ function DashboardView({ articles, users, products, gallery, attractions, ticket
     { label:"Total Pengguna", value:totalUsers,                   color:"#5B21B6", Icon:Users,       sub:`${writerCount}W · ${editorCount}E · ${adminCount}A`, nav:"manage-users" },
     { label:"Attractions",    value:(attractions||[]).length,     color:"#065F46", Icon:MapPin,      sub:"lokasi wisata aktif",                             nav:"attractions" },
     { label:"Tiket Online",   value:(ticketsOnline||[]).length,   color:"#B45309", Icon:Ticket,      sub:`${featuredTickets} unggulan`,                     nav:"tiket-online" },
+    { label:"Promo Aktif",    value:activePromos,                 color:"#7C3AED", Icon:Gift,        sub: nearestPromo ? `Terdekat: ${nearestPromo.endDate}` : "Kelola penawaran", nav:"promo" },
   ];
 
   return (
@@ -3345,6 +3358,341 @@ function MyArticlesAdminView({ articles, currentUser, setActiveNav }) {
 }
 
 /* ─────────────────────────────────────────────
+   PROMO MANAGEMENT VIEW
+───────────────────────────────────────────── */
+const PROMO_TYPES = [
+  { value:"discount_percent", label:"Diskon Persen" },
+  { value:"discount_fixed",   label:"Potongan Harga" },
+  { value:"cashback",         label:"Cashback" },
+  { value:"free_shipping",    label:"Gratis Ongkir" },
+  { value:"bundle",           label:"Bundle Promo" },
+];
+const BADGE_OPTIONS_PROMO = ["HOT","NEW","LIMITED","FLASH SALE","SPECIAL"];
+const PROMO_BLANK = {
+  title:"", subtitle:"", description:"", image:"",
+  type:"discount_percent", discountValue:"", minPurchase:"",
+  badgeLabel:"HOT", featured:false, active:true,
+  productLink:"/produk", ctaLabel:"Belanja Sekarang",
+  startDate:"", endDate:"",
+};
+
+function PromoTypeIcon({ type, size=15 }) {
+  const icons = {
+    discount_percent: <Percent size={size}/>,
+    discount_fixed:   <Tag size={size}/>,
+    bundle:           <Package size={size}/>,
+    free_shipping:    <Truck size={size}/>,
+    cashback:         <CreditCard size={size}/>,
+  };
+  return icons[type] || <Gift size={size}/>;
+}
+
+function PromoManagementView({ currentUser }) {
+  const [promos, setPromos]     = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing]   = useState(null); // firebaseId saat edit
+  const [form, setForm]         = useState(PROMO_BLANK);
+  const [saving, setSaving]     = useState(false);
+  const [deleteModal, setDeleteModal] = useState(null);
+  const [toast, showToast]      = useToast();
+
+  // Realtime listener
+  useEffect(() => {
+    const unsub = onValue(ref(db, "promos"), snap => {
+      const d = snap.val();
+      setPromos(d ? Object.entries(d).map(([id,v])=>({...v,firebaseId:id})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)) : []);
+      setLoading(false);
+    });
+    return () => unsub();
+  }, []);
+
+  const isExpired = p => p.endDate && new Date(p.endDate).getTime() < Date.now();
+
+  // Stats
+  const totalPromos    = promos.length;
+  const activeCount    = promos.filter(p => p.active && !isExpired(p)).length;
+  const featuredCount  = promos.filter(p => p.featured && p.active && !isExpired(p)).length;
+  const expiringSoon   = promos.filter(p => !isExpired(p) && p.endDate && new Date(p.endDate).getTime() - Date.now() < 7*86400000).length;
+
+  const openAdd = () => { setForm(PROMO_BLANK); setEditing(null); setShowForm(true); };
+  const openEdit = p => {
+    setForm({
+      title: p.title||"", subtitle: p.subtitle||"", description: p.description||"",
+      image: p.image||"", type: p.type||"discount_percent",
+      discountValue: p.discountValue||"", minPurchase: p.minPurchase||"",
+      badgeLabel: p.badgeLabel||"HOT", featured: !!p.featured, active: !!p.active,
+      productLink: p.productLink||"/produk", ctaLabel: p.ctaLabel||"Belanja Sekarang",
+      startDate: p.startDate||"", endDate: p.endDate||"",
+    });
+    setEditing(p.firebaseId);
+    setShowForm(true);
+  };
+
+  const handleSave = async () => {
+    if (!form.title.trim()) { showToast("✗ Judul promo wajib diisi."); return; }
+    setSaving(true);
+    try {
+      const data = {
+        ...form,
+        discountValue: Number(form.discountValue)||0,
+        minPurchase: Number(form.minPurchase)||0,
+        createdBy: currentUser?.displayName || "Admin",
+        updatedAt: Date.now(),
+      };
+      if (editing) {
+        await update(ref(db, `promos/${editing}`), data);
+        showToast("✓ Promo berhasil diperbarui.");
+      } else {
+        await push(ref(db, "promos"), { ...data, createdAt: Date.now() });
+        showToast("✓ Promo berhasil ditambahkan.");
+      }
+      setShowForm(false);
+    } catch (e) {
+      showToast("✗ Gagal menyimpan: " + e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleToggleActive = async (p) => {
+    await update(ref(db, `promos/${p.firebaseId}`), { active: !p.active });
+    showToast(`✓ Promo ${!p.active ? "diaktifkan" : "dinonaktifkan"}.`);
+  };
+  const handleToggleFeatured = async (p) => {
+    await update(ref(db, `promos/${p.firebaseId}`), { featured: !p.featured });
+    showToast(`✓ Promo ${!p.featured ? "dijadikan unggulan" : "dihapus dari unggulan"}.`);
+  };
+  const handleDelete = async () => {
+    await remove(ref(db, `promos/${deleteModal.firebaseId}`));
+    showToast("✓ Promo berhasil dihapus.");
+    setDeleteModal(null);
+  };
+
+  const inp = { width:"100%", padding:"9px 12px", borderRadius:8, border:"1px solid #D1D5DB", fontSize:14, boxSizing:"border-box", fontFamily:"inherit", outline:"none" };
+
+  return (
+    <div>
+      <Toast msg={toast} />
+      {deleteModal && (
+        <DeleteModal name={deleteModal.title} onConfirm={handleDelete} onCancel={()=>setDeleteModal(null)} />
+      )}
+
+      {/* Header */}
+      <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:24 }}>
+        <div>
+          <h1 style={{ fontSize:22, fontWeight:700, color:"#111827", margin:0 }}>Manajemen Promo</h1>
+          <p style={{ color:"#6B7280", fontSize:14, marginTop:4 }}>Kelola seluruh promo dan penawaran Edupark secara realtime.</p>
+        </div>
+        <button onClick={openAdd} style={{ display:"flex", alignItems:"center", gap:7, padding:"10px 18px", background:"#1B3A2A", color:"#fff", border:"none", borderRadius:9, fontSize:14, fontWeight:600, cursor:"pointer" }}>
+          <Plus size={15}/> Tambah Promo
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14, marginBottom:24 }}>
+        {[
+          { label:"Total Promo",           value:totalPromos,   color:"#1B3A2A", Icon:Gift },
+          { label:"Promo Aktif",           value:activeCount,   color:"#065F46", Icon:CheckCircle },
+          { label:"Featured Promo",        value:featuredCount, color:"#7C3AED", Icon:Star },
+          { label:"Berakhir Minggu Ini",   value:expiringSoon,  color:"#E65100", Icon:AlertCircle },
+        ].map(({ label, value, color, Icon }) => (
+          <div key={label} style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:12, padding:"16px 18px", display:"flex", alignItems:"center", gap:14 }}>
+            <div style={{ width:40, height:40, borderRadius:10, background:color+"15", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+              <Icon size={20} color={color}/>
+            </div>
+            <div>
+              <div style={{ fontSize:22, fontWeight:800, color, lineHeight:1 }}>{value}</div>
+              <div style={{ fontSize:12, color:"#6B7280", marginTop:3 }}>{label}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Table */}
+      {loading ? (
+        <div style={{ textAlign:"center", padding:"48px 0" }}>
+          <Loader size={28} color="#9CA3AF" style={{ animation:"spin 1s linear infinite" }}/>
+          <p style={{ color:"#6B7280", fontSize:14, marginTop:12 }}>Memuat data promo...</p>
+        </div>
+      ) : promos.length === 0 ? (
+        <div style={{ textAlign:"center", padding:"64px 0", background:"#fff", borderRadius:14, border:"1px solid #E5E7EB" }}>
+          <Gift size={48} color="#D1D5DB" style={{ display:"block", margin:"0 auto 12px" }}/>
+          <p style={{ color:"#9CA3AF", fontSize:15, fontWeight:600 }}>Belum ada promo</p>
+          <p style={{ color:"#9CA3AF", fontSize:13 }}>Klik "Tambah Promo" untuk memulai.</p>
+        </div>
+      ) : (
+        <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:14, overflow:"hidden" }}>
+          <div style={{ overflowX:"auto" }}>
+            <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
+              <thead>
+                <tr style={{ background:"#F9FAFB", borderBottom:"1px solid #E5E7EB" }}>
+                  {["Gambar","Judul Promo","Jenis","Diskon","Mulai","Berakhir","Status","Featured","Dibuat Oleh","Aksi"].map(h => (
+                    <th key={h} style={{ padding:"11px 14px", textAlign:"left", fontWeight:700, color:"#374151", fontSize:12, whiteSpace:"nowrap" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {promos.map((p, i) => {
+                  const expired = isExpired(p);
+                  return (
+                    <tr key={p.firebaseId} style={{ borderBottom: i < promos.length-1 ? "1px solid #F3F4F6" : "none", background: expired ? "#FFFBF5" : "#fff" }}>
+                      <td style={{ padding:"10px 14px" }}>
+                        <div style={{ width:44, height:44, borderRadius:8, overflow:"hidden", background:"#F3F4F6", flexShrink:0 }}>
+                          {p.image ? <img src={safeImg(p.image)} alt={p.title} style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center" }}><Gift size={18} color="#D1D5DB"/></div>}
+                        </div>
+                      </td>
+                      <td style={{ padding:"10px 14px", maxWidth:180 }}>
+                        <div style={{ fontWeight:700, color:"#111827", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.title}</div>
+                        {p.subtitle && <div style={{ fontSize:11, color:"#9CA3AF", marginTop:2 }}>{p.subtitle}</div>}
+                        {p.badgeLabel && <span style={{ fontSize:10, fontWeight:700, padding:"1px 6px", borderRadius:4, background:"#FEE2E2", color:"#DC2626", marginTop:3, display:"inline-block" }}>{p.badgeLabel}</span>}
+                      </td>
+                      <td style={{ padding:"10px 14px" }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:5, color:"#6B7280" }}>
+                          <PromoTypeIcon type={p.type}/>
+                          <span style={{ fontSize:12 }}>{PROMO_TYPES.find(t=>t.value===p.type)?.label||p.type}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding:"10px 14px", fontWeight:700, color:"#1B3A2A" }}>
+                        {p.type==="discount_percent"||p.type==="cashback" ? `${p.discountValue||0}%` : p.type==="discount_fixed" ? `Rp ${Number(p.discountValue||0).toLocaleString("id-ID")}` : "-"}
+                      </td>
+                      <td style={{ padding:"10px 14px", color:"#6B7280", fontSize:12 }}>{p.startDate||"-"}</td>
+                      <td style={{ padding:"10px 14px", color: expired?"#DC2626":"#6B7280", fontSize:12, fontWeight: expired?700:400 }}>{p.endDate||"-"}</td>
+                      <td style={{ padding:"10px 14px" }}>
+                        <button onClick={()=>handleToggleActive(p)} style={{ display:"flex", alignItems:"center", gap:5, padding:"4px 10px", borderRadius:20, border:"none", cursor:"pointer", fontSize:11, fontWeight:700, background: p.active&&!expired?"#D1FAE5":"#F3F4F6", color: p.active&&!expired?"#065F46":"#9CA3AF" }}>
+                          {p.active&&!expired ? <ToggleRight size={14}/> : <ToggleLeft size={14}/>}
+                          {expired ? "Expired" : p.active ? "Aktif" : "Nonaktif"}
+                        </button>
+                      </td>
+                      <td style={{ padding:"10px 14px" }}>
+                        <button onClick={()=>handleToggleFeatured(p)} style={{ display:"flex", alignItems:"center", gap:4, padding:"4px 10px", borderRadius:20, border:"none", cursor:"pointer", fontSize:11, fontWeight:700, background: p.featured?"#EDE9FE":"#F3F4F6", color: p.featured?"#7C3AED":"#9CA3AF" }}>
+                          <Star size={12}/> {p.featured?"Ya":"Tidak"}
+                        </button>
+                      </td>
+                      <td style={{ padding:"10px 14px", color:"#6B7280", fontSize:12 }}>{p.createdBy||"-"}</td>
+                      <td style={{ padding:"10px 14px" }}>
+                        <div style={{ display:"flex", gap:6 }}>
+                          <button onClick={()=>openEdit(p)} style={{ padding:"6px", background:"none", border:"1px solid #BFDBFE", borderRadius:6, cursor:"pointer", color:"#1E40AF", display:"flex" }}>
+                            <Pencil size={13}/>
+                          </button>
+                          <button onClick={()=>setDeleteModal(p)} style={{ padding:"6px", background:"none", border:"1px solid #FECACA", borderRadius:6, cursor:"pointer", color:"#DC2626", display:"flex" }}>
+                            <Trash2 size={13}/>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Form Modal */}
+      {showForm && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.5)", display:"flex", alignItems:"flex-start", justifyContent:"center", zIndex:1000, overflowY:"auto", padding:"32px 16px" }}>
+          <div style={{ background:"#fff", borderRadius:16, width:"100%", maxWidth:640, padding:28, boxShadow:"0 20px 60px rgba(0,0,0,0.2)" }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:22 }}>
+              <h2 style={{ fontSize:18, fontWeight:700, color:"#111827", margin:0 }}>{editing ? "Edit Promo" : "Tambah Promo Baru"}</h2>
+              <button onClick={()=>setShowForm(false)} style={{ background:"none", border:"none", cursor:"pointer", color:"#9CA3AF" }}><X size={20}/></button>
+            </div>
+
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
+              {/* Judul */}
+              <div style={{ gridColumn:"1/-1" }}>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Judul Promo *</label>
+                <input value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="Misal: Diskon Merchandise 20%" style={inp}/>
+              </div>
+              {/* Subjudul */}
+              <div style={{ gridColumn:"1/-1" }}>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Subjudul Promo</label>
+                <input value={form.subtitle} onChange={e=>setForm(f=>({...f,subtitle:e.target.value}))} placeholder="Misal: Promo Minggu Ini" style={inp}/>
+              </div>
+              {/* Deskripsi */}
+              <div style={{ gridColumn:"1/-1" }}>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Deskripsi Promo</label>
+                <textarea value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} placeholder="Deskripsi singkat promo..." rows={3} style={{ ...inp, resize:"vertical" }}/>
+              </div>
+              {/* URL Gambar */}
+              <div style={{ gridColumn:"1/-1" }}>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>URL Gambar Promo</label>
+                <input value={form.image} onChange={e=>setForm(f=>({...f,image:e.target.value}))} placeholder="https://..." style={inp}/>
+              </div>
+              {/* Jenis Promo */}
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Jenis Promo</label>
+                <select value={form.type} onChange={e=>setForm(f=>({...f,type:e.target.value}))} style={{ ...inp }}>
+                  {PROMO_TYPES.map(t=><option key={t.value} value={t.value}>{t.label}</option>)}
+                </select>
+              </div>
+              {/* Nilai Diskon */}
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Nilai Diskon</label>
+                <input type="number" value={form.discountValue} onChange={e=>setForm(f=>({...f,discountValue:e.target.value}))} placeholder="Misal: 20" style={inp}/>
+              </div>
+              {/* Min Pembelian */}
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Minimum Pembelian (Rp)</label>
+                <input type="number" value={form.minPurchase} onChange={e=>setForm(f=>({...f,minPurchase:e.target.value}))} placeholder="0 = tidak ada minimum" style={inp}/>
+              </div>
+              {/* Badge */}
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Label Badge</label>
+                <select value={form.badgeLabel} onChange={e=>setForm(f=>({...f,badgeLabel:e.target.value}))} style={inp}>
+                  {BADGE_OPTIONS_PROMO.map(b=><option key={b} value={b}>{b}</option>)}
+                </select>
+              </div>
+              {/* Tanggal Mulai */}
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Tanggal Mulai</label>
+                <input type="date" value={form.startDate} onChange={e=>setForm(f=>({...f,startDate:e.target.value}))} style={inp}/>
+              </div>
+              {/* Tanggal Berakhir */}
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Tanggal Berakhir</label>
+                <input type="date" value={form.endDate} onChange={e=>setForm(f=>({...f,endDate:e.target.value}))} style={inp}/>
+              </div>
+              {/* CTA Label */}
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Label Tombol CTA</label>
+                <input value={form.ctaLabel} onChange={e=>setForm(f=>({...f,ctaLabel:e.target.value}))} placeholder="Belanja Sekarang" style={inp}/>
+              </div>
+              {/* Product Link */}
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Link Produk</label>
+                <input value={form.productLink} onChange={e=>setForm(f=>({...f,productLink:e.target.value}))} placeholder="/produk" style={inp}/>
+              </div>
+              {/* Switches */}
+              <div style={{ gridColumn:"1/-1", display:"flex", gap:24 }}>
+                {[
+                  { key:"active",   label:"Promo Aktif",            color:"#065F46", bg:"#D1FAE5" },
+                  { key:"featured", label:"Promo Unggulan (Featured)", color:"#7C3AED", bg:"#EDE9FE" },
+                ].map(({ key, label, color, bg }) => (
+                  <label key={key} style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer", padding:"10px 16px", background: form[key] ? bg : "#F9FAFB", borderRadius:10, border:`1px solid ${form[key] ? color+"40":"#E5E7EB"}`, flex:1 }}>
+                    <div onClick={()=>setForm(f=>({...f,[key]:!f[key]}))} style={{ width:38, height:22, borderRadius:11, background: form[key] ? color : "#D1D5DB", position:"relative", transition:"background 0.2s", cursor:"pointer", flexShrink:0 }}>
+                      <div style={{ position:"absolute", top:3, left: form[key]?18:3, width:16, height:16, borderRadius:"50%", background:"#fff", transition:"left 0.2s", boxShadow:"0 1px 4px rgba(0,0,0,0.2)" }}/>
+                    </div>
+                    <span style={{ fontSize:13, fontWeight:600, color: form[key] ? color : "#6B7280" }}>{label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display:"flex", justifyContent:"flex-end", gap:10, marginTop:22 }}>
+              <button onClick={()=>setShowForm(false)} style={{ padding:"10px 20px", borderRadius:8, border:"1px solid #E5E7EB", background:"#fff", color:"#374151", fontSize:14, cursor:"pointer", fontWeight:600 }}>Batal</button>
+              <button onClick={handleSave} disabled={saving} style={{ padding:"10px 22px", borderRadius:8, border:"none", background: saving?"#6B7280":"#1B3A2A", color:"#fff", fontSize:14, cursor: saving?"not-allowed":"pointer", fontWeight:700, display:"flex", alignItems:"center", gap:8 }}>
+                <Save size={15}/> {saving ? "Menyimpan..." : "Simpan Promo"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
    ADMIN SETTINGS VIEW
 ───────────────────────────────────────────── */
 function AdminSettingsView({ currentUser, onLogout }) {
@@ -3447,6 +3795,7 @@ export default function AdminDashboard() {
   const [gallery,       setGallery]       = useState([]);
   const [attractions,   setAttractions]   = useState([]);
   const [ticketsOnline, setTicketsOnline] = useState([]);
+  const [promos,        setPromos]        = useState([]);
 
   /* ── Auto-create/update user entry in /users ──
      CATATAN: Pembuatan user baru & sinkronisasi role kini ditangani sepenuhnya
@@ -3483,8 +3832,12 @@ export default function AdminDashboard() {
       const d = snap.val();
       setTicketsOnline(d ? Object.entries(d).map(([id,v])=>({...v, firebaseId:id})) : []);
     });
+    const unsubPromo = onValue(ref(db, "promos"), snap => {
+      const d = snap.val();
+      setPromos(d ? Object.entries(d).map(([id,v])=>({...v, firebaseId:id})) : []);
+    });
 
-    return () => { unsubA(); unsubU(); unsubP(); unsubG(); unsubAtt(); unsubTick(); };
+    return () => { unsubA(); unsubU(); unsubP(); unsubG(); unsubAtt(); unsubTick(); unsubPromo(); };
   }, [user]);
 
   const handleLogout = async () => { await logout(); };
@@ -3495,7 +3848,7 @@ export default function AdminDashboard() {
   const renderContent = () => {
     switch (activeNav) {
       case "dashboard":
-        return <DashboardView articles={articles} users={users} products={products} gallery={gallery} attractions={attractions} ticketsOnline={ticketsOnline} setActiveNav={setActiveNav} currentUser={user} />;
+        return <DashboardView articles={articles} users={users} products={products} gallery={gallery} attractions={attractions} ticketsOnline={ticketsOnline} promos={promos} setActiveNav={setActiveNav} currentUser={user} />;
       case "create-article":
         return <CreateArticleView currentUser={user} onDone={() => setActiveNav("my-articles")} />;
       case "my-articles":
@@ -3514,6 +3867,8 @@ export default function AdminDashboard() {
         return <AttractionsView />;
       case "tiket-online":
         return <TicketsOnlineAdminView />;
+      case "promo":
+        return <PromoManagementView currentUser={user} />;
       case "writer-directory":
         return <WriterDirectoryView articles={articles} users={users} />;
       case "manage-users":

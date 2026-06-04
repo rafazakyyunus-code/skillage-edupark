@@ -34,6 +34,8 @@ import ETicket from "./pages/Etiket/ETicket";
 import Attractions from "./pages/Etiket/Attractions";
 import TicketsOnline from "./pages/Etiket/TicketsOnline";
 
+/* ───────── Promo ───────── */
+import Promo from "./pages/promo/Promo";
 
 /* ───────── DASHBOARD ───────── */
 import CreateArticle from "./pages/dashboard/CreateArticle";
@@ -197,14 +199,22 @@ function AppInner() {
             }
           />
 
-          <Route
-  path="/tickets-online"
-  element={
-    <AnimatedPage>
-      <TicketsOnline />
-    </AnimatedPage>
-  }
-/>
+                  <Route
+          path="/tickets-online"
+          element={
+            <AnimatedPage>
+              <TicketsOnline />
+            </AnimatedPage>
+          }
+        />
+                  <Route
+          path="/promo"
+          element={
+            <AnimatedPage>
+              <Promo />
+            </AnimatedPage>
+          }
+        />
 
 
           <Route

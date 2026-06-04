@@ -120,14 +120,29 @@ const IcoPlus     = ({ size=16, color="currentColor" }) => <Ico size={size} colo
 const IcoDoc      = ({ size=22, color="#9CA3AF" }) => <Ico size={size} color={color} d={<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></>} />;
 const IcoLeaf     = ({ size=40, color="#9CA3AF" }) => <Ico size={size} color={color} d={<path d="M2 22 A10 10 0 0 1 12 12 A10 10 0 0 1 22 2 A10 10 0 0 1 12 12 A10 10 0 0 1 2 22Z"/>} />;
 
+function PromoIcon({ active }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+      stroke={active ? "#fff" : "rgba(255,255,255,0.6)"} strokeWidth="2"
+      strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 12 20 22 4 22 4 12"/>
+      <rect x="2" y="7" width="20" height="5"/>
+      <line x1="12" y1="22" x2="12" y2="7"/>
+      <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+      <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+    </svg>
+  );
+}
+
 const NAV_ITEMS = [
-  { id: "dashboard",   label: "Dashboard",        Icon: DashboardIcon },
-  { id: "review",      label: "Review Articles",  Icon: ReviewIcon },
-  { id: "writers",     label: "Writer Directory", Icon: WritersIcon },
-  { id: "produk",      label: "Produk",            Icon: ProdukIcon },
-  { id: "gallery",     label: "Gallery",           Icon: GalleryIcon },
+  { id: "dashboard",    label: "Dashboard",        Icon: DashboardIcon },
+  { id: "review",       label: "Review Articles",  Icon: ReviewIcon },
+  { id: "writers",      label: "Writer Directory", Icon: WritersIcon },
+  { id: "produk",       label: "Produk",            Icon: ProdukIcon },
+  { id: "gallery",      label: "Gallery",           Icon: GalleryIcon },
   { id: "attractions",  label: "Attractions",       Icon: AttractionsIcon },
   { id: "ticketonline", label: "Tiket Online",      Icon: TicketsOnlineIcon },
+  { id: "promo",        label: "Manajemen Promo",   Icon: PromoIcon },
 ];
 
 /* ─────────────────────────────────────────────
@@ -2797,6 +2812,285 @@ function WriterDirectoryView({ articles }) {
 /* ─────────────────────────────────────────────
    MAIN EDITOR PORTAL
 ───────────────────────────────────────────── */
+/* ─────────────────────────────────────────────
+   PROMO MANAGEMENT VIEW (EDITOR)
+───────────────────────────────────────────── */
+const EDITOR_PROMO_TYPES = [
+  { value:"discount_percent", label:"Diskon Persen" },
+  { value:"discount_fixed",   label:"Potongan Harga" },
+  { value:"cashback",         label:"Cashback" },
+  { value:"free_shipping",    label:"Gratis Ongkir" },
+  { value:"bundle",           label:"Bundle Promo" },
+];
+const EDITOR_PROMO_BADGES = ["HOT","NEW","LIMITED","FLASH SALE","SPECIAL"];
+const PROMO_BLANK_ED = {
+  title:"", subtitle:"", description:"", image:"",
+  type:"discount_percent", discountValue:"", minPurchase:"",
+  badgeLabel:"HOT", featured:false, active:true,
+  productLink:"/produk", ctaLabel:"Belanja Sekarang",
+  startDate:"", endDate:"",
+};
+
+function EditorPromoManagementView({ currentUser }) {
+  const db2 = getDatabase();
+  const [promos, setPromos]       = useState([]);
+  const [loading, setLoading]     = useState(true);
+  const [showForm, setShowForm]   = useState(false);
+  const [editing, setEditing]     = useState(null);
+  const [form, setForm]           = useState(PROMO_BLANK_ED);
+  const [saving, setSaving]       = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [toastMsg, setToastMsg]   = useState("");
+
+  const showToast = m => { setToastMsg(m); setTimeout(()=>setToastMsg(""), 3000); };
+
+  useEffect(() => {
+    const unsub = onValue(ref(db2, "promos"), snap => {
+      const d = snap.val();
+      setPromos(d ? Object.entries(d).map(([id,v])=>({...v,firebaseId:id})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)) : []);
+      setLoading(false);
+    });
+    return () => unsub();
+  }, []);
+
+  const isExpired = p => p.endDate && new Date(p.endDate).getTime() < Date.now();
+  const activeCount   = promos.filter(p=>p.active&&!isExpired(p)).length;
+  const featuredCount = promos.filter(p=>p.featured&&p.active&&!isExpired(p)).length;
+  const expiringSoon  = promos.filter(p=>!isExpired(p)&&p.endDate&&new Date(p.endDate).getTime()-Date.now()<7*86400000).length;
+
+  const openAdd  = () => { setForm(PROMO_BLANK_ED); setEditing(null); setShowForm(true); };
+  const openEdit = p => {
+    setForm({ title:p.title||"", subtitle:p.subtitle||"", description:p.description||"", image:p.image||"", type:p.type||"discount_percent", discountValue:p.discountValue||"", minPurchase:p.minPurchase||"", badgeLabel:p.badgeLabel||"HOT", featured:!!p.featured, active:!!p.active, productLink:p.productLink||"/produk", ctaLabel:p.ctaLabel||"Belanja Sekarang", startDate:p.startDate||"", endDate:p.endDate||"" });
+    setEditing(p.firebaseId); setShowForm(true);
+  };
+
+  const handleSave = async () => {
+    if (!form.title.trim()) { showToast("✗ Judul promo wajib diisi."); return; }
+    setSaving(true);
+    try {
+      const data = { ...form, discountValue:Number(form.discountValue)||0, minPurchase:Number(form.minPurchase)||0, createdBy: currentUser?.displayName||"Editor", updatedAt:Date.now() };
+      if (editing) { await update(ref(db2,`promos/${editing}`), data); showToast("✓ Promo diperbarui."); }
+      else { await push(ref(db2,"promos"), {...data,createdAt:Date.now()}); showToast("✓ Promo ditambahkan."); }
+      setShowForm(false);
+    } catch(e) { showToast("✗ Gagal: "+e.message); }
+    finally { setSaving(false); }
+  };
+
+  const handleToggleActive   = async p => { await update(ref(db2,`promos/${p.firebaseId}`),{active:!p.active}); showToast(`✓ Promo ${!p.active?"diaktifkan":"dinonaktifkan"}.`); };
+  const handleToggleFeatured = async p => { await update(ref(db2,`promos/${p.firebaseId}`),{featured:!p.featured}); showToast(`✓ Featured ${!p.featured?"diaktifkan":"dinonaktifkan"}.`); };
+  const handleDelete = async () => { await remove(ref(db2,`promos/${deleteTarget.firebaseId}`)); showToast("✓ Promo dihapus."); setDeleteTarget(null); };
+
+  const inp = { width:"100%", padding:"9px 12px", borderRadius:8, border:"1px solid #D1D5DB", fontSize:14, boxSizing:"border-box", fontFamily:"inherit", outline:"none" };
+  const isErr = toastMsg.startsWith("✗");
+
+  return (
+    <div>
+      {/* Toast */}
+      {toastMsg && (
+        <div style={{ position:"fixed", top:24, right:24, zIndex:9999, padding:"12px 20px", borderRadius:10, fontSize:14, fontWeight:600, background:isErr?"#DC2626":"#1B3A2A", color:"#fff", boxShadow:"0 4px 20px rgba(0,0,0,0.2)", display:"flex", alignItems:"center", gap:8 }}>
+          {isErr
+            ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>}
+          {toastMsg.replace(/^[✓✗]\s*/,"")}
+        </div>
+      )}
+
+      {/* Delete confirm */}
+      {deleteTarget && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.45)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1000 }}>
+          <div style={{ background:"#fff", padding:28, borderRadius:14, width:340, textAlign:"center" }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2" style={{ display:"block", margin:"0 auto 10px" }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <h3 style={{ margin:"0 0 8px", color:"#111827", fontSize:17, fontWeight:700 }}>Konfirmasi Hapus</h3>
+            <p style={{ color:"#6B7280", fontSize:13, marginBottom:20 }}><strong>"{deleteTarget.title}"</strong> akan dihapus permanen.</p>
+            <div style={{ display:"flex", gap:10, justifyContent:"center" }}>
+              <button onClick={()=>setDeleteTarget(null)} style={{ padding:"9px 20px", borderRadius:8, border:"1px solid #E5E7EB", background:"#fff", color:"#374151", fontSize:14, cursor:"pointer", fontWeight:600 }}>Batal</button>
+              <button onClick={handleDelete} style={{ padding:"9px 20px", borderRadius:8, border:"none", background:"#DC2626", color:"#fff", fontSize:14, cursor:"pointer", fontWeight:700 }}>Ya, Hapus</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:24 }}>
+        <div>
+          <h1 style={{ fontSize:22, fontWeight:700, color:"#111827", margin:0 }}>Manajemen Promo</h1>
+          <p style={{ color:"#6B7280", fontSize:14, marginTop:4 }}>Kelola seluruh promo dan penawaran Edupark secara realtime.</p>
+        </div>
+        <button onClick={openAdd} style={{ display:"flex", alignItems:"center", gap:7, padding:"10px 18px", background:"#1B3A2A", color:"#fff", border:"none", borderRadius:9, fontSize:14, fontWeight:600, cursor:"pointer" }}>
+          <IcoPlus size={15}/> Tambah Promo
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14, marginBottom:24 }}>
+        {[
+          { label:"Total Promo",         value:promos.length, color:"#1B3A2A" },
+          { label:"Promo Aktif",         value:activeCount,   color:"#065F46" },
+          { label:"Featured Promo",      value:featuredCount, color:"#7C3AED" },
+          { label:"Berakhir Minggu Ini", value:expiringSoon,  color:"#E65100" },
+        ].map(({ label, value, color }) => (
+          <div key={label} style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:12, padding:"16px 18px" }}>
+            <div style={{ fontSize:26, fontWeight:800, color, lineHeight:1, marginBottom:4 }}>{value}</div>
+            <div style={{ fontSize:12, color:"#6B7280" }}>{label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Table */}
+      {loading ? (
+        <div style={{ textAlign:"center", padding:"48px 0" }}><IcoLoader/><p style={{ color:"#6B7280", fontSize:14, marginTop:12 }}>Memuat promo...</p></div>
+      ) : promos.length === 0 ? (
+        <div style={{ textAlign:"center", padding:"64px 0", background:"#fff", borderRadius:14, border:"1px solid #E5E7EB" }}>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="1.5" style={{ display:"block", margin:"0 auto 12px" }}><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          <p style={{ color:"#9CA3AF", fontSize:15, fontWeight:600 }}>Belum ada promo</p>
+        </div>
+      ) : (
+        <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:14, overflow:"hidden" }}>
+          <div style={{ overflowX:"auto" }}>
+            <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
+              <thead>
+                <tr style={{ background:"#F9FAFB", borderBottom:"1px solid #E5E7EB" }}>
+                  {["Gambar","Judul Promo","Jenis","Diskon","Mulai","Berakhir","Status","Featured","Dibuat Oleh","Aksi"].map(h=>(
+                    <th key={h} style={{ padding:"11px 14px", textAlign:"left", fontWeight:700, color:"#374151", fontSize:12, whiteSpace:"nowrap" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {promos.map((p,i)=>{
+                  const expired = isExpired(p);
+                  return (
+                    <tr key={p.firebaseId} style={{ borderBottom:i<promos.length-1?"1px solid #F3F4F6":"none", background:expired?"#FFFBF5":"#fff" }}>
+                      <td style={{ padding:"10px 14px" }}>
+                        <div style={{ width:44, height:44, borderRadius:8, overflow:"hidden", background:"#F3F4F6" }}>
+                          {p.image ? <img src={p.image.replace(/^http:\/\//i,"https://")} alt={p.title} style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center" }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/></svg></div>}
+                        </div>
+                      </td>
+                      <td style={{ padding:"10px 14px", maxWidth:160 }}>
+                        <div style={{ fontWeight:700, color:"#111827", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.title}</div>
+                        {p.badgeLabel && <span style={{ fontSize:10, fontWeight:700, padding:"1px 6px", borderRadius:4, background:"#FEE2E2", color:"#DC2626", display:"inline-block", marginTop:3 }}>{p.badgeLabel}</span>}
+                      </td>
+                      <td style={{ padding:"10px 14px", color:"#6B7280", fontSize:12 }}>{EDITOR_PROMO_TYPES.find(t=>t.value===p.type)?.label||p.type}</td>
+                      <td style={{ padding:"10px 14px", fontWeight:700, color:"#1B3A2A" }}>
+                        {p.type==="discount_percent"||p.type==="cashback"?`${p.discountValue||0}%`:p.type==="discount_fixed"?`Rp ${Number(p.discountValue||0).toLocaleString("id-ID")}`:"-"}
+                      </td>
+                      <td style={{ padding:"10px 14px", color:"#6B7280", fontSize:12 }}>{p.startDate||"-"}</td>
+                      <td style={{ padding:"10px 14px", color:expired?"#DC2626":"#6B7280", fontSize:12, fontWeight:expired?700:400 }}>{p.endDate||"-"}</td>
+                      <td style={{ padding:"10px 14px" }}>
+                        <button onClick={()=>handleToggleActive(p)} style={{ padding:"4px 10px", borderRadius:20, border:"none", cursor:"pointer", fontSize:11, fontWeight:700, background:p.active&&!expired?"#D1FAE5":"#F3F4F6", color:p.active&&!expired?"#065F46":"#9CA3AF" }}>
+                          {expired?"Expired":p.active?"Aktif":"Nonaktif"}
+                        </button>
+                      </td>
+                      <td style={{ padding:"10px 14px" }}>
+                        <button onClick={()=>handleToggleFeatured(p)} style={{ padding:"4px 10px", borderRadius:20, border:"none", cursor:"pointer", fontSize:11, fontWeight:700, background:p.featured?"#EDE9FE":"#F3F4F6", color:p.featured?"#7C3AED":"#9CA3AF" }}>
+                          {p.featured?"Ya":"Tidak"}
+                        </button>
+                      </td>
+                      <td style={{ padding:"10px 14px", color:"#6B7280", fontSize:12 }}>{p.createdBy||"-"}</td>
+                      <td style={{ padding:"10px 14px" }}>
+                        <div style={{ display:"flex", gap:6 }}>
+                          <button onClick={()=>openEdit(p)} style={{ padding:"6px", background:"none", border:"1px solid #BFDBFE", borderRadius:6, cursor:"pointer", color:"#1E40AF", display:"flex" }}><IcoEdit size={13}/></button>
+                          <button onClick={()=>setDeleteTarget(p)} style={{ padding:"6px", background:"none", border:"1px solid #FECACA", borderRadius:6, cursor:"pointer", color:"#DC2626", display:"flex" }}><IcoTrash size={13}/></button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Form Modal */}
+      {showForm && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.5)", display:"flex", alignItems:"flex-start", justifyContent:"center", zIndex:1000, overflowY:"auto", padding:"32px 16px" }}>
+          <div style={{ background:"#fff", borderRadius:16, width:"100%", maxWidth:640, padding:28, boxShadow:"0 20px 60px rgba(0,0,0,0.2)" }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:22 }}>
+              <h2 style={{ fontSize:18, fontWeight:700, color:"#111827", margin:0 }}>{editing?"Edit Promo":"Tambah Promo Baru"}</h2>
+              <button onClick={()=>setShowForm(false)} style={{ background:"none", border:"none", cursor:"pointer", color:"#9CA3AF" }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
+              <div style={{ gridColumn:"1/-1" }}>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Judul Promo *</label>
+                <input value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="Misal: Diskon Merchandise 20%" style={inp}/>
+              </div>
+              <div style={{ gridColumn:"1/-1" }}>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Subjudul</label>
+                <input value={form.subtitle} onChange={e=>setForm(f=>({...f,subtitle:e.target.value}))} placeholder="Promo Minggu Ini" style={inp}/>
+              </div>
+              <div style={{ gridColumn:"1/-1" }}>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Deskripsi</label>
+                <textarea value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} rows={3} style={{ ...inp, resize:"vertical" }}/>
+              </div>
+              <div style={{ gridColumn:"1/-1" }}>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>URL Gambar</label>
+                <input value={form.image} onChange={e=>setForm(f=>({...f,image:e.target.value}))} placeholder="https://..." style={inp}/>
+              </div>
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Jenis Promo</label>
+                <select value={form.type} onChange={e=>setForm(f=>({...f,type:e.target.value}))} style={inp}>
+                  {EDITOR_PROMO_TYPES.map(t=><option key={t.value} value={t.value}>{t.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Nilai Diskon</label>
+                <input type="number" value={form.discountValue} onChange={e=>setForm(f=>({...f,discountValue:e.target.value}))} placeholder="20" style={inp}/>
+              </div>
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Minimum Pembelian (Rp)</label>
+                <input type="number" value={form.minPurchase} onChange={e=>setForm(f=>({...f,minPurchase:e.target.value}))} placeholder="0" style={inp}/>
+              </div>
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Label Badge</label>
+                <select value={form.badgeLabel} onChange={e=>setForm(f=>({...f,badgeLabel:e.target.value}))} style={inp}>
+                  {EDITOR_PROMO_BADGES.map(b=><option key={b} value={b}>{b}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Tanggal Mulai</label>
+                <input type="date" value={form.startDate} onChange={e=>setForm(f=>({...f,startDate:e.target.value}))} style={inp}/>
+              </div>
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Tanggal Berakhir</label>
+                <input type="date" value={form.endDate} onChange={e=>setForm(f=>({...f,endDate:e.target.value}))} style={inp}/>
+              </div>
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Label CTA</label>
+                <input value={form.ctaLabel} onChange={e=>setForm(f=>({...f,ctaLabel:e.target.value}))} placeholder="Belanja Sekarang" style={inp}/>
+              </div>
+              <div>
+                <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#374151", marginBottom:5 }}>Link Produk</label>
+                <input value={form.productLink} onChange={e=>setForm(f=>({...f,productLink:e.target.value}))} placeholder="/produk" style={inp}/>
+              </div>
+              <div style={{ gridColumn:"1/-1", display:"flex", gap:16 }}>
+                {[
+                  { key:"active",   label:"Promo Aktif",             color:"#065F46", bg:"#D1FAE5" },
+                  { key:"featured", label:"Promo Unggulan (Featured)",color:"#7C3AED", bg:"#EDE9FE" },
+                ].map(({ key, label, color, bg }) => (
+                  <label key={key} style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer", padding:"10px 16px", background:form[key]?bg:"#F9FAFB", borderRadius:10, border:`1px solid ${form[key]?color+"40":"#E5E7EB"}`, flex:1 }}>
+                    <div onClick={()=>setForm(f=>({...f,[key]:!f[key]}))} style={{ width:38, height:22, borderRadius:11, background:form[key]?color:"#D1D5DB", position:"relative", transition:"background 0.2s", cursor:"pointer", flexShrink:0 }}>
+                      <div style={{ position:"absolute", top:3, left:form[key]?18:3, width:16, height:16, borderRadius:"50%", background:"#fff", transition:"left 0.2s", boxShadow:"0 1px 4px rgba(0,0,0,0.2)" }}/>
+                    </div>
+                    <span style={{ fontSize:13, fontWeight:600, color:form[key]?color:"#6B7280" }}>{label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div style={{ display:"flex", justifyContent:"flex-end", gap:10, marginTop:22 }}>
+              <button onClick={()=>setShowForm(false)} style={{ padding:"10px 20px", borderRadius:8, border:"1px solid #E5E7EB", background:"#fff", color:"#374151", fontSize:14, cursor:"pointer", fontWeight:600 }}>Batal</button>
+              <button onClick={handleSave} disabled={saving} style={{ padding:"10px 22px", borderRadius:8, border:"none", background:saving?"#6B7280":"#1B3A2A", color:"#fff", fontSize:14, cursor:saving?"not-allowed":"pointer", fontWeight:700, display:"flex", alignItems:"center", gap:8 }}>
+                <IcoSave size={15}/> {saving?"Menyimpan...":"Simpan Promo"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function EditorPortal({ externalArticles = [], onUpdateStatus, currentUser }) {
   const [activeNav, setActiveNav]         = useState("dashboard");
   const [selectedArticle, setSelectedArticle] = useState(null);
@@ -2832,6 +3126,7 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
   const [galleryList, setGalleryList]         = useState([]);
   const [attractionsList, setAttractionsList] = useState([]);
   const [ticketsList, setTicketsList]         = useState([]);
+  const [promoList, setPromoList]             = useState([]);
   useEffect(() => {
     const db = getDatabase();
     const unsubP = onValue(ref(db, "produk"), snap => {
@@ -2850,7 +3145,11 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
       const d = snap.val();
       setTicketsList(d ? Object.entries(d).map(([k,v])=>({...v, firebaseId:k})) : []);
     });
-    return () => { unsubP(); unsubG(); unsubA(); unsubT(); };
+    const unsubPr = onValue(ref(db, "promos"), snap => {
+      const d = snap.val();
+      setPromoList(d ? Object.entries(d).map(([k,v])=>({...v, firebaseId:k})) : []);
+    });
+    return () => { unsubP(); unsubG(); unsubA(); unsubT(); unsubPr(); };
   }, []);
 
   const articles  = externalArticles;
@@ -2901,6 +3200,7 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
                         : id === "gallery" ? galleryList.length
                         : id === "attractions" ? attractionsList.length
                         : id === "ticketonline" ? ticketsList.length
+                        : id === "promo" ? promoList.filter(p=>p.active&&(!p.endDate||new Date(p.endDate).getTime()>Date.now())).length
                         : id === "writers" ? [...new Set(articles.map(a=>a.author))].length
                         : null;
             return (
@@ -3024,7 +3324,7 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
             {/* ── ROW 2: 5 module stat cards ── */}
             <div style={{
               display:"grid",
-              gridTemplateColumns:"repeat(5,1fr)",
+              gridTemplateColumns:"repeat(6,1fr)",
               gap:14,
               marginBottom:18
             }}>
@@ -3069,6 +3369,13 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
                     </svg>
                   )
                 },  
+                {
+                  label:"Promo Aktif",
+                  val: promoList.filter(p=>p.active&&(!p.endDate||new Date(p.endDate).getTime()>Date.now())).length,
+                  sub: (() => { const n=promoList.filter(p=>p.active&&p.endDate&&new Date(p.endDate).getTime()-Date.now()<7*86400000&&new Date(p.endDate).getTime()>Date.now()).length; return n>0?`${n} berakhir minggu ini`:"kelola penawaran"; })(),
+                  valColor:"#7C3AED", bg:"#F5F3FF", border:"#DDD6FE", onClick:()=>setActiveNav("promo"),
+                  icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                },
                 { label:"Total Penulis", val:uniqueWriters.length, sub:`${articles.length} total artikel ditulis`, valColor:"#BE185D", bg:"#FDF2F8", border:"#FBCFE8", onClick:()=>setActiveNav("writers"),
                   icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#BE185D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
               ].map(s=>(
@@ -3345,6 +3652,9 @@ export default function EditorPortal({ externalArticles = [], onUpdateStatus, cu
 
         {/* TICKETS ONLINE */}
         {activeNav === "ticketonline" && <TicketsOnlineView />}
+
+        {/* PROMO */}
+        {activeNav === "promo" && <EditorPromoManagementView currentUser={currentUser} />}
 
         {/* SETTINGS */}
         {activeNav === "settings" && <EditorSettingsView onLogout={handleLogout} onNameChange={setProfileName} />}
