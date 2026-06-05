@@ -31,10 +31,10 @@ export default function Footer() {
           </p>
 
           <div className="social-icons">
-            <a href="#"><FaWhatsapp /></a>
-            <a href="#"><FaInstagram /></a>
-            <a href="#"><FaFacebook /></a>
-            <a href="#"><FaTiktok /></a>
+            <a href="https://wa.me/6285219801259?text=Assalamualaikum%20saya%20ingin%20bertanya%20tentang%20Skillage%20Edupark"><FaWhatsapp /></a>
+            <a href="https://www.instagram.com/skillageislamicschool/"><FaInstagram /></a>
+            <a href="https://www.facebook.com/profile.php?id=61550884861070"><FaFacebook /></a>
+            <a href="https://www.tiktok.com/@skillageislamicschool?is_from_webapp=1&sender_device=pc"><FaTiktok /></a>
           </div>
         </div>
 
