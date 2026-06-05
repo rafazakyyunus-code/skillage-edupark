@@ -509,81 +509,53 @@
    RESPONSIVE — Mobile (≤ 768px)
    ========================================================================== */
 @media (max-width: 768px) {
+
   .program-page .program-hero {
-    height: 460px;
-    border-bottom-left-radius: 24px;
-    border-bottom-right-radius: 24px;
+    min-height: 85vh;
+    height: auto;
+    padding: 100px 0 60px;
+    border-radius: 0;
+    background-position: center center !important;
+    background-size: cover !important;
+  }
+
+  .hero-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(0,0,0,.20) 0%,
+      rgba(0,0,0,.45) 50%,
+      rgba(0,0,0,.65) 100%
+    );
+  }
+
+  .program-page .hero-content {
+    padding: 0 24px;
   }
 
   .program-page .hero-content h1 {
-    font-size: 2.5rem;
-    letter-spacing: -0.5px;
+    font-size: 2.3rem;
+    line-height: 1.15;
+    margin-bottom: 16px;
   }
 
   .program-page .hero-content p {
     font-size: 1rem;
+    line-height: 1.7;
+    max-width: 100%;
+    margin-bottom: 28px;
   }
 
   .program-page .hero-btns,
   .program-page .cta-btns {
     flex-direction: column;
     align-items: center;
+    width: 100%;
   }
 
   .btn-primary,
-  .btn-outline,
-  .program-page .cta-btns a {
+  .btn-outline {
     width: 100%;
-    max-width: 280px;
-  }
-
-  .section-title {
-    font-size: 1.8rem;
-    margin-bottom: 36px;
-  }
-
-  .program-page .about-text h2 {
-    font-size: 1.9rem;
-    line-height: 1.25;
-  }
-
-  .program-page .features-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .program-page .feature-card {
-    padding: 28px 22px;
-  }
-
-  .program-page .visual-image {
-    height: 240px;
-  }
-
-  .stats-row {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .stat {
-    text-align: center;
-  }
-
-  .program-page .plants-track {
-    gap: 14px;
-    animation-duration: 14s;
-  }
-
-  .program-page .plant-chip {
-    font-size: 13px;
-    padding: 9px 16px;
-  }
-
-  .program-cta h2 {
-    font-size: 2rem;
-  }
-
-  .program-page .program-cta p {
-    font-size: 1rem;
+    max-width: 320px;
   }
 }
 
@@ -591,44 +563,22 @@
    RESPONSIVE — Small Mobile (≤ 480px)
    ========================================================================== */
 @media (max-width: 480px) {
-  .container {
-    padding: 0 18px;
-  }
 
   .program-page .program-hero {
-    height: 420px;
+    min-height: 90vh;
+    padding: 90px 0 50px;
+  }
+
+  .program-page .hero-content {
+    padding: 0 18px;
   }
 
   .program-page .hero-content h1 {
     font-size: 2rem;
+    line-height: 1.2;
   }
 
   .program-page .hero-content p {
-    font-size: 0.95rem;
-  }
-
-  .program-page .about-text {
-    padding: 20px;
-    border-radius: 18px;
-  }
-
-  .program-page .about-text h2 {
-    font-size: 1.65rem;
-  }
-
-  .program-page .visual-image {
-    height: 210px;
-  }
-
-  .program-page .feature-card {
-    border-radius: 18px;
-  }
-
-  .program-page .feature-icon {
-    font-size: 2.2rem;
-  }
-
-  .program-cta h2 {
-    font-size: 1.75rem;
+    font-size: .95rem;
   }
 }

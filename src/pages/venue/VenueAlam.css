@@ -113,6 +113,7 @@
   box-shadow: 0 10px 30px rgba(0,0,0,0.06);
   transition: all 0.4s ease;
   transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+  position: relative;
 }
 
 .venue-card::after {
@@ -137,7 +138,7 @@
 /* ================= IMAGE ================= */
 .venue-image {
   position: relative;
-   height: 180px;
+   height: 220px;
   overflow: hidden;
 }
 
@@ -163,7 +164,7 @@
 
 .venue-image img {
   width: 100%;
-   height: 180px;
+  height: 220px;
   object-fit: cover;
   transition: transform 0.5s ease;
 }
@@ -300,17 +301,38 @@
 @media (max-width: 768px) {
 
   .venue-hero {
-    height: 460px;
-    border-bottom-left-radius: 24px;
-    border-bottom-right-radius: 24px;
+    min-height: 85vh;
+    height: auto;
+    padding: 100px 0 60px;
+    border-radius: 0;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+  }
+
+  .hero-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(0,0,0,.15) 0%,
+      rgba(0,0,0,.35) 50%,
+      rgba(0,0,0,.65) 100%
+    );
+  }
+
+  .venue-hero-content {
+    padding: 0 24px;
   }
 
   .venue-hero h1 {
-    font-size: 2.4rem;
+    font-size: 2.5rem;
+    line-height: 1.15;
+    margin-bottom: 16px;
   }
 
   .venue-hero p {
-    font-size: 0.98rem;
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 100%;
   }
 
   .venue-grid {
@@ -319,34 +341,41 @@
   }
 
   .venue-card {
-    border-radius: 22px;
+    border-radius: 20px;
+    transform: none !important;
+  }
+
+  .venue-card:hover {
+    transform: translateY(-5px) !important;
   }
 
   .venue-image,
   .venue-image img {
-    height: 220px;
+    height: 240px;
   }
 
   .venue-content {
-    padding: 20px;
+    padding: 22px;
   }
 
   .venue-content h3 {
-    font-size: 1.15rem;
+    font-size: 1.2rem;
   }
 
   .venue-cta {
-    padding: 90px 20px;
+    padding: 90px 24px;
   }
 
   .venue-cta h2 {
     font-size: 2rem;
+    line-height: 1.2;
   }
 
   .venue-btn {
-    display: inline-block;
     width: 100%;
-    max-width: 280px;
+    max-width: 320px;
+    display: inline-flex;
+    justify-content: center;
   }
 }
 

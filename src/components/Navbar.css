@@ -25,18 +25,23 @@ body {
 
   z-index: 1000;
 
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
 
-  backdrop-filter: blur(14px);
-
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 
   box-shadow:
-    0 6px 24px rgba(0, 0, 0, 0.04);
+    0 4px 20px rgba(0, 0, 0, 0.04),
+    0 1px 3px rgba(0, 0, 0, 0.03);
+
+  /* FIX: gunakan will-change agar transform tidak menyebabkan child ter-mirror */
+  will-change: transform;
 
   transition:
-    transform 0.35s ease,
-    background 0.3s ease;
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 /* navbar show */
@@ -48,17 +53,21 @@ body {
 .navbar.hide {
   transform: translateY(-100%);
 }
-/* navbar hide -> semua dropdown ikut hilang */
+
+/* FIX: navbar.hide hanya sembunyikan dropdown desktop,
+   JANGAN sembunyikan nav-links sidebar mobile saat scroll */
 .navbar.hide .profile-dropdown {
   opacity: 0 !important;
   visibility: hidden !important;
-  transform: translateY(10px);
-  pointer-events: none;
+  transform: translateY(10px) !important;
+  pointer-events: none !important;
 }
-.navbar.hide .dropdown-menu {
+
+/* dropdown desktop saja — mobile ditangani via .nav-links.active */
+.navbar.hide .dropdown-menu:not(.mobile-show) {
   opacity: 0 !important;
   visibility: hidden !important;
-  pointer-events: none;
+  pointer-events: none !important;
 }
 
 /* ================= CONTAINER ================= */
@@ -85,7 +94,10 @@ body {
   width: auto;
   object-fit: contain;
   cursor: pointer;
-  transform: translateX(45px);
+  transform: translateX(13px);
+
+  /* FIX: pastikan logo tidak ter-mirror */
+  transform: translateX(13px) scaleX(1) !important;
 }
 
 .leaf {
@@ -139,7 +151,9 @@ body {
 
   color: #111111;
 
-  transition: 0.3s ease;
+  transition:
+    color 0.3s ease,
+    letter-spacing 0.3s ease;
 
   background: transparent;
   border: none;
@@ -148,14 +162,13 @@ body {
 }
 
 /* hover */
-
 .nav-links a:hover,
 .dropdown-title:hover {
   color: #16c35b;
+  letter-spacing: 0.01em;
 }
 
 /* active */
-
 .nav-links a.active {
   color: #16c35b;
   font-weight: 600;
@@ -166,8 +179,7 @@ body {
   font-weight: 600;
 }
 
-/* underline hover */
-
+/* underline hover — animasi pill dari tengah */
 .nav-links a::after,
 .dropdown-title::after {
   content: "";
@@ -177,15 +189,16 @@ body {
   bottom: -10px;
 
   width: 0%;
-  height: 2px;
+  height: 2.5px;
 
-  background: #16c35b;
+  background: linear-gradient(90deg, #16c35b, #22e06f);
 
   border-radius: 20px;
 
   transform: translateX(-50%);
 
-  transition: 0.3s ease;
+  transition:
+    width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-links a:hover::after,
@@ -194,7 +207,6 @@ body {
 }
 
 /* active underline */
-
 .nav-links a.active::after,
 .dropdown.active .dropdown-title::after {
   width: 100%;
@@ -211,7 +223,7 @@ body {
 /* ================= CONTACT BUTTON ================= */
 
 .btn-contact {
-  padding: 12px 22px;
+  padding: 11px 22px;
 
   border-radius: 14px;
 
@@ -222,23 +234,29 @@ body {
 
   color: white;
 
-  background: linear-gradient(
-    135deg,
-    #16c35b,
-    #11a94e
-  );
+  background: linear-gradient(135deg, #16c35b 0%, #0fa84c 100%);
 
   box-shadow:
-    0 12px 28px rgba(22, 195, 91, 0.28);
+    0 8px 24px rgba(22, 195, 91, 0.30),
+    0 2px 6px rgba(22, 195, 91, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20);
 
-  transition: 0.3s ease;
+  transition:
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease;
 }
 
 .btn-contact:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.02);
 
   box-shadow:
-    0 16px 34px rgba(22, 195, 91, 0.38);
+    0 14px 32px rgba(22, 195, 91, 0.40),
+    0 4px 10px rgba(22, 195, 91, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.btn-contact:active {
+  transform: translateY(-1px) scale(0.99);
 }
 
 /* ================= DROPDOWN ================= */
@@ -248,12 +266,11 @@ body {
 }
 
 /* chevron */
-
 .chevron {
   width: 15px;
   height: 15px;
 
-  transition: 0.3s ease;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dropdown.open .chevron {
@@ -278,14 +295,21 @@ body {
   background: white;
 
   box-shadow:
-    0 16px 40px rgba(0, 0, 0, 0.08);
+    0 20px 50px rgba(0, 0, 0, 0.10),
+    0 4px 12px rgba(0, 0, 0, 0.06);
+
+  border: 1px solid rgba(0, 0, 0, 0.04);
 
   opacity: 0;
   visibility: hidden;
 
-  transform: translateY(12px);
+  transform: translateY(14px) scale(0.97);
+  transform-origin: top left;
 
-  transition: 0.28s ease;
+  transition:
+    opacity 0.28s ease,
+    visibility 0.28s ease,
+    transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 
   z-index: 100;
 }
@@ -294,11 +318,11 @@ body {
   opacity: 1;
   visibility: visible;
 
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .dropdown-menu li {
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .dropdown-menu li:last-child {
@@ -306,13 +330,22 @@ body {
 }
 
 .dropdown-menu a {
-  display: block;
+  display: flex;
+  align-items: center;
 
-  padding: 12px 15px;
+  padding: 11px 15px;
 
   border-radius: 12px;
 
-  transition: 0.25s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: #222;
+
+  transition:
+    background 0.22s ease,
+    color 0.22s ease,
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    padding-left 0.22s ease;
 }
 
 .dropdown-menu a::after {
@@ -321,10 +354,9 @@ body {
 
 .dropdown-menu a:hover {
   background: rgba(22, 195, 91, 0.08);
-
   color: #16c35b;
-
-  transform: translateX(4px);
+  transform: translateX(5px);
+  padding-left: 18px;
 }
 
 /* ================= DROPDOWN SCROLLABLE (PRODUK) ================= */
@@ -335,8 +367,6 @@ body {
   overflow-x: hidden;
 }
 
-/* scrollbar tipis & elegan */
-
 .dropdown-menu.scrollable::-webkit-scrollbar {
   width: 4px;
 }
@@ -346,13 +376,14 @@ body {
 }
 
 .dropdown-menu.scrollable::-webkit-scrollbar-thumb {
-  background: rgba(22, 195, 91, 0.35);
+  background: rgba(22, 195, 91, 0.30);
   border-radius: 20px;
 }
 
 .dropdown-menu.scrollable::-webkit-scrollbar-thumb:hover {
-  background: rgba(22, 195, 91, 0.6);
+  background: rgba(22, 195, 91, 0.55);
 }
+
 /* ================= PROFILE MENU ================= */
 
 .profile-menu {
@@ -374,12 +405,26 @@ body {
 
   cursor: pointer;
 
-  transition: 0.3s ease;
+  /* FIX: pastikan transform tidak menyebabkan mirror */
+  transform: none !important;
+
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .profile-btn:hover {
   background: rgba(22, 195, 91, 0.08);
   color: #16c35b;
+  box-shadow: 0 0 0 3px rgba(22, 195, 91, 0.12);
+}
+
+/* FIX: profile-btn img/svg jangan mirror */
+.profile-btn img,
+.profile-btn svg {
+  transform: none !important;
+  /* Pastikan tidak ada efek scaleX negatif */
+  -webkit-transform: none !important;
 }
 
 .profile-dropdown {
@@ -396,14 +441,21 @@ body {
   padding: 10px;
 
   box-shadow:
-    0 14px 34px rgba(0, 0, 0, 0.08);
+    0 16px 40px rgba(0, 0, 0, 0.10),
+    0 4px 10px rgba(0, 0, 0, 0.06);
+
+  border: 1px solid rgba(0, 0, 0, 0.04);
 
   opacity: 0;
   visibility: hidden;
 
-  transform: translateY(10px);
+  transform: translateY(12px) scale(0.97);
+  transform-origin: top right;
 
-  transition: 0.25s ease;
+  transition:
+    opacity 0.25s ease,
+    visibility 0.25s ease,
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
   z-index: 999;
 }
@@ -412,7 +464,7 @@ body {
   opacity: 1;
   visibility: visible;
 
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .profile-dropdown button {
@@ -431,16 +483,22 @@ body {
 
   font-size: 14px;
   font-weight: 500;
+  color: #222;
 
   cursor: pointer;
 
-  transition: 0.25s ease;
+  transition:
+    background 0.22s ease,
+    color 0.22s ease,
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .profile-dropdown button:hover {
   background: rgba(22, 195, 91, 0.08);
   color: #16c35b;
+  transform: translateX(3px);
 }
+
 /* ================= HAMBURGER ================= */
 
 .hamburger {
@@ -450,42 +508,52 @@ body {
   justify-content: center;
   gap: 5px;
 
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
 
   background: transparent;
   border: none;
+  border-radius: 10px;
 
   cursor: pointer;
+
+  padding: 4px;
+
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.hamburger:hover {
+  background: rgba(22, 195, 91, 0.08);
 }
 
 .hamburger span {
   width: 100%;
-  height: 3px;
+  height: 2.5px;
 
   background: #111;
 
   border-radius: 20px;
 
-  transition: 0.3s ease;
+  transition:
+    transform 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.25s ease,
+    width 0.3s ease;
 }
 
-/* animation */
-
+/* animasi hamburger → X */
 .hamburger.open span:nth-child(1) {
-  transform:
-    rotate(45deg)
-    translateY(8px);
+  transform: rotate(45deg) translateY(8px);
 }
 
 .hamburger.open span:nth-child(2) {
   opacity: 0;
+  width: 0%;
 }
 
 .hamburger.open span:nth-child(3) {
-  transform:
-    rotate(-45deg)
-    translateY(-8px);
+  transform: rotate(-45deg) translateY(-8px);
 }
 
 /* ================= OVERLAY ================= */
@@ -494,9 +562,26 @@ body {
   position: fixed;
   inset: 0;
 
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.38);
+
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
 
   z-index: 998;
+
+  /* Animasi fade overlay */
+  animation: overlayFadeIn 0.28s ease forwards;
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(3px);
+  }
 }
 
 /* ================= NAVBAR PROGRESS ================= */
@@ -507,14 +592,12 @@ body {
   bottom: 0;
 
   width: 100%;
-  height: 4px;
+  height: 3px;
 
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.04);
 
   overflow: hidden;
 }
-
-/* garis progress */
 
 .scroll-progress-bar {
   position: relative;
@@ -526,53 +609,48 @@ body {
 
   background: linear-gradient(
     90deg,
+    #0fa84c,
     #16c35b,
-    #22e06f,
+    #2edf72,
     #4dff91
   );
 
-  transition: width 0.45s ease;
+  transition: width 0.3s ease;
 
   box-shadow:
-    0 0 12px rgba(22, 195, 91, 0.4),
-    0 0 24px rgba(22, 195, 91, 0.2);
+    0 0 10px rgba(22, 195, 91, 0.45),
+    0 0 22px rgba(22, 195, 91, 0.20);
 }
 
-/* glow effect */
-
+/* glow sweep */
 .scroll-progress-bar::after {
   content: "";
 
   position: absolute;
   top: 0;
-  right: 0;
+  right: -80px;
 
-  width: 70px;
+  width: 80px;
   height: 100%;
 
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 0.85),
     transparent
   );
 
-  animation: glowMove 1.2s linear infinite;
+  animation: glowMove 1.4s linear infinite;
 }
-
-/* animation */
 
 @keyframes glowMove {
-  0% {
-    transform: translateX(-70px);
-  }
-
-  100% {
-    transform: translateX(70px);
-  }
+  0%   { transform: translateX(-80px); opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateX(80px); opacity: 0; }
 }
 
-/* ================= MOBILE ================= */
+/* ================= MOBILE (≤1200px) ================= */
 
 @media (max-width: 1200px) {
 
@@ -587,9 +665,16 @@ body {
   .hamburger {
     display: flex;
     z-index: 1002;
+    order: 3;
+  }
+
+  /* FIX: profile-menu tetap visible di mobile, tapi dalam sidebar */
+  .profile-menu.desktop-only {
+    display: none;
   }
 
   .nav-center {
+    flex: 1;
     justify-content: flex-end;
   }
 
@@ -598,31 +683,54 @@ body {
   .nav-links {
     position: fixed;
 
-    top: 74px;
-    right: -100%;
+    /* FIX: posisi sidebar mulai dari atas navbar, bukan 74px */
+    top: 82px;
+    right: -110%;             /* mulai lebih jauh agar tidak "kilat" */
 
     width: 78%;
     max-width: 320px;
 
-    height: calc(100vh - 74px);
+    height: calc(100vh - 82px);
 
     flex-direction: column;
     align-items: flex-start;
 
-    padding: 24px 20px;
+    padding: 20px 16px 32px;
 
     overflow-y: auto;
+    overflow-x: hidden;
 
     background: #ffffff;
 
-    gap: 18px;
+    gap: 4px;
 
-    transition: right 0.35s ease;
+    /* FIX: transform hanya pada right, tidak menggunakan transform 
+       agar tidak mempengaruhi children (foto mirror issue) */
+    transition: right 0.38s cubic-bezier(0.4, 0, 0.2, 1);
 
     box-shadow:
-      -8px 0 24px rgba(0, 0, 0, 0.08);
+      -10px 0 40px rgba(0, 0, 0, 0.10),
+      -2px 0 8px rgba(0, 0, 0, 0.04);
 
     z-index: 1001;
+
+    /* Pastikan sidebar selalu benar */
+    transform: none !important;
+    /* FIX utama: jangan biarkan parent transform mewarisi ke child */
+    will-change: right;
+  }
+
+  /* FIX UTAMA MIRROR: 
+     Semua elemen dalam sidebar TIDAK boleh ter-mirror */
+  .nav-links *,
+  .nav-links img,
+  .nav-links svg,
+  .nav-links .profile-btn,
+  .nav-links .profile-btn img,
+  .nav-links .profile-btn svg {
+    transform: none !important;
+    -webkit-transform: none !important;
+    /* Tapi izinkan animasi hover yang spesifik via CSS classes */
   }
 
   /* menu muncul */
@@ -630,14 +738,90 @@ body {
     right: 0;
   }
 
-  /* navbar hide -> menu ikut hide */
+  /* FIX SCROLL NAVBAR: 
+     Saat navbar.hide di mobile, JANGAN tutup sidebar jika sedang aktif.
+     Kita override dengan !important */
   .navbar.hide .nav-links {
-    right: -100%;
+    /* HAPUS: right: -100%; — ini yang menyebabkan sidebar ikut hilang saat scroll */
+    /* Biarkan sidebar tetap pada posisinya */
+  }
+
+  /* Jika sidebar tidak aktif, tetap sembunyikan */
+  .navbar.hide .nav-links:not(.active) {
+    right: -110%;
+  }
+
+  /* Jika sidebar aktif, pertahankan posisinya meski navbar hide */
+  .navbar.hide .nav-links.active {
+    right: 0 !important;
   }
 
   .nav-links li {
     width: 100%;
   }
+
+  /* ================= DIVIDER DALAM SIDEBAR ================= */
+
+  .nav-links .sidebar-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.06);
+    margin: 8px 0;
+    border-radius: 20px;
+  }
+
+  /* ================= PROFILE SECTION DALAM SIDEBAR ================= */
+
+  .nav-links .sidebar-profile {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 10px;
+    border-radius: 14px;
+    background: rgba(22, 195, 91, 0.05);
+    margin-bottom: 8px;
+  }
+
+  .nav-links .sidebar-profile-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(22, 195, 91, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  /* FIX: avatar/foto tidak mirror */
+  .nav-links .sidebar-profile-avatar img,
+  .nav-links .sidebar-profile-avatar svg {
+    width: 24px;
+    height: 24px;
+    transform: none !important;
+    object-fit: cover;
+  }
+
+  .nav-links .sidebar-profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .nav-links .sidebar-profile-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111;
+  }
+
+  .nav-links .sidebar-profile-role {
+    font-size: 12px;
+    color: #888;
+  }
+
+  /* ================= NAV LINK MOBILE ================= */
 
   .nav-links a,
   .dropdown-title {
@@ -647,12 +831,33 @@ body {
     align-items: center;
     justify-content: space-between;
 
-    padding: 6px 0;
+    padding: 13px 14px;
 
     font-size: 15px;
+    font-weight: 500;
+
+    border-radius: 12px;
+
+    transition:
+      background 0.22s ease,
+      color 0.22s ease,
+      padding-left 0.22s ease;
   }
 
-  /* hilangkan underline mobile */
+  .nav-links a:hover,
+  .dropdown-title:hover {
+    background: rgba(22, 195, 91, 0.07);
+    color: #16c35b;
+    padding-left: 18px;
+    letter-spacing: normal;
+  }
+
+  .nav-links a.active {
+    background: rgba(22, 195, 91, 0.10);
+    color: #16c35b;
+  }
+
+  /* hilangkan underline di mobile */
   .nav-links a::after,
   .dropdown-title::after {
     display: none;
@@ -663,7 +868,8 @@ body {
   .dropdown-menu {
     position: relative;
 
-    top: 8px;
+    top: 4px;
+    left: 0;
 
     width: 100%;
     min-width: 100%;
@@ -679,16 +885,30 @@ body {
 
     border-radius: 14px;
 
-    background: #f5f5f5;
+    background: rgba(246, 248, 246, 0.9);
 
     box-shadow: none;
+    border: 1px solid rgba(22, 195, 91, 0.08);
+
+    margin-bottom: 4px;
   }
 
   .dropdown-menu.show {
     display: block;
+    /* Animasi slide ke bawah */
+    animation: dropdownMobileOpen 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
-  /* dropdown produk mobile tetap scrollable */
+  @keyframes dropdownMobileOpen {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
   .dropdown-menu.scrollable {
     max-height: 220px;
@@ -701,11 +921,57 @@ body {
   }
 
   .dropdown-menu a {
-    padding: 10px 12px;
+    padding: 10px 13px;
     font-size: 14px;
+    border-radius: 10px;
+    transform: none;
   }
 
-  /* profile dropdown mobile */
+  .dropdown-menu a:hover {
+    transform: translateX(4px);
+    padding-left: 16px;
+  }
+
+  /* ================= TOMBOL PROFIL SIDEBAR ================= */
+
+  .nav-links .sidebar-btn-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .nav-links .sidebar-action-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.22s ease, color 0.22s ease;
+    text-decoration: none;
+  }
+
+  .nav-links .sidebar-action-btn:hover {
+    background: rgba(22, 195, 91, 0.08);
+    color: #16c35b;
+  }
+
+  .nav-links .sidebar-action-btn.danger:hover {
+    background: rgba(239, 68, 68, 0.07);
+    color: #ef4444;
+  }
+
+  /* profile dropdown di mobile tidak dipakai,
+     karena sudah masuk sidebar */
   .profile-dropdown {
     right: 0;
     top: 52px;
@@ -714,11 +980,12 @@ body {
 
   /* overlay */
   .overlay {
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
   }
 }
 
-/* ================= SMALL MOBILE ================= */
+/* ================= SMALL MOBILE (≤600px) ================= */
 
 @media (max-width: 600px) {
 
@@ -733,8 +1000,7 @@ body {
   .nav-links {
     top: 74px;
     height: calc(100vh - 74px);
-
-    width: 82%;
+    width: 85%;
   }
 
   .logo {
@@ -744,5 +1010,100 @@ body {
   .profile-btn {
     width: 38px;
     height: 38px;
+  }
+}
+
+/* ================= ANIMASI STAGGER SIDEBAR ITEMS ================= */
+
+/* Item sidebar muncul satu per satu saat dibuka */
+.nav-links.active li:nth-child(1)  { animation: sidebarItemIn 0.32s ease 0.05s both; }
+.nav-links.active li:nth-child(2)  { animation: sidebarItemIn 0.32s ease 0.10s both; }
+.nav-links.active li:nth-child(3)  { animation: sidebarItemIn 0.32s ease 0.15s both; }
+.nav-links.active li:nth-child(4)  { animation: sidebarItemIn 0.32s ease 0.18s both; }
+.nav-links.active li:nth-child(5)  { animation: sidebarItemIn 0.32s ease 0.21s both; }
+.nav-links.active li:nth-child(6)  { animation: sidebarItemIn 0.32s ease 0.24s both; }
+.nav-links.active li:nth-child(7)  { animation: sidebarItemIn 0.32s ease 0.27s both; }
+.nav-links.active li:nth-child(8)  { animation: sidebarItemIn 0.32s ease 0.30s both; }
+.nav-links.active li:nth-child(9)  { animation: sidebarItemIn 0.32s ease 0.33s both; }
+.nav-links.active li:nth-child(10) { animation: sidebarItemIn 0.32s ease 0.36s both; }
+
+@keyframes sidebarItemIn {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ================= MOBILE ONLY ITEMS ================= */
+/* Item ini hanya tampil di sidebar mobile, disembunyikan di desktop */
+
+.mobile-only-item {
+  display: none;
+}
+
+.sidebar-divider-li {
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+/* Tombol login/logout di sidebar */
+.sidebar-action-link,
+.sidebar-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  width: 100%;
+  padding: 13px 14px;
+  border: none;
+  border-radius: 12px;
+
+  background: transparent;
+  font-family: "Poppins", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+
+  text-decoration: none;
+  cursor: pointer;
+
+  transition: background 0.22s ease, color 0.22s ease;
+}
+
+.sidebar-action-link:hover {
+  background: rgba(22, 195, 91, 0.08);
+  color: #16c35b;
+}
+
+.sidebar-action-btn.danger {
+  color: #ef4444;
+}
+
+.sidebar-action-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.07);
+  color: #ef4444;
+}
+
+/* ================= DESKTOP PROFILE ================= */
+/* Profile menu tetap ada di desktop */
+
+@media (max-width: 1200px) {
+  /* Di mobile, profile menu di topbar disembunyikan */
+  .desktop-profile {
+    display: none;
+  }
+
+  /* Mobile-only items tampil di sidebar */
+  .mobile-only-item {
+    display: flex;
+    width: 100%;
+  }
+
+  .mobile-only-item > * {
+    width: 100%;
   }
 }

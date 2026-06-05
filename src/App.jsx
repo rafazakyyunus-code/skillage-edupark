@@ -118,6 +118,19 @@ function useArticles() {
 }
 
 /* ───────── APP INNER (pakai useAuth) ───────── */
+function ScrollToTop() {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [location.pathname]);
+
+  return null;
+}
+
 function AppInner() {
   const location = useLocation();
   const { user } = useAuth();
@@ -130,10 +143,13 @@ function AppInner() {
     location.pathname === "/login" ||
     location.pathname === "/waiting-approval";
 
-  return (
-    <>
-      {!hideLayout && <Navbar />}
+return (
+  <div className="min-h-screen w-full overflow-x-hidden bg-white">
+    <ScrollToTop />
 
+    {!hideLayout && <Navbar />}
+
+    <main className="w-full overflow-x-hidden">
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
 
@@ -394,17 +410,20 @@ function AppInner() {
 
         </Routes>
       </AnimatePresence>
+    </main>
 
-      {!hideLayout && <Footer />}
-    </>
-  );
+    {!hideLayout && <Footer />}
+  </div>
+);
 }
 
 /* ───────── APP ROOT (wrap AuthProvider) ───────── */
 function App() {
   return (
     <AuthProvider>
-      <AppInner />
+      <div className="w-full min-h-screen overflow-x-hidden">
+        <AppInner />
+      </div>
     </AuthProvider>
   );
 }
