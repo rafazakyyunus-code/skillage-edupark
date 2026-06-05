@@ -545,17 +545,52 @@
     margin-bottom: 28px;
   }
 
+  /* ===== BUTTONS MOBILE — rapi & konsisten ===== */
   .program-page .hero-btns,
   .program-page .cta-btns {
     flex-direction: column;
     align-items: center;
     width: 100%;
+    gap: 12px;
   }
 
-  .btn-primary,
-  .btn-outline {
+  .program-page .hero-btns .btn-primary,
+  .program-page .hero-btns .btn-outline,
+  .program-page .cta-btns .btn-primary,
+  .program-page .cta-btns .btn-outline,
+  .program-page .cta-btns a {
     width: 100%;
-    max-width: 320px;
+    max-width: 280px;
+    justify-content: center;
+    text-align: center;
+    padding: 14px 20px;
+    font-size: 15px;
+    border-radius: 12px;
+    box-sizing: border-box;
+  }
+
+  /* Outline button di hero (background gelap) — pakai border putih transparan */
+  .program-page .hero-btns .btn-outline {
+    border: 2px solid rgba(255, 255, 255, 0.75);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .program-page .hero-btns .btn-outline:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: #fff;
+  }
+
+  /* Outline button di CTA section (background hijau gelap) */
+  .program-page .cta-btns .btn-outline {
+    border: 2px solid rgba(255, 255, 255, 0.80);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.10);
+  }
+
+  .program-page .cta-btns .btn-outline:hover {
+    background: rgba(255, 255, 255, 0.20);
+    border-color: #fff;
   }
 }
 
@@ -580,5 +615,16 @@
 
   .program-page .hero-content p {
     font-size: .95rem;
+  }
+
+  /* Button lebih kecil di HP kecil */
+  .program-page .hero-btns .btn-primary,
+  .program-page .hero-btns .btn-outline,
+  .program-page .cta-btns .btn-primary,
+  .program-page .cta-btns .btn-outline,
+  .program-page .cta-btns a {
+    max-width: 260px;
+    font-size: 14px;
+    padding: 13px 18px;
   }
 }

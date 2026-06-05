@@ -95,10 +95,18 @@ export default function Attractions() {
           </p>
           <div className="at-buttons">
             <button className="at-primary" onClick={() => {
-              const el = document.getElementById("explore-section");
-              if (el) el.scrollIntoView({ behavior: "smooth" });
-            }}>Mulai Menjelajah</button>
-            <button className="at-secondary">Lihat Peta</button>
+              window.location.href = "/tickets-online";
+            }}>
+              Mulai Menjelajah
+            </button>
+
+            {/* Menggunakan onClick untuk membuka link */}
+            <button 
+              className="at-secondary" 
+              onClick={() => window.open("https://maps.app.goo.gl/z91sATRhmCq5GaW77", "_blank", "noopener,noreferrer")}
+            >
+              Lihat Peta
+            </button>
           </div>
         </div>
       </section>

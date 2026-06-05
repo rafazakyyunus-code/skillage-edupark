@@ -100,5 +100,12 @@ html, body {
   .hero-buttonss {
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+  }
+
+  .hero-buttonss .btn-primary,
+  .hero-buttonss .btn-outline {
+    width: fit-content;
+    text-align: center;
   }
 }
