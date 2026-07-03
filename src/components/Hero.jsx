@@ -17,7 +17,7 @@ export default function Hero() {
 
         <div className="hero-buttonss">
           <a href="/tentang-kami" className="btn-primary">Tentang Kami</a>
-          <a href="/contact" className="btn-outline">Selengkapnya</a>
+          <a href="/tickets-online" className="btn-outline">Selengkapnya</a>
         </div>
       </div>
     </section>

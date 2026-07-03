@@ -38,7 +38,7 @@
    CARD
 ────────────────────────────── */
 .why-card {
-  width: 260px;
+  width: 280px;
   flex-shrink: 0;
   background: #fff;
   border-radius: 16px;
@@ -49,17 +49,37 @@
   text-align: left;
 }
 
+/* Image wrapper (for badge positioning) */
+.why-card-img-wrap {
+  position: relative;
+}
+
 .why-card img {
   width: 100%;
-  height: 150px;
+  height: 160px;
   object-fit: cover;
+  display: block;
+}
+
+/* Featured badge */
+.why-featured-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: 30px;
 }
 
 .card-content {
-  padding: 16px 18px 18px;
+  padding: 14px 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 /* Category badge */
@@ -77,8 +97,8 @@
 }
 
 .card-content h4 {
-  margin: 4px 0 4px;
-  font-size: 14px;
+  margin: 4px 0 2px;
+  font-size: 13.5px;
   font-weight: 700;
   color: #111827;
   line-height: 1.4;
@@ -88,21 +108,87 @@
   overflow: hidden;
 }
 
-.card-content p {
-  font-size: 12.5px;
-  color: #777;
-  line-height: 1.55;
+/* Features list */
+.why-features-list {
+  margin: 2px 0 4px;
+  padding-left: 16px;
+  list-style: disc;
+  color: #555;
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.why-features-list li {
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.why-read-more {
+/* Price rows */
+.why-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 12px;
-  font-weight: 600;
+  margin-top: 2px;
+}
+
+.why-price-label {
+  color: #888;
+  font-weight: 500;
+}
+
+.why-price-value {
   color: #16a34a;
-  margin-top: 4px;
+  font-weight: 700;
+}
+
+/* ──────────────────────────────
+   ACTION BUTTONS
+────────────────────────────── */
+.why-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.why-btn-detail {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1.5px solid #16a34a;
+  background: #fff;
+  color: #16a34a;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  white-space: nowrap;
+}
+
+.why-btn-detail:hover {
+  background: #f0fdf4;
+  transform: translateY(-2px);
+}
+
+.why-btn-book {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+
+.why-btn-book:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(34, 197, 94, 0.4);
 }
 
 /* ──────────────────────────────
@@ -144,7 +230,7 @@
 
 .skeleton-img {
   width: 100%;
-  height: 150px;
+  height: 160px;
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
@@ -181,7 +267,7 @@
   }
 
   .why-card {
-    width: 200px;
+    width: 220px;
   }
 
   .slider-track {

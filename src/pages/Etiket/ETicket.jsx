@@ -188,7 +188,7 @@ export default function ETicket() {
       {/* ════════════════ EDUCATIONAL PACKAGES ════════════════ */}
       <section className="et-packages">
         <div className="et-title">
-          <h2>Paket Edukasi</h2>
+          <h2>Paket Wahana</h2>
           <p>
             Pilih pengalaman terbaik untuk kunjungan Anda. Mulai dari penjelajah individu 
             hingga rombongan sekolah besar, kami menyediakan paket yang dirancang khusus untuk Anda.

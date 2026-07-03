@@ -117,6 +117,33 @@ function useArticles() {
   };
 }
 
+/* ───────── CUSTOM HOOK FIREBASE TICKETS ───────── */
+function useTickets() {
+  const [tickets, setTickets] = useState([]);
+
+  useEffect(() => {
+    const ticketsRef = ref(db, "ticketsOnline");
+
+    const unsubscribe = onValue(ticketsRef, (snapshot) => {
+      const data = snapshot.val();
+
+      if (data) {
+        const list = Object.keys(data).map((key) => ({
+          id: key,
+          ...data[key],
+        }));
+        setTickets(list);
+      } else {
+        setTickets([]);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  return { tickets };
+}
+
 /* ───────── APP INNER (pakai useAuth) ───────── */
 function ScrollToTop() {
   const location = useLocation();
@@ -136,6 +163,7 @@ function AppInner() {
   const { user } = useAuth();
 
   const { articles, addArticle, updateStatus } = useArticles();
+  const { tickets } = useTickets();
 
   /* Hide navbar/footer di halaman login & dashboard */
   const hideLayout =
@@ -160,7 +188,7 @@ return (
               <AnimatedPage>
                 <Hero />
                 <About />
-                <WhyChoose articles={articles} />
+                <WhyChoose tickets={tickets} />
                 <ProductSection />
                 <ProgramSection />
                 <GallerySection />
